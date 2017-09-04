@@ -11,6 +11,8 @@ int main(void)
 	TestAle();
 	
 	
+	SRAM_test(void);
+	
 	/*
 	
 	uart_init(9600);
