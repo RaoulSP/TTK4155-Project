@@ -8,15 +8,20 @@ int main(void)
 {
 	//1 output, 0 input 
 	
-	TestAle();
-	
-	
-	SRAM_test(void);
-	
-	/*
+	//TestAle();
 	
 	uart_init(9600);
 	fdevopen(uart_putchar, uart_getchar);
+	
+	MCUCR |= (1<<SRE);
+	SFIOR |= (1<<XMM2);
+	
+	SRAM_test();
+	
+	
+	
+
+	/*
 	DDRA |= (1<<PA0);
 	char x[20]; 
     while(1)

@@ -12,5 +12,6 @@
 
 
 void TestAle();
+void SRAM_test(void);
 
 #endif /* UTILS_H_ */
