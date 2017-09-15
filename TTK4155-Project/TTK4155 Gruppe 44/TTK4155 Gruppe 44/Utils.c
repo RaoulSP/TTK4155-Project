@@ -41,7 +41,7 @@ void SRAM_test(void)
 		uint8_t some_value = rand();
 		ext_ram[i] = some_value;
 		uint8_t retreived_value = ext_ram[i];
-		printf("Write phase : ext_ram[%4d] = %02X (should be %02X)\n", i,retreived_value, some_value);
+		//printf("Write phase : ext_ram[%4d] = %02X (should be %02X)\n", i,retreived_value, some_value);
 		if (retreived_value != some_value) {
 			printf("Write phase error: ext_ram[%4d] = %02X (should be %02X)\n", i,retreived_value, some_value);
 			write_errors++;

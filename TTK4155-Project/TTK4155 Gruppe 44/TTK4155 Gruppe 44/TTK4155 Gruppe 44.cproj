@@ -109,7 +109,19 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="TTK4155 Gruppe 44.c">
+    <Compile Include="adc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="adc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="joy.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="joy.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="uart.c">
@@ -118,10 +130,10 @@
     <Compile Include="uart.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Utils.c">
+    <Compile Include="utils.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Utils.h">
+    <Compile Include="utils.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

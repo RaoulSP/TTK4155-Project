@@ -2,9 +2,13 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-TTK4155 Gruppe 44.c
+adc.c
+
+joy.c
+
+main.c
 
 uart.c
 
-Utils.c
+utils.c
 
