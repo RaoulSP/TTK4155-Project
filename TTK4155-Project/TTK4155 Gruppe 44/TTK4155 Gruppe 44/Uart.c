@@ -14,8 +14,6 @@ unsigned char uart_getchar(){
 	return UDR0;
 }
 
-
-
 int uart_init(int baudRate){
 	int UBRR = ((long)4915200/((long)16*baudRate) - 1);
 	//Enable printf

@@ -8,6 +8,8 @@ joy.c
 
 main.c
 
+touchModule.c
+
 uart.c
 
 utils.c

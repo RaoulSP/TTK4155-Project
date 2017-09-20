@@ -8,7 +8,9 @@
 	adcConversionRunning = 0;
 }*/
 
-
+void ADC_init(){
+	clear_bit(DDRE, PE0); //Set DDR to input for interrupt flag
+}
 uint8_t ADC_read(char channel)
 {
 	volatile char *ext_adc = (char *) 0x1200; 
@@ -31,7 +33,6 @@ uint8_t ADC_read(char channel)
 	{
 		*ext_adc = 0b0111;
 	}
-	while(test_bit(PORTE, PE0));
-	_delay_us(5);
+	while(test_bit(PINE, PE0));
 	return (uint8_t) *ext_adc;
 }
