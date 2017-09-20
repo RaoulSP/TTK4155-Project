@@ -4,7 +4,6 @@
 
 #include <avr/interrupt.h>
 
-int ADC_read(int channel);
-
+uint8_t ADC_read(char channel);
 
 #endif /* ADC_H_ */

@@ -1,20 +1,18 @@
 #include "uart.h"
 #include "utils.h"
 #include <avr/io.h>
+#define F_CPU 4915200
 #include <util/delay.h>
 #include "adc.h"
-#define F_CPU 4900000
+
 
 
 int main(void)
 {
 	//1 output, 0 input 
-	
-	
-	
 	uart_init(9600);
-	fdevopen(uart_putchar, uart_getchar);
 	
+	//enable external memory
 	MCUCR |= (1<<SRE);
 	SFIOR |= (1<<XMM2);
 	//set interrupt bit to input
@@ -22,10 +20,17 @@ int main(void)
 	while (1)
 	{
 		printf("x = ");
-		ADC_read('x');
+		printf("%d", ADC_read('x'));
 		
 		printf(",  y = ");
-		ADC_read('y');
+		printf("%d", ADC_read('y'));
+		
+		printf(",  Left slider = ");
+		printf("%d",ADC_read('l'));
+
+		printf(",  Right slider = ");
+		printf("%d", ADC_read('r'));
+		
 		printf("\n");
 	}
 	

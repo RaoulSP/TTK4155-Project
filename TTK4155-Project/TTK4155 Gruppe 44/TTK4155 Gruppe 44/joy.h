@@ -2,14 +2,17 @@
 typedef struct JOY_position_t 
 {
 	 int x, y
-}JOY_position_t;
-typedef struct JOY_direction_t 
+}Position;
+typedef enum JOY_direction_t 
 {
-
-}JOY_direction_t;
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT
+}Direction;
 
 void JOY_init();
 void JOY_calibrate();
 void JOY_button(int button);
-JOY_position_t JOY_getPosition();
-JOY_direction_t JOY_getDirection();
+Position JOY_getPosition( Position ex);
+Direction JOY_getDirection(Direction ex);

@@ -13,10 +13,10 @@ void JOY_button(int button){
 	
 }
 
-JOY_position_t JOY_getPosition(){
-
+Position JOY_getPosition(Position ex){
+	return ex;
 }
 
-JOY_direction_t JOY_getDirection(){ 
-
+Direction JOY_getDirection(Direction ex){ 
+	return ex;
 }
