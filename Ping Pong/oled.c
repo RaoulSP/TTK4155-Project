@@ -106,6 +106,19 @@ void oled_write_data(char data){
 	}	
 }
 
+char oled_read_data(){
+	if(doublebuffering){
+		if (oled_back_buffer_index > 1023){
+			printf("Outside of screen!\n");
+			return -1;
+		}
+		return oled_back_buffer[oled_back_buffer_index];
+	}
+	else{
+		return 0x00; //Alternatively NULL
+	}
+}
+
 void oled_goto_line(int line){
 	if(doublebuffering){
 		oled_back_buffer_index = oled_back_buffer_index % 128 + line*128;	
@@ -146,15 +159,35 @@ void oled_refresh(){
 void oled_draw_pixel(int x, int y){
 	oled_goto_column(x);
 	oled_goto_line(y/8);
-	oled_write_data((1 << (y % 8)) | oled_back_buffer[x + (y/8)*128]);
+	oled_write_data((1 << (y % 8)) | oled_read_data());
+}
+
+int oled_read_pixel(int x, int y){
+	oled_goto_column(x);
+	oled_goto_line(y/8);
+	return !!((1 << (y % 8)) & oled_read_data());
 }
 
 void oled_clear_pixel(int x, int y){
 	oled_goto_column(x);
 	oled_goto_line(y/8);
-	oled_write_data(~(1 << (y % 8)) & oled_back_buffer[x + (y/8)*128]);
+	oled_write_data(~(1 << (y % 8)) & oled_read_data());
+}
+
+void oled_invert_pixel(int x, int y){
+	oled_goto_column(x);
+	oled_goto_line(y/8);
+	oled_write_data((1 << (y % 8)) ^ oled_read_data()); //exclusive or
 }
 
 void oled_draw_line(int x1, int y1, int x2, int y2){
 	
+}
+
+void oled_invert_rectangle(int x1, int y1, int x2, int y2){
+	for (int x = x1; x < x2; x++){
+		for (int y = y1; y < y2; y++){
+			oled_invert_pixel(x, y);
+		}
+	}
 }

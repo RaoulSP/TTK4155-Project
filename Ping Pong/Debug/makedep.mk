@@ -8,6 +8,8 @@ joy.c
 
 main.c
 
+menu.c
+
 oled.c
 
 sram.c

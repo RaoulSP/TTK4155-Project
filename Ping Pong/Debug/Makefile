@@ -40,6 +40,7 @@ C_SRCS +=  \
 ../adc.c \
 ../joy.c \
 ../main.c \
+../menu.c \
 ../oled.c \
 ../sram.c \
 ../touch.c \
@@ -56,6 +57,7 @@ OBJS +=  \
 adc.o \
 joy.o \
 main.o \
+menu.o \
 oled.o \
 sram.o \
 touch.o \
@@ -65,6 +67,7 @@ OBJS_AS_ARGS +=  \
 adc.o \
 joy.o \
 main.o \
+menu.o \
 oled.o \
 sram.o \
 touch.o \
@@ -74,6 +77,7 @@ C_DEPS +=  \
 adc.d \
 joy.d \
 main.d \
+menu.d \
 oled.d \
 sram.d \
 touch.d \
@@ -83,6 +87,7 @@ C_DEPS_AS_ARGS +=  \
 adc.d \
 joy.d \
 main.d \
+menu.d \
 oled.d \
 sram.d \
 touch.d \
@@ -117,6 +122,13 @@ LINKER_SCRIPT_DEP+=
 	
 
 ./main.o: .././main.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+./menu.o: .././menu.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
