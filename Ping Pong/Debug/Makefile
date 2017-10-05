@@ -38,6 +38,7 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../adc.c \
+../menu2.c \
 ../joy.c \
 ../main.c \
 ../menu.c \
@@ -55,6 +56,7 @@ ASM_SRCS +=
 
 OBJS +=  \
 adc.o \
+menu2.o \
 joy.o \
 main.o \
 menu.o \
@@ -65,6 +67,7 @@ uart.o
 
 OBJS_AS_ARGS +=  \
 adc.o \
+menu2.o \
 joy.o \
 main.o \
 menu.o \
@@ -75,6 +78,7 @@ uart.o
 
 C_DEPS +=  \
 adc.d \
+menu2.d \
 joy.d \
 main.d \
 menu.d \
@@ -85,6 +89,7 @@ uart.d
 
 C_DEPS_AS_ARGS +=  \
 adc.d \
+menu2.d \
 joy.d \
 main.d \
 menu.d \
@@ -108,6 +113,13 @@ LINKER_SCRIPT_DEP+=
 
 # AVR32/GNU C Compiler
 ./adc.o: .././adc.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+./menu2.o: .././menu2.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

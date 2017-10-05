@@ -4,6 +4,8 @@
 
 adc.c
 
+menu2.c
+
 joy.c
 
 main.c

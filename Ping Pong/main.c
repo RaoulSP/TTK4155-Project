@@ -9,7 +9,12 @@
 #include "joy.h"
 #include "oled.h"
 #include "sram.h"
-#include "menu.h"
+#include "menu2.h"
+
+/*--TODO--
+-Add a brightness function
+-Add a interrupt for 60 Hz updates
+*/
 
 /*
 JTAG interface with the 168
@@ -37,30 +42,12 @@ int main(void)
 	joy_init();
 	touch_init();
 	oled_clear_screen();
-	
-	
-	oled_print_string("New Game",0,0,8,0);
-	oled_print_string("High score",0,1,8,0);
-	oled_print_string("Options",0,2,8,0);
 	oled_refresh();
-	oled_draw_pixel(50,50); //128 x 64
-	oled_draw_pixel(50,51); //128 x 64
-	oled_draw_pixel(50,52); //128 x 64
-	oled_clear_pixel(50,51);
-	oled_invert_rectangle(30,0,127,12);
-	oled_refresh();
-	
-	sram_test();
+	init_menus();
 	
 	while (1)
 	{
-		//joy_print(1);
-		//touch_print(0);
-		//printf("\n");
-		//_delay_ms(10);
-	
-		menu_controller();
-	
+		run_display();
 	}
 
 }
