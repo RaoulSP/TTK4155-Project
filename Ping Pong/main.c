@@ -9,7 +9,8 @@
 #include "joy.h"
 #include "oled.h"
 #include "sram.h"
-#include "menu2.h"
+#include "menu.h"
+#include "spi.h"
 
 /*--TODO--
 -Add a brightness function
@@ -41,13 +42,24 @@ int main(void)
 	oled_refresh();
 	joy_init();
 	touch_init();
+	menu_init();
+	spi_master_init();
+	
+	
+	
 	oled_clear_screen();
 	oled_refresh();
-	init_menus();
+	
 	
 	while (1)
 	{
-		run_display();
+		//printf("\n");
+		//menu_run_display();
+		char k = (spi_master_transmit('a'));
+		printf("%d",k);
+		//SPDR = 0b11111111;
+		//_delay_ms(10);
+		
 	}
 
 }

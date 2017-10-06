@@ -1,77 +1,46 @@
-//#include "oled.h"
-//
-//#ifndef MENU_H_
-//#define MENU_H_
-//
-////typedef struct main_menu 
-////{
-	////typedef struct difficulty 
-	////{
-		////typedef	enum diff_t 
-		////{
-			////EASY,
-			////MEDIUM,
-			////HARD,
-			////NIGHTMARE
-		////};
-	////}diff;	
-	////typedef struct highscore {
-		////int x;
-	////}high;
-////};
-//
-//
-//
-//
-//typedef enum menus_t
-//{
-	//MAIN_MENU,
-	//DIFFICULTY,
-	//HIGHSCORE,
-	//OPTIONS,
-	//EASTER_EGG
-//} Menu;
-//
-//typedef enum main_cursor_t
-//{
-	//C_DIFFICULTY,
-	//C_HIGHSCORE,
-	//C_OPTIONS,
-	//C_EASTER_EGG
-//} Main_cursor;
-//
-//typedef enum difficulty_cursor_t
-//{
-	//EASY,
-	//MEDIUM,
-	//HARD,
-	//NIGHTMARE
-//} Difficulty_cursor;
-//
-//typedef enum highscore_selected_t
-//{
-	//HERMAN,
-	//RAOUL,
-	//BESTEMOR,
-	//HANS
-//} Highscore_cursor;
-//
-//typedef enum easter_egg_selected_t
-//{
-	//sdfsdrg
-//} Easter_egg_selected;
-//
-//
-//void menu_controller();
-//
-//#endif /* MENU_H_ */
-//
-//typedef struct menu{
-	//char** entries;
-	//char** submenus;
-	//char supermenu;	
-	//}Menus;
-	//
-	//
-	//Menus main_menu, sub_menu;
-	//
+
+#ifndef MENU_H_
+#define MENU_H_
+
+//Denne kan fjernes
+//typedef enum menu_type_t{
+	//MENU,
+	//LIST,
+	//IMAGE,
+	//ANIMATION
+//}Type;
+
+typedef struct menu_t{
+	char* name;
+	char** entries;
+	int num_of_entries;
+	
+	int cursor;
+	
+	//Type type;	//To identify this as a menu or something else THIS CAN BE REMOVED
+
+	struct menu_t* super_menu;
+	struct menu_t** sub_menus;
+	
+	struct menu_t* (*draw)(struct menu_t* self);
+	
+	//---NEW---
+	//void (*action)();
+	
+}Menu;
+
+//Setup functions
+void add_entries(Menu* menu, char*entries[], int num_of_new_entries);
+void add_sub_menu(Menu* super, Menu* sub);
+void menu_init();
+
+//Drawing functions - to differentiate between different types of menus (change this to update menu?)
+Menu* draw_menu(Menu* self);
+Menu* draw_list(Menu* self);
+
+//Actions
+//void action_game();
+//void action_animation();
+
+void menu_run_display();
+#endif /* MENU_H_ */

@@ -3,6 +3,11 @@
 #ifndef OLED_H_
 #define OLED_H_
 
+int timer_intr;
+
+//---TIMER SETUP FOR 60Hz refresh---
+
+
 void oled_init();
 
 void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font_size, int invert);

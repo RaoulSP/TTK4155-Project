@@ -4,15 +4,19 @@
 
 adc.c
 
-menu2.c
+can.c
 
 joy.c
 
 main.c
 
+mcp.c
+
 menu.c
 
 oled.c
+
+spi.c
 
 sram.c
 

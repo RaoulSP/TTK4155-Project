@@ -115,10 +115,13 @@
     <Compile Include="adc.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="fonts.h">
+    <Compile Include="can.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="menu2.c">
+    <Compile Include="can.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fonts.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="joy.c">
@@ -130,19 +133,28 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="mcp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="mcp.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="menu.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="menu.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="menu2.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="oled.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="oled.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="sram.c">
