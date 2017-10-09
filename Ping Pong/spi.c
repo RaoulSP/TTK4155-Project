@@ -16,14 +16,13 @@ void spi_master_init()
 
 char spi_master_transmit(char cData)
 {
-	clear_bit(PORTB, PB4);
+	//clear_bit(PORTB, PB4);
 	/* Start transmission */
 	SPDR = cData;
+	
 	/* Wait for transmission complete */
 	while(!(SPSR & (1<<SPIF)));
-	set_bit(PORTB,PB4);
+	//set_bit(PORTB,PB4);
 	
-	//NOT SURE THIS ACTUALLY RETURNS THE CORRECT VALUE
 	return SPDR;
 }
-

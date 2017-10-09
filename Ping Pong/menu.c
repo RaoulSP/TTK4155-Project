@@ -65,7 +65,7 @@ void menu_init(){
 	add_entries(&difficulty, diff_entr, 3);
 	add_sub_menu(&main_menu, &difficulty);
 	
-	char* high_entr[4] = {"1. Hans","2. Raoul","3. Alle andre","-inf. Herman"};
+	char* high_entr[4] = {"1. Herman","2. Raoul","3. Alle andre","-inf^inf. Hans"};
 	add_entries(&highscore, high_entr,4);
 	add_sub_menu(&main_menu, &highscore);
 	
@@ -84,10 +84,10 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
 		//---NEW---
 		//Menu* empty;
 		//empty = malloc(sizeof(Menu));
-		//empty->name = malloc(strlen(entries[i]) * sizeof(char));
+		////empty->name = malloc(strlen(entries[i]) * sizeof(char));
 		//empty->name = entries[i];
 		//add_sub_menu(menu, empty);
-		menu->num_of_entries+=1;
+		//menu->num_of_entries+=1;
 	}
 	//menu->num_of_entries = num_of_new_entries;
 	menu->cursor = 0; //To make sure the cursor is not something else
@@ -184,7 +184,6 @@ Menu* current_menu = &main_menu;
 
 void menu_run_display(){
 	oled_clear_screen();
-	printf("RUN DISPLAY");
 	current_menu = current_menu->draw(current_menu);
 	oled_refresh();
 }

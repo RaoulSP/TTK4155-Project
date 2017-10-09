@@ -15,7 +15,8 @@ main.d main.o: .././main.c \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\math.h \
  .././uart.h .././adc.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
- .././touch.h .././joy.h .././oled.h .././sram.h .././menu.h .././spi.h
+ .././touch.h .././joy.h .././oled.h .././sram.h .././menu.h .././spi.h \
+ .././mcp.h .././can.h
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -62,3 +63,7 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 .././menu.h:
 
 .././spi.h:
+
+.././mcp.h:
+
+.././can.h:
