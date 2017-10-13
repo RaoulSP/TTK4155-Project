@@ -13,7 +13,7 @@
 #include "spi.h"
 #include "mcp.h"
 #include "can.h"
-
+#include "MCP2515.h"
 /*--TODO--
 -Add a brightness function
 -Add a interrupt for 60 Hz updates
@@ -47,7 +47,7 @@ int main(void)
 	menu_init();
 	spi_master_init();
 	mcp_reset(); //reset = init
-	can_init(3); //3 for loopback mode
+	can_init(MODE_LOOPBACK); 
 	
 	oled_clear_screen();
 	oled_refresh();
@@ -55,24 +55,32 @@ int main(void)
 	/*
 	char k = (spi_master_transmit('a'));
 	printf("%d",k);
-	char z = (spi_master_transmit('a'));
+	char = (spi_master_transmit('a'));
 	printf("%d",z);
 	*/
 	
-	mcp_request_to_send(0,1,1);
-	printf("Read status: %d\n", mcp_read_status());
-	char STREAING[13] = "Hans er sist!";
-	mcp_write(0x1, STREAING, 13);
-	char* arr = (mcp_read(0x1,13));
-	printf("%s\n",arr);
+	//mcp_request_to_send(0,1,1);
+	//printf("Read status: %d\n", mcp_read_status());
+	//char STREAING[13] = "Hans er sist!";
+	//mcp_write(0x1, STREAING, 13);
+	//char* arr = (mcp_read(0x1,13));
+	//printf("%s\n",arr);
+	
+	char test[] = "HansBest";
+
+	can_write(23,test);
+	printf("%s\n",can_read());
+	
+
 	
 	while (1)
 	{
 		//printf("\n");
-		menu_run_display();
+		//menu_run_display();
 		
 		//SPDR = 0b11111111;
 		//_delay_ms(10);
+		//printf(sizeof(int));
 		
 	}
 

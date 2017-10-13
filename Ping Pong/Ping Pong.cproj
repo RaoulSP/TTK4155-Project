@@ -139,6 +139,9 @@
     <Compile Include="mcp.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="MCP2515.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="menu.c">
       <SubType>compile</SubType>
     </Compile>
