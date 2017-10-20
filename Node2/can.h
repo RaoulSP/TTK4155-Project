@@ -6,12 +6,12 @@
 typedef struct frame_t {
 	int id;
 	char data;
-	int length;	
+	int length;
 }Frame;
-//can_msg_t
+
 
 void can_init(int mode);
-void can_write(int id, char *data, int data_length);
+void can_write(int id, char *data);
 char* can_read();
 
 

@@ -42,13 +42,12 @@ int main(void)
 	oled_init();
 	oled_print_string("Please calibrate joystick!",0,0,8,0);
 	oled_refresh();
-	//joy_init();
+	joy_init();
 	touch_init();
 	menu_init();
 	spi_master_init();
 	mcp_reset(); //reset = init
 	can_init(MODE_LOOPBACK); 
-	
 	oled_clear_screen();
 	oled_refresh();
 	
@@ -66,20 +65,49 @@ int main(void)
 	//char* arr = (mcp_read(0x1,13));
 	//printf("%s\n",arr);
 	
-	char test[] = "HansBest";
+	//char test[] = "Raoul000"; DO NOT USE THIS 
 
-	can_write(23,test);
-	printf("%s\n",can_read());
-	
-
+	//char* test = "raoul&he";
 	
 	while (1)
 	{
-		//printf("\n");
-		//menu_run_display();
+		//debugg
+		//printf("%d\t",joy_get_position().x);
+		//printf("%d\n",joy_get_position().y);
+		//debugg
 		
-		//SPDR = 0b11111111;
-		//_delay_ms(10);
+		Position position = joy_get_position();
+		int position_address = &position;
+		int position_length = sizeof(position);
+		//printf("%d",position_length);
+		can_write(26, position_address, position_length);
+		//can_transmitt(msg);
+		_delay_ms(10);
+		//can_msg_t msg = can_receive();
+		//position3.x = msg.data[0];
+		
+		Position* position2_address = can_read(); //?
+		Position position2 = *position2_address;
+		printf("x:%d\ty:%d\n",position2.x,position2.y);
+		
+		/*char pos[2];
+		pos[0] = position.x;
+		pos[1] = position.y;
+		
+		printf("%s\n",pos);
+		can_write(23,pos, data_length);
+
+		
+		int x = pos[0];
+		int y = pos[1];
+		printf("%d\t%d\n",x,y);
+		*/
+		
+		
+		
+		//menu_run_display();
+		//SPDR = 0b11111111; wtf is this?
+		_delay_ms(1000);
 		//printf(sizeof(int));
 		
 	}
