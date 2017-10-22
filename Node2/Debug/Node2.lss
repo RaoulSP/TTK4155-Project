@@ -191,12 +191,6 @@ Disassembly of section .text:
  122:	6e cf       	rjmp	.-292    	; 0x0 <__vectors>
 
 00000124 <can_init>:
-	//TXB0Dm - Data transmit buffer - The bytes with all the data
-	for(int i = 0; i < data_length; i++){
-		mcp_write(0x46 + i, data[i]);
-	}
-	mcp_request_to_send(0,1,0);		//Request to send - sending will start as soon as the bus is clear
-}
  124:	cf 93       	push	r28
  126:	c8 2f       	mov	r28, r24
  128:	40 e0       	ldi	r20, 0x00	; 0
@@ -215,8 +209,6 @@ Disassembly of section .text:
  142:	08 95       	ret
 
 00000144 <can_read>:
-
-char* can_read(){
  144:	4f 92       	push	r4
  146:	5f 92       	push	r5
  148:	6f 92       	push	r6
@@ -235,23 +227,11 @@ char* can_read(){
  162:	df 93       	push	r29
  164:	cd b7       	in	r28, 0x3d	; 61
  166:	de b7       	in	r29, 0x3e	; 62
-		printf("%d",mcp_read(0x66 + 0));
-	}
-	data[data_length] = '\0';
-	mcp_bit_modify(0x2C, 1, 0);	//CANINTF - Sets RX0IF to 0
-	return data;
  168:	4d b6       	in	r4, 0x3d	; 61
  16a:	5e b6       	in	r5, 0x3e	; 62
-}
-
-char* can_read(){
-	//Add something to read the standard identifier of the message received
-	
-	uint8_t data_length = mcp_read(0x65) & 0b00001111;
  16c:	85 e6       	ldi	r24, 0x65	; 101
  16e:	5d d0       	rcall	.+186    	; 0x22a <mcp_read>
  170:	8f 70       	andi	r24, 0x0F	; 15
-	char data[data_length];
  172:	68 2e       	mov	r6, r24
  174:	71 2c       	mov	r7, r1
  176:	2d b7       	in	r18, 0x3d	; 61
@@ -267,7 +247,6 @@ char* can_read(){
  18a:	fe b7       	in	r31, 0x3e	; 62
  18c:	31 96       	adiw	r30, 0x01	; 1
  18e:	4f 01       	movw	r8, r30
-	printf("DL= %d \n", data_length);
  190:	53 01       	movw	r10, r6
  192:	1f 92       	push	r1
  194:	8f 93       	push	r24
@@ -276,7 +255,6 @@ char* can_read(){
  19a:	9f 93       	push	r25
  19c:	8f 93       	push	r24
  19e:	58 d1       	rcall	.+688    	; 0x450 <printf>
-	for(int i = 0; i < data_length; i++){
  1a0:	0f 90       	pop	r0
  1a2:	0f 90       	pop	r0
  1a4:	0f 90       	pop	r0
@@ -287,27 +265,18 @@ char* can_read(){
  1ae:	64 01       	movw	r12, r8
  1b0:	00 e0       	ldi	r16, 0x00	; 0
  1b2:	10 e0       	ldi	r17, 0x00	; 0
-		data[i] = mcp_read(0x66 + i);  //Read data
-		printf("%d",mcp_read(0x66 + 0));
  1b4:	0f 2e       	mov	r0, r31
  1b6:	ff e0       	ldi	r31, 0x0F	; 15
  1b8:	ef 2e       	mov	r14, r31
  1ba:	f2 e0       	ldi	r31, 0x02	; 2
  1bc:	ff 2e       	mov	r15, r31
  1be:	f0 2d       	mov	r31, r0
-	
-	uint8_t data_length = mcp_read(0x65) & 0b00001111;
-	char data[data_length];
-	printf("DL= %d \n", data_length);
-	for(int i = 0; i < data_length; i++){
-		data[i] = mcp_read(0x66 + i);  //Read data
  1c0:	86 e6       	ldi	r24, 0x66	; 102
  1c2:	80 0f       	add	r24, r16
  1c4:	32 d0       	rcall	.+100    	; 0x22a <mcp_read>
  1c6:	f6 01       	movw	r30, r12
  1c8:	81 93       	st	Z+, r24
  1ca:	6f 01       	movw	r12, r30
-		printf("%d",mcp_read(0x66 + 0));
  1cc:	86 e6       	ldi	r24, 0x66	; 102
  1ce:	2d d0       	rcall	.+90     	; 0x22a <mcp_read>
  1d0:	1f 92       	push	r1
@@ -315,12 +284,6 @@ char* can_read(){
  1d4:	ff 92       	push	r15
  1d6:	ef 92       	push	r14
  1d8:	3b d1       	rcall	.+630    	; 0x450 <printf>
-	//Add something to read the standard identifier of the message received
-	
-	uint8_t data_length = mcp_read(0x65) & 0b00001111;
-	char data[data_length];
-	printf("DL= %d \n", data_length);
-	for(int i = 0; i < data_length; i++){
  1da:	0f 5f       	subi	r16, 0xFF	; 255
  1dc:	1f 4f       	sbci	r17, 0xFF	; 255
  1de:	0f 90       	pop	r0
@@ -330,20 +293,14 @@ char* can_read(){
  1e6:	0a 15       	cp	r16, r10
  1e8:	1b 05       	cpc	r17, r11
  1ea:	54 f3       	brlt	.-44     	; 0x1c0 <can_read+0x7c>
-		data[i] = mcp_read(0x66 + i);  //Read data
-		printf("%d",mcp_read(0x66 + 0));
-	}
-	data[data_length] = '\0';
  1ec:	f4 01       	movw	r30, r8
  1ee:	e6 0d       	add	r30, r6
  1f0:	f7 1d       	adc	r31, r7
  1f2:	10 82       	st	Z, r1
-	mcp_bit_modify(0x2C, 1, 0);	//CANINTF - Sets RX0IF to 0
  1f4:	40 e0       	ldi	r20, 0x00	; 0
  1f6:	61 e0       	ldi	r22, 0x01	; 1
  1f8:	8c e2       	ldi	r24, 0x2C	; 44
  1fa:	23 d0       	rcall	.+70     	; 0x242 <mcp_bit_modify>
-	return data;
  1fc:	c4 01       	movw	r24, r8
  1fe:	0f b6       	in	r0, 0x3f	; 63
  200:	f8 94       	cli
@@ -369,12 +326,6 @@ char* can_read(){
  228:	08 95       	ret
 
 0000022a <mcp_read>:
-	clear_bit(PORTB, PB7);
-	spi_master_transmit(MCP_READ_STATUS);
-	char status = spi_master_transmit(0x00);
-	set_bit(PORTB ,PB7);
-	return status;
-}
  22a:	cf 93       	push	r28
  22c:	c8 2f       	mov	r28, r24
  22e:	2f 98       	cbi	0x05, 7	; 5
@@ -389,70 +340,43 @@ char* can_read(){
  240:	08 95       	ret
 
 00000242 <mcp_bit_modify>:
-
-void mcp_bit_modify(char address, char mask, char data){
  242:	1f 93       	push	r17
  244:	cf 93       	push	r28
  246:	df 93       	push	r29
  248:	18 2f       	mov	r17, r24
  24a:	d6 2f       	mov	r29, r22
  24c:	c4 2f       	mov	r28, r20
-	clear_bit(PORTB, PB7);
  24e:	2f 98       	cbi	0x05, 7	; 5
-	spi_master_transmit(MCP_BITMOD);
  250:	85 e0       	ldi	r24, 0x05	; 5
  252:	2b d0       	rcall	.+86     	; 0x2aa <spi_master_transmit>
-	spi_master_transmit(address);
  254:	81 2f       	mov	r24, r17
  256:	29 d0       	rcall	.+82     	; 0x2aa <spi_master_transmit>
-	spi_master_transmit(mask);
  258:	8d 2f       	mov	r24, r29
  25a:	27 d0       	rcall	.+78     	; 0x2aa <spi_master_transmit>
-	spi_master_transmit(data);
  25c:	8c 2f       	mov	r24, r28
  25e:	25 d0       	rcall	.+74     	; 0x2aa <spi_master_transmit>
-	set_bit(PORTB, PB7);
  260:	2f 9a       	sbi	0x05, 7	; 5
-}
  262:	df 91       	pop	r29
  264:	cf 91       	pop	r28
  266:	1f 91       	pop	r17
  268:	08 95       	ret
 
 0000026a <mcp_reset>:
-
-void mcp_reset(){
-	clear_bit(PORTB, PB7);
  26a:	2f 98       	cbi	0x05, 7	; 5
-	spi_master_transmit(MCP_RESET);
  26c:	80 ec       	ldi	r24, 0xC0	; 192
  26e:	1d d0       	rcall	.+58     	; 0x2aa <spi_master_transmit>
-	set_bit(PORTB, PB7);
  270:	2f 9a       	sbi	0x05, 7	; 5
  272:	08 95       	ret
 
 00000274 <main>:
-#include "mcp.h"
-#include <util/delay.h>
-
-int main(void)
-{	
-	uart_init(9600);
  274:	80 e8       	ldi	r24, 0x80	; 128
  276:	95 e2       	ldi	r25, 0x25	; 37
  278:	30 d0       	rcall	.+96     	; 0x2da <uart_init>
-	spi_master_init();
  27a:	0f d0       	rcall	.+30     	; 0x29a <spi_master_init>
-    mcp_reset();
  27c:	f6 df       	rcall	.-20     	; 0x26a <mcp_reset>
-	can_init(MODE_NORMAL);
  27e:	80 e0       	ldi	r24, 0x00	; 0
  280:	90 e0       	ldi	r25, 0x00	; 0
  282:	50 df       	rcall	.-352    	; 0x124 <can_init>
-	while(1)
-    {
-		//printf("%s\n",can_read());
-		char* position = can_read();
  284:	5f df       	rcall	.-322    	; 0x144 <can_read>
 	#else
 		//round up by default
@@ -472,86 +396,46 @@ int main(void)
  298:	f5 cf       	rjmp	.-22     	; 0x284 <main+0x10>
 
 0000029a <spi_master_init>:
-
-void spi_master_init()
-{	
-	/* Set MOSI, SS and SCK output, all others input */
-	//Without setting PB0 as an output printf doesn|t work!?!?!?!?
-	DDRB |= (1<<PB1)|(1 << PB2)|(1 << PB7)|(1 << PB0); 	
  29a:	84 b1       	in	r24, 0x04	; 4
  29c:	87 68       	ori	r24, 0x87	; 135
  29e:	84 b9       	out	0x04, r24	; 4
-	//DO NOT TINK IS NECCSCAS RYTSR:
-	DDRB &= ~(1 << PB3);
  2a0:	23 98       	cbi	0x04, 3	; 4
-
-	/* Enable SPI, Master, set clock rate fck/16*/
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);	
  2a2:	81 e5       	ldi	r24, 0x51	; 81
  2a4:	8c bd       	out	0x2c, r24	; 44
-	set_bit(PORTB,PB7);
  2a6:	2f 9a       	sbi	0x05, 7	; 5
  2a8:	08 95       	ret
 
 000002aa <spi_master_transmit>:
-
-
-char spi_master_transmit(char cData)
-{
-	/* Start transmission */
-	SPDR = cData;	
  2aa:	8e bd       	out	0x2e, r24	; 46
-	/* Wait for transmission complete */
-	while(!(SPSR & (1<<SPIF)));	
  2ac:	0d b4       	in	r0, 0x2d	; 45
  2ae:	07 fe       	sbrs	r0, 7
  2b0:	fd cf       	rjmp	.-6      	; 0x2ac <spi_master_transmit+0x2>
-	return SPDR;
  2b2:	8e b5       	in	r24, 0x2e	; 46
-}
  2b4:	08 95       	ret
 
 000002b6 <uart_putchar>:
-#include <avr/io.h>
-#include <stdio.h>
-
-int uart_putchar(char c){
-	//Wait for empty transmit buffer
-	while (!( UCSR0A & (1<<UDRE0)));
  2b6:	e0 ec       	ldi	r30, 0xC0	; 192
  2b8:	f0 e0       	ldi	r31, 0x00	; 0
  2ba:	90 81       	ld	r25, Z
  2bc:	95 ff       	sbrs	r25, 5
  2be:	fd cf       	rjmp	.-6      	; 0x2ba <uart_putchar+0x4>
-	//Put data into buffer, sends the data
-	UDR0 = c;
  2c0:	80 93 c6 00 	sts	0x00C6, r24
-	return 1;
-}
  2c4:	81 e0       	ldi	r24, 0x01	; 1
  2c6:	90 e0       	ldi	r25, 0x00	; 0
  2c8:	08 95       	ret
 
 000002ca <uart_getchar>:
-
-unsigned char uart_getchar(){
-	while (!( UCSR0A & (1<<RXC0)));
  2ca:	e0 ec       	ldi	r30, 0xC0	; 192
  2cc:	f0 e0       	ldi	r31, 0x00	; 0
  2ce:	80 81       	ld	r24, Z
  2d0:	88 23       	and	r24, r24
  2d2:	ec f7       	brge	.-6      	; 0x2ce <uart_getchar+0x4>
-	return UDR0;
  2d4:	80 91 c6 00 	lds	r24, 0x00C6
-}
  2d8:	08 95       	ret
 
 000002da <uart_init>:
-
-int uart_init(int baudRate){
  2da:	cf 93       	push	r28
  2dc:	df 93       	push	r29
-	int UBRR = ((long)16000000/((long)16*baudRate) - 1);
  2de:	aa 27       	eor	r26, r26
  2e0:	97 fd       	sbrc	r25, 7
  2e2:	a0 95       	com	r26
@@ -581,29 +465,17 @@ int uart_init(int baudRate){
  312:	16 d0       	rcall	.+44     	; 0x340 <__divmodsi4>
  314:	e9 01       	movw	r28, r18
  316:	21 97       	sbiw	r28, 0x01	; 1
-	//Enable printf
-	fdevopen(uart_putchar, uart_getchar);
  318:	65 e6       	ldi	r22, 0x65	; 101
  31a:	71 e0       	ldi	r23, 0x01	; 1
  31c:	8b e5       	ldi	r24, 0x5B	; 91
  31e:	91 e0       	ldi	r25, 0x01	; 1
  320:	4d d0       	rcall	.+154    	; 0x3bc <fdevopen>
-	//Setting
-	UBRR0L = UBRR;
  322:	c0 93 c4 00 	sts	0x00C4, r28
-	UBRR0H = (UBRR>>8);
  326:	d0 93 c5 00 	sts	0x00C5, r29
-	//Enable receiver and transmitter
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0);
  32a:	88 e1       	ldi	r24, 0x18	; 24
  32c:	80 93 c1 00 	sts	0x00C1, r24
-	//Set frame format: 2 stop bit, 8data
-	UCSR0C = (1<<USBS0)|(3<<UCSZ00);
  330:	8e e0       	ldi	r24, 0x0E	; 14
  332:	80 93 c2 00 	sts	0x00C2, r24
-	//Ursel makes sure we won't access UBRRH during operation, but UCSRC
-	return 1;
-}
  336:	81 e0       	ldi	r24, 0x01	; 1
  338:	90 e0       	ldi	r25, 0x00	; 0
  33a:	df 91       	pop	r29
