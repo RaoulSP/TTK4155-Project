@@ -44,7 +44,7 @@ int main(void)
 	menu_init();
 	spi_master_init();
 	mcp_init();
-	can_init(MODE_LOOPBACK); 
+	can_init(MODE_NORMAL); 
 	oled_clear_screen();
 	oled_refresh();
 	
@@ -73,15 +73,17 @@ int main(void)
 		//printf("%d",position_length);
 		can_write(26, (char *)position_address, position_length);
 		//can_transmitt(msg);
-		_delay_ms(10);
+		//_delay_ms(10);
 		//can_msg_t msg = can_receive();
 		//position3.x = msg.data[0];
 		
-		Position* position2_ptr = (Position*)can_read(); //?
-		Position position2 = *position2_ptr;
-		//Position position2 = *(Position*)can_read(); //single line
 		
-		printf("x:%4d\ty:%4d\r",position2.x,position2.y);
+		//Position* position2_ptr = (Position*)can_read(); //?
+		//Position position2 = *position2_ptr;
+		//Position position2 = *(Position*)can_read(); //single line
+		//printf("x:%4d\ty:%4d\r",position2.x,position2.y);
+		
+		
 		//printf("%30s",string); Nice
 		
 		//printf("\b");
@@ -104,7 +106,7 @@ int main(void)
 		
 		menu_run_display();
 		//SPDR = 0b11111111; wtf is this?
-		_delay_ms(1000);
+		_delay_ms(100);
 		//printf(sizeof(int));
 		
 	}

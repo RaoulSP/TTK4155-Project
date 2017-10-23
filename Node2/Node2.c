@@ -6,6 +6,7 @@
 #include "spi.h"
 #include "can.h"
 #include "mcp.h"
+#include "joy.h"
 #include <util/delay.h>
 
 int main(void)
@@ -16,16 +17,18 @@ int main(void)
 	can_init(MODE_NORMAL);
 	while(1)
     {
-		//printf("%s\n",can_read());
-		char* position = can_read();
-		int x = position[0];
-		int y = position[1];
-
+		
+		//char* position = can_read();
+		//int x = position[0];
+		//int y = position[1];
+		//printf("%d\t %d \n",x,y);
 		
 		
-		printf("%d\t %d \n",x,y);
-		//printf("hey");
-
-		_delay_ms(1000);
+		Position* position2_ptr = (Position*)can_read(); //?
+		Position position2 = *position2_ptr;
+		
+		printf("x:%4d\ty:%4d\tz:%4d\r",position2.x,position2.y,position2.z);
+		
+		_delay_ms(100);
     }
 }

@@ -5,18 +5,12 @@
 
 void can_init(int mode){
 	//priority bits? TXP
-	
-	
 	//CANINTE.TXInE
 	//Disables interrupts from empty buffers
 	mcp_bit_modify(0x2B,0b00011100, 0b00000000);
-
-
 	//Disable filters
 	mcp_bit_modify(MCP_RXB0CTRL, 0b01100000, 0b01100000);
-	
 	//TODO: Filter initialization
-	
 	//Sets operation mode 
 	mcp_bit_modify(MCP_CANCTRL, 0xFF, mode);
 	
@@ -25,6 +19,7 @@ void can_init(int mode){
 //can_msg_t
 
 void can_write(int id, char *data, int data_length){
+	//int data_length = strlen(data);
 	mcp_write(0x41, id >> 3);  //TXB0SIDH - Higher identifier byte
 	mcp_write(0x42, id << 5);  //TXB0SIDL - Lower -------||-------
 	mcp_write(0x45, data_length); //TXB0DLC	- Data length - RTR will be set to 0 (Data Frame message)

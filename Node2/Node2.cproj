@@ -127,6 +127,9 @@
     <Compile Include="can.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="joy.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="mcp.c">
       <SubType>compile</SubType>
     </Compile>
