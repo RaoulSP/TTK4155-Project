@@ -14,20 +14,28 @@
 #include "mcp.h"
 #include "can.h"
 #include "MCP2515.h"
-/*--TODO--
--Add a brightness function
--Add a interrupt for 60 Hz updates
-*/
 
-/*
+/*--NOTES--
+1 output, 0 input
+
 JTAG interface with the 168
-Left to right
+Left to right (row 41-44)
 1,5,3,9
 Vcc 4
 GND 2
-*/
 
-//1 output, 0 input
+char test[] = "raoul&he"; DO NOT USE THIS
+char* test = "raoul&he"; USE THIS. Adds \0 termination automatically
+
+printf("%30s",string); Variable string will take fixed amount of space by padding with spaces
+printf("%4d",integer); Variable digit will take fixed amount of space by padding with spaces
+
+printf("\b"); Backspace
+printf("\n"); Line Feed
+printf("\r"); Carriage Return
+Only works properly in putty
+\r\n is a proper new line! This combination works in Putty, Bray's and Termite
+*/
 
 int main(void)
 {
@@ -62,57 +70,35 @@ int main(void)
 	//char* arr = (mcp_read(0x1,13));
 	//printf("%s\n",arr);
 	
-	//char test[] = "raoul&he"; DO NOT USE THIS 
-	//char* test = "raoul&he"; USE THIS
-	
 	while (1)
 	{
 		Position position = joy_get_position();
-		Position* position_address = &position;
 		int position_length = sizeof(position);
-		//printf("%d",position_length);
-		can_write(26, (char *)position_address, position_length);
-		//can_transmitt(msg);
-		//_delay_ms(10);
-		//can_msg_t msg = can_receive();
-		//position3.x = msg.data[0];
-		
-		
-		//Position* position2_ptr = (Position*)can_read(); //?
-		//Position position2 = *position2_ptr;
-		//Position position2 = *(Position*)can_read(); //single line
-		//printf("x:%4d\ty:%4d\r",position2.x,position2.y);
-		
-		
-		//printf("%30s",string); Nice
-		
-		//printf("\b");
-		//printf("\n");
-		
-		/*char pos[2];
-		pos[0] = position.x;
-		pos[1] = position.y;
-		
-		printf("%s\n",pos);
-		can_write(23,pos, data_length);
-
-		
-		int x = pos[0];
-		int y = pos[1];
-		printf("%d\t%d\n",x,y);
+		can_write(42, (char *)&position, position_length);
+		/*
+		//for loopback mode:
+		Position* position2_ptr = (Position*)can_read(); //?
+		Position position2 = *position2_ptr;
+		Position position2 = *(Position*)can_read(); //single line
+		printf("x:%4d\ty:%4d\r",position2.x,position2.y);
 		*/
-		
-		
-		
 		menu_run_display();
-		//SPDR = 0b11111111; wtf is this?
-		_delay_ms(100);
-		//printf(sizeof(int));
-		
+		_delay_ms(100);	
 	}
-	//sleep(); avr/sleep.h? Don't run main loop more often than necessary
-	//Read about various sleep states. Sleep state for ADC reading?
-	//EEPROM Usage?
-	//Use fprintf and set up multiple streams
-	//fprintf(&uart_print,"",string);
+	
+	/*--TODO--
+	-Add a brightness function
+	-Add a interrupt for 60 Hz updates
+
+	-can_transmitt(msg);
+	can_msg_t msg = can_receive();
+	position3.x = msg.data[0];
+
+	Tips from student assistant:
+	sleep(); avr/sleep.h? Don't run main loop more often than necessary
+	Read about various sleep states. Sleep state for ADC reading?
+	EEPROM Usage?
+	Use fprintf and set up multiple streams
+	fprintf(&uart_print,"",string);
+	*/
 }

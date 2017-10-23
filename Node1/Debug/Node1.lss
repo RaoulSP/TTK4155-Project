@@ -13,19 +13,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .debug_aranges 00000280  00000000  00000000  00002c10  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   000029cd  00000000  00000000  00002e90  2**0
+  5 .debug_info   000029b9  00000000  00000000  00002e90  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000e6f  00000000  00000000  0000585d  2**0
+  6 .debug_abbrev 00000e6f  00000000  00000000  00005849  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000cee  00000000  00000000  000066cc  2**0
+  7 .debug_line   00000ced  00000000  00000000  000066b8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  0000073c  00000000  00000000  000073bc  2**2
+  8 .debug_frame  0000073c  00000000  00000000  000073a8  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000866  00000000  00000000  00007af8  2**0
+  9 .debug_str    00000855  00000000  00000000  00007ae4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00001d19  00000000  00000000  0000835e  2**0
+ 10 .debug_loc    00001d19  00000000  00000000  00008339  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000228  00000000  00000000  0000a077  2**0
+ 11 .debug_ranges 00000228  00000000  00000000  0000a052  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -933,9 +933,9 @@ void can_write(int id, char *data, int data_length){
      ba8:	08 95       	ret
 
 00000baa <main>:
+Only works properly in putty
+\r\n is a proper new line! This combination works in Putty, Bray's and Termite
 */
-
-//1 output, 0 input
 
 int main(void)
 {
@@ -992,8 +992,8 @@ int main(void)
      c06:	0e 94 a4 0a 	call	0x1548	; 0x1548 <oled_clear_screen>
 	oled_refresh();
      c0a:	0e 94 38 0b 	call	0x1670	; 0x1670 <oled_refresh>
-	//char test[] = "raoul&he"; DO NOT USE THIS 
-	//char* test = "raoul&he"; USE THIS
+	//char* arr = (mcp_read(0x1,13));
+	//printf("%s\n",arr);
 	
 	while (1)
 	{
@@ -1005,23 +1005,21 @@ int main(void)
      c18:	5c 83       	std	Y+4, r21	; 0x04
      c1a:	6d 83       	std	Y+5, r22	; 0x05
      c1c:	7e 83       	std	Y+6, r23	; 0x06
-		Position* position_address = &position;
 		int position_length = sizeof(position);
-		//printf("%d",position_length);
-		can_write(26, (char *)position_address, position_length);
+		can_write(42, (char *)&position, position_length);
      c1e:	46 e0       	ldi	r20, 0x06	; 6
      c20:	50 e0       	ldi	r21, 0x00	; 0
      c22:	be 01       	movw	r22, r28
      c24:	6f 5f       	subi	r22, 0xFF	; 255
      c26:	7f 4f       	sbci	r23, 0xFF	; 255
-     c28:	8a e1       	ldi	r24, 0x1A	; 26
+     c28:	8a e2       	ldi	r24, 0x2A	; 42
      c2a:	90 e0       	ldi	r25, 0x00	; 0
      c2c:	0e 94 c7 03 	call	0x78e	; 0x78e <can_write>
-		printf("%d\t%d\n",x,y);
+		Position* position2_ptr = (Position*)can_read(); //?
+		Position position2 = *position2_ptr;
+		Position position2 = *(Position*)can_read(); //single line
+		printf("x:%4d\ty:%4d\r",position2.x,position2.y);
 		*/
-		
-		
-		
 		menu_run_display();
      c30:	0e 94 33 09 	call	0x1266	; 0x1266 <menu_run_display>
 	#else
@@ -2450,8 +2448,8 @@ void mcp_init(){
     17c2:	08 95       	ret
 
 000017c4 <uart_putchar>:
-#include <stdio.h>
-//Asynchronous - No parity - 2 stop bits - 8 bit char size
+    return;
+}
 
 void uart_putchar(char c){
 	//Wait for empty transmit buffer
@@ -2473,10 +2471,13 @@ unsigned char uart_getchar(){
     17ce:	fe cf       	rjmp	.-4      	; 0x17cc <uart_getchar>
 	return UDR0;
     17d0:	8c b1       	in	r24, 0x0c	; 12
-}
     17d2:	08 95       	ret
 
 000017d4 <uart_init>:
+#include <stdio.h>
+
+#include "uart.h"
+//Asynchronous - No parity - 2 stop bits - 8 bit char size
 
 void uart_init(int baudRate){
     17d4:	cf 93       	push	r28
@@ -2533,6 +2534,7 @@ void uart_init(int baudRate){
     182a:	80 bd       	out	0x20, r24	; 32
 	//Ursel makes sure we won't access UBRRH during operation, but UCSRC
     return;
+}
     182c:	df 91       	pop	r29
     182e:	cf 91       	pop	r28
     1830:	08 95       	ret

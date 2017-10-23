@@ -651,21 +651,21 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0xa20
+.debug_info     0x00000000      0xa08
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x31f can.o
  .debug_info    0x0000031f      0x2d4 mcp.o
- .debug_info    0x000005f3      0x189 Node2.o
- .debug_info    0x0000077c       0xb7 spi.o
- .debug_info    0x00000833      0x1ed uart.o
+ .debug_info    0x000005f3      0x171 Node2.o
+ .debug_info    0x00000764       0xb7 spi.o
+ .debug_info    0x0000081b      0x1ed uart.o
 
-.debug_abbrev   0x00000000      0x54a
+.debug_abbrev   0x00000000      0x53b
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x132 can.o
  .debug_abbrev  0x00000132      0x140 mcp.o
- .debug_abbrev  0x00000272      0x115 Node2.o
- .debug_abbrev  0x00000387       0x7a spi.o
- .debug_abbrev  0x00000401      0x149 uart.o
+ .debug_abbrev  0x00000272      0x106 Node2.o
+ .debug_abbrev  0x00000378       0x7a spi.o
+ .debug_abbrev  0x000003f2      0x149 uart.o
 
 .debug_line     0x00000000      0x6a6
  *(.debug_line .debug_line.* .debug_line_end)
@@ -683,17 +683,17 @@ END GROUP
  .debug_frame   0x00000184       0x34 spi.o
  .debug_frame   0x000001b8       0x50 uart.o
 
-.debug_str      0x00000000      0x33c
+.debug_str      0x00000000      0x32e
  *(.debug_str)
  .debug_str     0x00000000      0x186 can.o
                                 0x1c4 (size before relaxing)
  .debug_str     0x00000186       0x9c mcp.o
                                 0x1ef (size before relaxing)
- .debug_str     0x00000222       0x94 Node2.o
-                                0x1d4 (size before relaxing)
- .debug_str     0x000002b6       0x21 spi.o
+ .debug_str     0x00000222       0x86 Node2.o
+                                0x1c6 (size before relaxing)
+ .debug_str     0x000002a8       0x21 spi.o
                                 0x185 (size before relaxing)
- .debug_str     0x000002d7       0x65 uart.o
+ .debug_str     0x000002c9       0x65 uart.o
                                 0x1ad (size before relaxing)
 
 .debug_loc      0x00000000      0x670

@@ -13,19 +13,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .debug_aranges 000000f0  00000000  00000000  00000d12  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000a20  00000000  00000000  00000e02  2**0
+  5 .debug_info   00000a08  00000000  00000000  00000e02  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 0000054a  00000000  00000000  00001822  2**0
+  6 .debug_abbrev 0000053b  00000000  00000000  0000180a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000006a6  00000000  00000000  00001d6c  2**0
+  7 .debug_line   000006a6  00000000  00000000  00001d45  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000208  00000000  00000000  00002414  2**2
+  8 .debug_frame  00000208  00000000  00000000  000023ec  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    0000033c  00000000  00000000  0000261c  2**0
+  9 .debug_str    0000032e  00000000  00000000  000025f4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000670  00000000  00000000  00002958  2**0
+ 10 .debug_loc    00000670  00000000  00000000  00002922  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 000000a0  00000000  00000000  00002fc8  2**0
+ 11 .debug_ranges 000000a0  00000000  00000000  00002f92  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -362,8 +362,8 @@ char* can_read(){
  220:	08 95       	ret
 
 00000222 <main>:
+#include "mcp.h"
 #include "joy.h"
-#include <util/delay.h>
 
 int main(void)
 {	
@@ -379,24 +379,20 @@ int main(void)
  22c:	80 e0       	ldi	r24, 0x00	; 0
  22e:	90 e0       	ldi	r25, 0x00	; 0
  230:	79 df       	rcall	.-270    	; 0x124 <can_init>
-		
-		
-		Position* position2_ptr = (Position*)can_read(); //?
-		Position position2 = *position2_ptr;
-		
+	while(1)
+    {
+		Position position2 = *(Position*)can_read();
 		printf("x:%4d\ty:%4d\tz:%4d\r",position2.x,position2.y,position2.z);
  232:	c6 e0       	ldi	r28, 0x06	; 6
  234:	d2 e0       	ldi	r29, 0x02	; 2
-		//int x = position[0];
-		//int y = position[1];
-		//printf("%d\t %d \n",x,y);
-		
-		
-		Position* position2_ptr = (Position*)can_read(); //?
+	spi_master_init();
+    mcp_reset();
+	can_init(MODE_NORMAL);
+	while(1)
+    {
+		Position position2 = *(Position*)can_read();
  236:	86 df       	rcall	.-244    	; 0x144 <can_read>
  238:	fc 01       	movw	r30, r24
-		Position position2 = *position2_ptr;
-		
 		printf("x:%4d\ty:%4d\tz:%4d\r",position2.x,position2.y,position2.z);
  23a:	85 81       	ldd	r24, Z+5	; 0x05
  23c:	8f 93       	push	r24
@@ -457,8 +453,8 @@ int main(void)
  296:	08 95       	ret
 
 00000298 <uart_putchar>:
-#include <stdio.h>
-//Asynchronous - No parity - 2 stop bits - 8 bit char size
+	return;
+}
 
 void uart_putchar(char c){
 	//Wait for empty transmit buffer
@@ -486,10 +482,13 @@ unsigned char uart_getchar(){
  2b0:	ec f7       	brge	.-6      	; 0x2ac <uart_getchar+0x4>
 	return UDR0;
  2b2:	80 91 c6 00 	lds	r24, 0x00C6
-}
  2b6:	08 95       	ret
 
 000002b8 <uart_init>:
+#include <stdio.h>
+
+#include "uart.h"
+//Asynchronous - No parity - 2 stop bits - 8 bit char size
 
 void uart_init(int baudRate){
  2b8:	cf 93       	push	r28
@@ -546,6 +545,7 @@ void uart_init(int baudRate){
  310:	80 93 c2 00 	sts	0x00C2, r24
 	//Ursel makes sure we won't access UBRRH during operation, but UCSRC
 	return;
+}
  314:	df 91       	pop	r29
  316:	cf 91       	pop	r28
  318:	08 95       	ret

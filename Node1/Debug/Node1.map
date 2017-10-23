@@ -1213,18 +1213,18 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x29cd
+.debug_info     0x00000000     0x29b9
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000       0xcf adc.o
  .debug_info    0x000000cf      0x31f can.o
  .debug_info    0x000003ee      0x5b7 joy.o
- .debug_info    0x000009a5      0x3bf main.o
- .debug_info    0x00000d64      0x2f7 mcp.o
- .debug_info    0x0000105b      0x861 menu.o
- .debug_info    0x000018bc      0xbc7 oled.o
- .debug_info    0x00002483       0xb7 spi.o
- .debug_info    0x0000253a      0x2a6 touch.o
- .debug_info    0x000027e0      0x1ed uart.o
+ .debug_info    0x000009a5      0x3ab main.o
+ .debug_info    0x00000d50      0x2f7 mcp.o
+ .debug_info    0x00001047      0x861 menu.o
+ .debug_info    0x000018a8      0xbc7 oled.o
+ .debug_info    0x0000246f       0xb7 spi.o
+ .debug_info    0x00002526      0x2a6 touch.o
+ .debug_info    0x000027cc      0x1ed uart.o
 
 .debug_abbrev   0x00000000      0xe6f
  *(.debug_abbrev)
@@ -1239,18 +1239,18 @@ END GROUP
  .debug_abbrev  0x00000bc7      0x15f touch.o
  .debug_abbrev  0x00000d26      0x149 uart.o
 
-.debug_line     0x00000000      0xcee
+.debug_line     0x00000000      0xced
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000       0xc7 adc.o
  .debug_line    0x000000c7       0xf5 can.o
  .debug_line    0x000001bc      0x184 joy.o
- .debug_line    0x00000340      0x19f main.o
- .debug_line    0x000004df      0x129 mcp.o
- .debug_line    0x00000608      0x1b9 menu.o
- .debug_line    0x000007c1      0x28a oled.o
- .debug_line    0x00000a4b       0xc1 spi.o
- .debug_line    0x00000b0c       0xfd touch.o
- .debug_line    0x00000c09       0xe5 uart.o
+ .debug_line    0x00000340      0x19e main.o
+ .debug_line    0x000004de      0x129 mcp.o
+ .debug_line    0x00000607      0x1b9 menu.o
+ .debug_line    0x000007c0      0x28a oled.o
+ .debug_line    0x00000a4a       0xc1 spi.o
+ .debug_line    0x00000b0b       0xfd touch.o
+ .debug_line    0x00000c08       0xe5 uart.o
 
 .debug_frame    0x00000000      0x73c
  *(.debug_frame)
@@ -1265,7 +1265,7 @@ END GROUP
  .debug_frame   0x00000660       0x8c touch.o
  .debug_frame   0x000006ec       0x50 uart.o
 
-.debug_str      0x00000000      0x866
+.debug_str      0x00000000      0x855
  *(.debug_str)
  .debug_str     0x00000000      0x136 adc.o
                                 0x16f (size before relaxing)
@@ -1273,19 +1273,19 @@ END GROUP
                                 0x1bb (size before relaxing)
  .debug_str     0x000001e4      0x144 joy.o
                                 0x29a (size before relaxing)
- .debug_str     0x00000328      0x105 main.o
-                                0x2a2 (size before relaxing)
- .debug_str     0x0000042d       0x4d mcp.o
+ .debug_str     0x00000328       0xf4 main.o
+                                0x291 (size before relaxing)
+ .debug_str     0x0000041c       0x4d mcp.o
                                 0x1e7 (size before relaxing)
- .debug_str     0x0000047a      0x16f menu.o
+ .debug_str     0x00000469      0x16f menu.o
                                 0x328 (size before relaxing)
- .debug_str     0x000005e9      0x184 oled.o
+ .debug_str     0x000005d8      0x184 oled.o
                                 0x37d (size before relaxing)
- .debug_str     0x0000076d       0x54 spi.o
+ .debug_str     0x0000075c       0x54 spi.o
                                 0x180 (size before relaxing)
- .debug_str     0x000007c1       0x4f touch.o
+ .debug_str     0x000007b0       0x4f touch.o
                                 0x1ac (size before relaxing)
- .debug_str     0x00000810       0x56 uart.o
+ .debug_str     0x000007ff       0x56 uart.o
                                 0x1a4 (size before relaxing)
 
 .debug_loc      0x00000000     0x1d19
