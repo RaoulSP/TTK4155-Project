@@ -9,24 +9,30 @@
 int x;
 int y;
 int z;
-int xmean;
-int ymean;
-int xmax = 0;
-int xmin = 255;
-int ymax = 0;
-int ymin = 255;
+
+int xmin = 0;
+int xmean = 127;
+int xmax = 255;
+
+int ymin = 0;
+int ymean = 127;
+int ymax = 255;
 
 void joy_init(){
 	clear_bit(DDRB,PB2);	//Set joystick button pin to input
 	set_bit(PORTB,PB2);		//Set the internal pull-up resistor needed for the button
-	printf("Calibrating...\r\n");
-	joy_calibrate();
-	printf("Calibrated.\r\n");
+	//joy_calibrate();
 }
 
 void joy_calibrate(){
 	xmean = adc_read('x');
 	ymean = adc_read('y');
+	xmax = 0;
+	xmin = 255;
+	ymax = 0;
+	ymin = 255;
+	
+	printf("Calibrating...\r\n");
 	while (test_bit(PINB, PB2)) //perform until joystick is pressed
 	{
 		x = adc_read('x');
@@ -48,6 +54,7 @@ void joy_calibrate(){
 			printf("%d \r\n", ymin);
 		}
 	}
+	printf("Calibrated.\r\n");
 }
 
 Position joy_get_position(){
@@ -75,6 +82,14 @@ Position joy_get_position(){
 		return pos;
 }
 
+Position_polar joy_get_position_polar(){
+	Position pos_cart = joy_get_position();
+	Position_polar pos_pol;
+	pos_pol.angle = atan2(pos_cart.y,pos_cart.x) * (180.0/ M_PI);
+	pos_pol.amplitude = sqrt((uint16_t)(pos_cart.y*pos_cart.y) + (uint16_t)(pos_cart.x*pos_cart.x));
+	return pos_pol;
+}
+
 Direction joy_get_direction(){ 
 	Position_polar pos_pol  = joy_get_position_polar();
 	
@@ -97,14 +112,6 @@ Direction joy_get_direction(){
 	}
 	return NEUTRAL;
 } 
-
-Position_polar joy_get_position_polar(){
-	Position pos_cart = joy_get_position();
-	Position_polar pos_pol;
-	pos_pol.angle = atan2(pos_cart.y,pos_cart.x) * (180.0/ M_PI);
-	pos_pol.amplitude = sqrt((uint16_t)(pos_cart.y*pos_cart.y) + (uint16_t)(pos_cart.x*pos_cart.x));
-	return pos_pol; 
-}
 
 void joy_print(int all){
 	if(all){

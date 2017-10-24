@@ -1,19 +1,19 @@
-#define F_CPU 4915200
 #define NODE_1 1
+#define F_CPU 4915200
 
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "uart.h"
 #include "adc.h"
-#include "touch.h"
 #include "joy.h"
-#include "oled.h"
-#include "sram.h"
-#include "menu.h"
 #include "spi.h"
 #include "mcp.h"
 #include "can.h"
+#include "uart.h"
+#include "oled.h"
+#include "sram.h"
+#include "menu.h"
+#include "touch.h"
 #include "MCP2515.h"
 
 int main(void)
@@ -29,27 +29,32 @@ int main(void)
 	joy_init();
 	touch_init();
 	menu_init();
-	spi_master_init();
+	spi_master_init(NODE_1);
 	mcp_init();
 	can_init(MODE_LOOPBACK); 
-	oled_clear_screen();
-	oled_refresh();
+	//oled_clear_screen();
+	//oled_refresh();
 	
 	//mcp_test();
-	//sram_test(); Not ok...
+	//sram_test(); //Not working...
+	//can_test(); //Not working
 
 	while (1)
 	{
 		Position position = joy_get_position();
-		int position_length = sizeof(position);
-		can_transmit(42, (char *)&position, position_length);
+		
+		Msg msg;
+		msg.id = 42;
+		msg.length = sizeof(position);
+		msg.data = (char*) &position;
+		can_transmit(msg);
 		
 		//for loopback mode:
 		Position position_received = *(Position*)can_receive();
-		printf("x:%4d\ty:%4d\tz:%4d\r",position_received.x,position_received.y,position_received.z);
+		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 	
 		menu_run_display();
-		_delay_ms(100);	
+		_delay_ms(50);	
 	}
 }	
 	
@@ -100,8 +105,8 @@ int main(void)
 		int input = ;
 		int output = ;
 		int expected = ;
-		do_something(input);
-		output = check_results();
+		module_write(input); //or do something similar
+		output = module_read();
 		if (output == expected){
 			printf("got %s, expected %s ...OK", output, expected);
 			return 0;
@@ -117,6 +122,7 @@ int main(void)
 	Testing SPI		... OK
 	Testing RAM		... OK
 	Testing ADC		... OK
-	Testing Oled	... (printed "OK")
+	Testing Oled	... (Print "OK" on OLED)
 	Testing CAN_LOOPBACK ...OK
+	etc.
 	*/

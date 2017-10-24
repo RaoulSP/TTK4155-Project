@@ -1,18 +1,26 @@
 #include <avr/io.h>
 #include "spi.h"
+#define NODE_1 1
+#define NODE_2 2
 
-void spi_master_init()
+void spi_master_init(int node)
 {
-	/* Set MOSI and SCK output, all others input */
-	DDRB |= (1<<PB5)|(1<<PB7)|(1 << PB4); //DDB4
-	DDRB &= ~(1 << DDB6);
-	/* Enable SPI, Master, set clock rate fck/16 */
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPI2X);
-	set_bit(PORTB,PB4); //Disable chip
-	
-	//TODO: combine with spi_master_init() for node 2? Take int node as argument
-}
+	if (node == NODE_1){
+		DDRB |= (1<<DDB5)|(1<<DDB7)|(1 << DDB4); //Set MOSI and SCK output, all others input
+		DDRB &= ~(1 << DDB6);
 
+		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPI2X); //Enable SPI, Master, set clock rate fck/16
+		set_bit(PORTB,PB4); //Disable chip
+	}
+	else if (node == NODE_2){
+		//Without setting PB0 as an output printf doesn|t work!?!?!?!?
+		DDRB |= (1<<PB1)|(1 << PB2)|(1 << PB7)|(1 << PB0); //Set MOSI, SS and SCK output, all others input
+		DDRB &= ~(1 << PB3); //DO NOT TINK IS NECCSCAS RYTSR:
+
+		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0); //Enable SPI, Master, set clock rate fck/16
+		set_bit(PORTB,PB7); //Disable chip
+	}
+}
 
 char spi_master_transmit(char cData)
 {
@@ -22,7 +30,7 @@ char spi_master_transmit(char cData)
 }
 
 
-/*Testing code taken from main.c - this test doesn't work correctly, even when SPI is working. (?)
+/*This testing code is taken from main.c - this test doesn't work correctly, even when SPI is working. (?)
 	char k = (spi_master_transmit('a'));
 	printf("%c\r\n",k);
 	char z = (spi_master_transmit('a'));

@@ -5,7 +5,7 @@
 #ifndef SPI_H_
 #define SPI_H_
 
-void spi_master_init();
+void spi_master_init(int node);
 char spi_master_transmit(char cData);
 
 #endif /* SPI_H_ */

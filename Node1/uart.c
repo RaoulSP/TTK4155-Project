@@ -1,4 +1,5 @@
 #define F_CPU 4915200
+#define NODE_1 1
 
 #include <avr/io.h>
 #include <stdio.h>
@@ -12,23 +13,13 @@ void uart_init(int baudRate, int node){
 	UBRR0L = UBRR; //Setting baud rate low byte
     UBRR0H = (UBRR>>8); //Setting baud rate high byte
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0); //Enable receiver and transmitter 
-    UCSR0C = ((1<<URSEL0)|(1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bit, 8data.
-    
-	//Why doesn't the stuff below work? prints [00]
-	
-    //if (node == 1){ //URSEL should not be set in node 2
-	//    UCSR0C = ((1<<URSEL0)|(1<<USBS0)|(3<<UCSZ00)); //URSEL makes sure we won't access UBRRH during operation, but UCSRC.
-	//}
-	
-		
+	UCSR0C = (((node == NODE_1)<<URSEL0)|(1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bit, 8data. //URSEL makes sure we won't access UBRRH during operation, but UCSRC. //URSEL should not be set in node 2
 	fdevopen(uart_putchar, uart_getchar); //Enable printf use
-	return;
 }
 
 void uart_putchar(char c){
 	while (!( UCSR0A & (1<<UDRE0))); //Wait for empty transmit buffer
 	UDR0 = c; //Put data into buffer, sends the data
-	return;
 }
 
 unsigned char uart_getchar(){

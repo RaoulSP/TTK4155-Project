@@ -27,8 +27,8 @@ typedef enum joy_direction_t
 void joy_init();
 void joy_calibrate();
 Position joy_get_position();
-Direction joy_get_direction();
 Position_polar joy_get_position_polar();
+Direction joy_get_direction();
 
 void joy_print(int all);
 #endif /* JOY_H_ */
