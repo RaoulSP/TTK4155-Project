@@ -35,7 +35,7 @@ void can_write(int id, char *data, int data_length){
 }
 
 //MCP_TXB0CTRL
-char* can_read(){
+char* can_receive(){
 	//Add something to read the standard identifier of the message received
 	
 	uint8_t data_length = mcp_read(0x65) & 0b00001111;

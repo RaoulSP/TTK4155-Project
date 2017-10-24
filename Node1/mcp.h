@@ -1,5 +1,3 @@
-
-
 #ifndef MCP_H_
 #define MCP_H_
 
@@ -10,5 +8,6 @@ char mcp_read_status();
 void mcp_bit_modify(char address, char mask, char data);
 void mcp_reset();
 void mcp_init();
+int mcp_test();
 
 #endif /* MCP_H_ */

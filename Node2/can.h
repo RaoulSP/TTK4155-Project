@@ -12,7 +12,7 @@ typedef struct frame_t {
 
 void can_init(int mode);
 void can_write(int id, char *data, int data_length);
-char* can_read();
+char* can_receive();
 
 
 

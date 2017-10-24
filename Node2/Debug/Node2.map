@@ -431,9 +431,9 @@ END GROUP
  .text.can_init
                 0x00000124       0x20 can.o
                 0x00000124                can_init
- .text.can_read
+ .text.can_receive
                 0x00000144       0x94 can.o
-                0x00000144                can_read
+                0x00000144                can_receive
  .text.mcp_read
                 0x000001d8       0x18 mcp.o
                 0x000001d8                mcp_read
@@ -683,17 +683,17 @@ END GROUP
  .debug_frame   0x00000184       0x34 spi.o
  .debug_frame   0x000001b8       0x50 uart.o
 
-.debug_str      0x00000000      0x32e
+.debug_str      0x00000000      0x331
  *(.debug_str)
- .debug_str     0x00000000      0x186 can.o
-                                0x1c4 (size before relaxing)
- .debug_str     0x00000186       0x9c mcp.o
+ .debug_str     0x00000000      0x189 can.o
+                                0x1c7 (size before relaxing)
+ .debug_str     0x00000189       0x9c mcp.o
                                 0x1ef (size before relaxing)
- .debug_str     0x00000222       0x86 Node2.o
+ .debug_str     0x00000225       0x86 Node2.o
                                 0x1c6 (size before relaxing)
- .debug_str     0x000002a8       0x21 spi.o
+ .debug_str     0x000002ab       0x21 spi.o
                                 0x185 (size before relaxing)
- .debug_str     0x000002c9       0x65 uart.o
+ .debug_str     0x000002cc       0x65 uart.o
                                 0x1ad (size before relaxing)
 
 .debug_loc      0x00000000      0x670

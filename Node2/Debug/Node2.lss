@@ -21,11 +21,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  00000208  00000000  00000000  000023ec  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    0000032e  00000000  00000000  000025f4  2**0
+  9 .debug_str    00000331  00000000  00000000  000025f4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000670  00000000  00000000  00002922  2**0
+ 10 .debug_loc    00000670  00000000  00000000  00002925  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 000000a0  00000000  00000000  00002f92  2**0
+ 11 .debug_ranges 000000a0  00000000  00000000  00002f95  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -214,10 +214,10 @@ Disassembly of section .text:
  140:	cf 91       	pop	r28
  142:	08 95       	ret
 
-00000144 <can_read>:
+00000144 <can_receive>:
 
 //MCP_TXB0CTRL
-char* can_read(){
+char* can_receive(){
  144:	8f 92       	push	r8
  146:	9f 92       	push	r9
  148:	af 92       	push	r10
@@ -241,7 +241,7 @@ char* can_read(){
  162:	9e b6       	in	r9, 0x3e	; 62
 
 //MCP_TXB0CTRL
-char* can_read(){
+char* can_receive(){
 	//Add something to read the standard identifier of the message received
 	
 	uint8_t data_length = mcp_read(0x65) & 0b00001111;
@@ -267,7 +267,7 @@ char* can_read(){
 	for(int i = 0; i < data_length; i++){
  188:	1c 14       	cp	r1, r12
  18a:	1d 04       	cpc	r1, r13
- 18c:	74 f4       	brge	.+28     	; 0x1aa <can_read+0x66>
+ 18c:	74 f4       	brge	.+28     	; 0x1aa <can_receive+0x66>
  18e:	7f 01       	movw	r14, r30
  190:	00 e0       	ldi	r16, 0x00	; 0
  192:	10 e0       	ldi	r17, 0x00	; 0
@@ -278,7 +278,7 @@ char* can_read(){
  19a:	f7 01       	movw	r30, r14
  19c:	81 93       	st	Z+, r24
  19e:	7f 01       	movw	r14, r30
-char* can_read(){
+char* can_receive(){
 	//Add something to read the standard identifier of the message received
 	
 	uint8_t data_length = mcp_read(0x65) & 0b00001111;
@@ -288,7 +288,7 @@ char* can_read(){
  1a2:	1f 4f       	sbci	r17, 0xFF	; 255
  1a4:	0c 15       	cp	r16, r12
  1a6:	1d 05       	cpc	r17, r13
- 1a8:	ac f3       	brlt	.-22     	; 0x194 <can_read+0x50>
+ 1a8:	ac f3       	brlt	.-22     	; 0x194 <can_receive+0x50>
 		data[i] = mcp_read(0x66 + i);  //Read data
 	}
 	//data[data_length] = '\0';
@@ -379,19 +379,20 @@ int main(void)
  22c:	80 e0       	ldi	r24, 0x00	; 0
  22e:	90 e0       	ldi	r25, 0x00	; 0
  230:	79 df       	rcall	.-270    	; 0x124 <can_init>
+	
 	while(1)
     {
-		Position position2 = *(Position*)can_read();
+		Position position2 = *(Position*)can_receive();
 		printf("x:%4d\ty:%4d\tz:%4d\r",position2.x,position2.y,position2.z);
  232:	c6 e0       	ldi	r28, 0x06	; 6
  234:	d2 e0       	ldi	r29, 0x02	; 2
-	spi_master_init();
     mcp_reset();
 	can_init(MODE_NORMAL);
+	
 	while(1)
     {
-		Position position2 = *(Position*)can_read();
- 236:	86 df       	rcall	.-244    	; 0x144 <can_read>
+		Position position2 = *(Position*)can_receive();
+ 236:	86 df       	rcall	.-244    	; 0x144 <can_receive>
  238:	fc 01       	movw	r30, r24
 		printf("x:%4d\ty:%4d\tz:%4d\r",position2.x,position2.y,position2.z);
  23a:	85 81       	ldd	r24, Z+5	; 0x05

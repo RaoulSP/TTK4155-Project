@@ -16,9 +16,10 @@ int main(void)
 	spi_master_init();
     mcp_reset();
 	can_init(MODE_NORMAL);
+	
 	while(1)
     {
-		Position position2 = *(Position*)can_read();
+		Position position2 = *(Position*)can_receive();
 		printf("x:%4d\ty:%4d\tz:%4d\r",position2.x,position2.y,position2.z);
 		_delay_ms(100);
     }
