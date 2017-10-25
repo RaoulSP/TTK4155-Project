@@ -8,9 +8,8 @@ typedef struct can_msg_t {
 } Msg;
 
 void can_init(int mode);
-void can_transmit(Msg msg); //void can_transmit(int id, char *data, int data_length); //Old version
+void can_transmit(Msg msg); 
 char* can_receive();
 int can_test();
-
 
 #endif /* CAN_H_ */

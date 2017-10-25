@@ -32,11 +32,11 @@ int main(void)
 	can_init(MODE_LOOPBACK); 
 	
 	//mcp_test();
-	//sram_test(); //Not working...
+	//sram_test(); //Not working?
 	//can_test(); //Not working
 
 	while (1)
-	{
+	{		
 		Position position = joy_get_position();
 		
 		Msg msg;
@@ -45,10 +45,12 @@ int main(void)
 		msg.data = (char*) &position;
 		can_transmit(msg);
 		
-		//for loopback mode:
+		//for loopback mode only:
 		Position position_received = *(Position*)can_receive();
 		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 	
+		//sending a string over CAN doesn't seem to work
+
 		menu_run_display();
 		_delay_ms(50);	
 	}
@@ -97,6 +99,9 @@ int main(void)
 	Testing Oled	... (Print "OK" on OLED)
 	Testing CAN_LOOPBACK ...OK
 	etc.
+	
+	
+	#include "common.h"?
 	*/
 	
 	

@@ -1,12 +1,13 @@
 #include "oled.h"
 #include "fonts.h"
 
+int doublebuffering = 1;
+int oled_back_buffer_index = 0;
+
 volatile uint8_t *oled_command = 0x1000;
 volatile uint8_t *oled_back_buffer = 0x1800;
 volatile uint8_t *oled_front_buffer = 0x1200;
 
-int oled_back_buffer_index = 0;
-int doublebuffering = 1;
 
 void oled_init(){
 	oled_write_command(0xae); //display off
@@ -95,7 +96,7 @@ void oled_write_command(char command){
 void oled_write_data(char data){
 	if(doublebuffering){
 		if (oled_back_buffer_index > 1023){
-			printf("Outside of screen!\n");
+			//printf("Outside of screen!\n");
 			return -1;
 		}
 		oled_back_buffer[oled_back_buffer_index] = data;
@@ -109,8 +110,9 @@ void oled_write_data(char data){
 char oled_read_data(){
 	if(doublebuffering){
 		if (oled_back_buffer_index > 1023){
-			printf("Outside of screen!\n");
-			return -1;
+			//printf("Outside of screen!\n");
+			//return -1;
+			return 0x00;
 		}
 		return oled_back_buffer[oled_back_buffer_index];
 	}
@@ -181,7 +183,22 @@ void oled_invert_pixel(int x, int y){
 }
 
 void oled_draw_line(int x1, int y1, int x2, int y2){
+	if ((y2-y1)<=(x2-x1)){
+		float m = (float)(y2-y1)/(float)(x2-x1);
+		for (int x = 0; x < (x2-x1); x++){
+			int y = (int)(m*x+0.5);
+			oled_draw_pixel(x1+x,y1+y);
+		}
+	}
+	else{
+		float m = (float)(x2-x1)/(float)(y2-y1);
+		for (int y = 0; y < (y2-y1); y++){
+			int x = (int)(m*y+0.5);
+			oled_draw_pixel(x1+x,y1+y);
+		}
+	}
 	
+	//not finished
 }
 
 void oled_invert_rectangle(int x1, int y1, int x2, int y2){
