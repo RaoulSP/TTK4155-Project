@@ -8,7 +8,7 @@
 
 int x;
 int y;
-int z;
+int z = 0;
 
 int xmin = 0;
 int xmean = 127;
@@ -33,10 +33,14 @@ void joy_calibrate(){
 	ymin = 255;
 	
 	printf("Calibrating...\r\n");
-	while (test_bit(PINB, PB2)) //perform until joystick is pressed
-	{
+	oled_print_string("Please calibrate joystick!",0,0,8,0);
+	oled_refresh();
+	
+	while (z == 0){
 		x = adc_read('x');
 		y = adc_read('y');
+		z = !test_bit(PINB, PB2);
+		
 		if (x > xmax){
 			xmax = x;
 			printf("%d \r\n", xmax);
@@ -55,6 +59,9 @@ void joy_calibrate(){
 		}
 	}
 	printf("Calibrated.\r\n");
+	oled_clear_screen();
+	oled_print_string("Calibrated!",0,0,8,0);
+	oled_refresh();
 }
 
 Position joy_get_position(){

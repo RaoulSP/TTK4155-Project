@@ -24,16 +24,12 @@ int main(void)
 	uart_init(9600, NODE_1);
 	adc_init();
 	oled_init();
-	oled_print_string("Please calibrate joystick!",0,0,8,0);
-	oled_refresh();
 	joy_init();
 	touch_init();
 	menu_init();
 	spi_master_init(NODE_1);
 	mcp_init();
 	can_init(MODE_LOOPBACK); 
-	//oled_clear_screen();
-	//oled_refresh();
 	
 	//mcp_test();
 	//sram_test(); //Not working...
@@ -57,30 +53,6 @@ int main(void)
 		_delay_ms(50);	
 	}
 }	
-	
-	/*--NOTES--
-	1 output, 0 input
-
-	JTAG interface with the 168
-	Left to right (row 41-44)
-	1,5,3,9
-	Vcc 4
-	GND 2
-
-	char test[] = "raoul&he"; DO NOT USE THIS
-	char* test = "raoul&he"; USE THIS. Adds \0 termination automatically
-
-	printf("%30s",string); Variable string will take fixed amount of space by padding with spaces
-	printf("%4d",integer); Variable digit will take fixed amount of space by padding with spaces
-
-	printf("\b"); Backspace
-	printf("\n"); Line Feed
-	printf("\r"); Carriage Return
-	Only works properly in putty
-	\r\n is a proper new line! This combination works in Putty, Bray's and Termite
-	*/
-
-	
 	
 	
 	/*--TODO--
@@ -125,4 +97,29 @@ int main(void)
 	Testing Oled	... (Print "OK" on OLED)
 	Testing CAN_LOOPBACK ...OK
 	etc.
+	*/
+	
+	
+	
+	
+	/*--NOTES--
+	1 output, 0 input
+
+	JTAG interface with the 168
+	Left to right (row 41-44)
+	1,5,3,9
+	Vcc 4
+	GND 2
+
+	char test[] = "raoul&he"; DO NOT USE THIS
+	char* test = "raoul&he"; USE THIS. Adds \0 termination automatically
+
+	printf("%30s",string); Variable string will take fixed amount of space by padding with spaces
+	printf("%4d",integer); Variable digit will take fixed amount of space by padding with spaces
+
+	printf("\b"); Backspace
+	printf("\n"); Line Feed
+	printf("\r"); Carriage Return
+	Only works properly in PuTTY
+	\r\n is a proper new line! This combination works in Putty, Bray's and Termite
 	*/

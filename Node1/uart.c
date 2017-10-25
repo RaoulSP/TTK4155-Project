@@ -7,14 +7,12 @@
 #include "uart.h"
 
 void uart_init(int baudRate, int node){
-	//Asynchronous - No parity - 2 stop bits - 8 bit char size
-	
 	int UBRR = ((long)F_CPU/((long)16*baudRate) - 1);
-	UBRR0L = UBRR; //Setting baud rate low byte
-    UBRR0H = (UBRR>>8); //Setting baud rate high byte
+	UBRR0L = UBRR;
+    UBRR0H = (UBRR>>8);
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0); //Enable receiver and transmitter 
-	UCSR0C = (((node == NODE_1)<<URSEL0)|(1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bit, 8data. //URSEL makes sure we won't access UBRRH during operation, but UCSRC. //URSEL should not be set in node 2
-	fdevopen(uart_putchar, uart_getchar); //Enable printf use
+	UCSR0C = (((node == NODE_1)<<URSEL0)|(1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bits, 8 data bits //Asynchronous - No parity //URSEL makes sure we won't access UBRRH during operation, but UCSRC. //URSEL should not be set in node 2
+	fdevopen(uart_putchar, uart_getchar);
 }
 
 void uart_putchar(char c){

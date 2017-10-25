@@ -1,12 +1,14 @@
-#include <avr/io.h>
-#include "spi.h"
 #define NODE_1 1
 #define NODE_2 2
+
+#include <avr/io.h>
+
+#include "spi.h"
 
 void spi_master_init(int node)
 {
 	if (node == NODE_1){
-		DDRB |= (1<<DDB5)|(1<<DDB7)|(1 << DDB4); //Set MOSI and SCK output, all others input
+		DDRB |= (1<<DDB4)|(1<<DDB5)|(1<<DDB7); //Set MOSI and SCK output, all others input
 		DDRB &= ~(1 << DDB6);
 
 		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPI2X); //Enable SPI, Master, set clock rate fck/16
@@ -14,7 +16,7 @@ void spi_master_init(int node)
 	}
 	else if (node == NODE_2){
 		//Without setting PB0 as an output printf doesn|t work!?!?!?!?
-		DDRB |= (1<<PB1)|(1 << PB2)|(1 << PB7)|(1 << PB0); //Set MOSI, SS and SCK output, all others input
+		DDRB |= (1<<PB0)|(1 << PB1)|(1 << PB2)|(1 << PB7); //Set MOSI, SS and SCK output, all others input
 		DDRB &= ~(1 << PB3); //DO NOT TINK IS NECCSCAS RYTSR:
 
 		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0); //Enable SPI, Master, set clock rate fck/16
