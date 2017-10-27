@@ -9,7 +9,8 @@ typedef struct can_msg_t {
 
 void can_init(int mode);
 void can_transmit(Msg msg); 
-char* can_receive();
+Msg can_receive();
+//char* can_receive();
 int can_test();
 
 #endif /* CAN_H_ */

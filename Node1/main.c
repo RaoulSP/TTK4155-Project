@@ -32,11 +32,13 @@ int main(void)
 	can_init(MODE_LOOPBACK); 
 	
 	//mcp_test();
-	//sram_test(); //Not working?
+	//sram_test();
 	//can_test(); //Not working
+	
+	printf("\r\n%s\r\n", "New run");
 
 	while (1)
-	{		
+	{	
 		Position position = joy_get_position();
 		
 		Msg msg;
@@ -46,10 +48,27 @@ int main(void)
 		can_transmit(msg);
 		
 		//for loopback mode only:
-		Position position_received = *(Position*)can_receive();
+		Position position_received = *(Position*)can_receive().data;
 		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
-	
-		//sending a string over CAN doesn't seem to work
+		
+		
+		/*
+		char* test = "Hello";
+		//int test = 1234;
+		
+		Msg msg;
+		msg.id = 42;
+		msg.length = 7;
+		msg.data = test;
+		can_transmit(msg);
+		
+		//for loopback mode only:
+		char* test_received = can_receive().data; //Sending this MAKES THE MCU REBOOT
+		printf("%s\r", test_received);
+		*/
+		
+		
+		//sending a string over CAN still doesn't seem to work
 
 		menu_run_display();
 		_delay_ms(50);	
@@ -102,6 +121,10 @@ int main(void)
 	
 	
 	#include "common.h"?
+	
+	Boot nr.: in eeprom?
+	
+	coordinate struct? containing x  and y (and z? ... mwahaha)
 	*/
 	
 	
@@ -127,4 +150,6 @@ int main(void)
 	printf("\r"); Carriage Return
 	Only works properly in PuTTY
 	\r\n is a proper new line! This combination works in Putty, Bray's and Termite
+	
+	sizeof(int) = 2 bytes
 	*/

@@ -148,6 +148,6 @@ void joy_print(int all){
 	printf("%d  ", joy_get_direction());
 	
 	printf("Middle button= ");
-	printf("%d  ", pos.z);
+	printf("%d  \r", pos.z);
 	
 }
