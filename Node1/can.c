@@ -32,6 +32,7 @@ void can_transmit(Msg msg){
 	//TXBnCTRL.TXERR and the CANINTF.MERRF bits will be set and an interrupt will be generated on the INT pin if the CANINTE.MERRE bit is set
 }
 
+/*
 Msg can_receive(){
 	int buffer = 0; //n = 1 or 2
 	
@@ -50,6 +51,8 @@ Msg can_receive(){
 	//TODO: Add something to read the standard identifier of the message received
 	//use Msg type? Return Msg type and access data using "can_receive().data"?
 }
+*/
+
 
 /* //Not working?
 Msg can_receive(){
@@ -68,7 +71,8 @@ Msg can_receive(){
 }
 */
 
-/* //"Original"
+
+ //"Original"
 char* can_receive(){
 	uint8_t data_length = mcp_read(0x65) & 0b00001111;
 	char data[data_length];
@@ -81,7 +85,7 @@ char* can_receive(){
 	//TODO: Add something to read the standard identifier of the message received
 	//use Msg type? Return Msg type and access data using "can_receive().data"?
 }
-*/
+
 
 /*
 int can_test(){ 

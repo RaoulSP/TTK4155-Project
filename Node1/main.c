@@ -29,7 +29,7 @@ int main(void)
 	menu_init();
 	spi_master_init(NODE_1);
 	mcp_init();
-	can_init(MODE_LOOPBACK); 
+	can_init(MODE_NORMAL); 
 	
 	//mcp_test();
 	//sram_test();
@@ -40,7 +40,6 @@ int main(void)
 	while (1)
 	{	
 		Position position = joy_get_position();
-		
 		Msg msg;
 		msg.id = 42;
 		msg.length = sizeof(position);
@@ -48,11 +47,17 @@ int main(void)
 		can_transmit(msg);
 		
 		//for loopback mode only:
-		Position position_received = *(Position*)can_receive().data;
-		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		//Position position_received = *(Position*)can_receive();
+		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		
+		menu_run_display();
+		_delay_ms(50);
 		
 		
-		/*
+		
+		
+		
+		/* //For later!
 		char* test = "Hello";
 		//int test = 1234;
 		
@@ -67,11 +72,9 @@ int main(void)
 		printf("%s\r", test_received);
 		*/
 		
-		
 		//sending a string over CAN still doesn't seem to work
 
-		menu_run_display();
-		_delay_ms(50);	
+		
 	}
 }	
 	
