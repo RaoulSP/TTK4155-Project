@@ -20,8 +20,12 @@ int main(void)
 	can_init(MODE_NORMAL);
 	pwm_init();
 	adc_init();
+	
+	int score = 0;
+	
 	while(1)
 	{
+		
 		/*
 		Position position_received = *(Position*)can_receive();
 		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
@@ -29,10 +33,28 @@ int main(void)
 		pwm_set_duty_cycle((((float)position_received.x)*1.2/200.0)+1.5);
 		_delay_ms(10);
 		*/
+		//if (adc_read < 700)
+		//{
+			//counter++;
+		//}
+		score += check_if_scored();
+		printf("%d\r\n", score);
 		
-		printf("%d\r\n",adc_read());
+		//printf("%d\r\n",adc_read());
 		_delay_ms(100);
 	}
+}
+
+int check_if_scored() 
+{
+	int scoring_allowed = 1;
+	int trigger_value = 500;
+	int adc_val = adc_read();
+	printf("%d\r\n", adc_val);
+	if (adc_val < trigger_value && scoring_allowed){
+		return 1;
+	}
+	else return 0;
 }
 
 /*--TODO

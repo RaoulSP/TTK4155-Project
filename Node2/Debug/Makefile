@@ -43,7 +43,8 @@ C_SRCS +=  \
 ../Node2.c \
 ../pwm.c \
 ../spi.c \
-../uart.c
+../uart.c \
+../utils.c
 
 
 PREPROCESSING_SRCS += 
@@ -59,7 +60,8 @@ mcp.o \
 Node2.o \
 pwm.o \
 spi.o \
-uart.o
+uart.o \
+utils.o
 
 OBJS_AS_ARGS +=  \
 adc.o \
@@ -68,7 +70,8 @@ mcp.o \
 Node2.o \
 pwm.o \
 spi.o \
-uart.o
+uart.o \
+utils.o
 
 C_DEPS +=  \
 adc.d \
@@ -77,7 +80,8 @@ mcp.d \
 Node2.d \
 pwm.d \
 spi.d \
-uart.d
+uart.d \
+utils.d
 
 C_DEPS_AS_ARGS +=  \
 adc.d \
@@ -86,7 +90,8 @@ mcp.d \
 Node2.d \
 pwm.d \
 spi.d \
-uart.d
+uart.d \
+utils.d
 
 OUTPUT_FILE_PATH +=Node2.elf
 
@@ -102,6 +107,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

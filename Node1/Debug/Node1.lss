@@ -21,11 +21,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  000007b0  00000000  00000000  00007598  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000007ef  00000000  00000000  00007d48  2**0
+  9 .debug_str    00000824  00000000  00000000  00007d48  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00002092  00000000  00000000  00008537  2**0
+ 10 .debug_loc    00002092  00000000  00000000  0000856c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000230  00000000  00000000  0000a5c9  2**0
+ 11 .debug_ranges 00000230  00000000  00000000  0000a5fe  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -428,40 +428,24 @@ Disassembly of section .text:
      766:	08 95       	ret
 
 00000768 <can_init>:
-
-#include "mcp.h"
-#include "can.h"
-#include "MCP2515.h"
-
-void can_init(int mode){
      768:	cf 93       	push	r28
      76a:	c8 2f       	mov	r28, r24
-	mcp_bit_modify(0x2B,0b00011100, 0b00000000); //Disables interrupts from empty buffers
      76c:	40 e0       	ldi	r20, 0x00	; 0
      76e:	6c e1       	ldi	r22, 0x1C	; 28
      770:	8b e2       	ldi	r24, 0x2B	; 43
      772:	0e 94 d0 05 	call	0xba0	; 0xba0 <mcp_bit_modify>
-	mcp_bit_modify(MCP_RXB0CTRL, 0b01100000, 0b01100000); //Disable filters
      776:	40 e6       	ldi	r20, 0x60	; 96
      778:	60 e6       	ldi	r22, 0x60	; 96
      77a:	80 e6       	ldi	r24, 0x60	; 96
      77c:	0e 94 d0 05 	call	0xba0	; 0xba0 <mcp_bit_modify>
-	mcp_bit_modify(MCP_CANCTRL, 0xFF, mode); //Sets operation mode 
      780:	4c 2f       	mov	r20, r28
      782:	6f ef       	ldi	r22, 0xFF	; 255
      784:	8f e0       	ldi	r24, 0x0F	; 15
      786:	0e 94 d0 05 	call	0xba0	; 0xba0 <mcp_bit_modify>
-	
-	//TODO: Filter initialization
-	//NOTES: CANINTE.TXInE
-	//priority bits? TXP
-}
      78a:	cf 91       	pop	r28
      78c:	08 95       	ret
 
 0000078e <can_transmit>:
-
-void can_transmit(Msg msg){
      78e:	ef 92       	push	r14
      790:	ff 92       	push	r15
      792:	0f 93       	push	r16
@@ -483,9 +467,6 @@ void can_transmit(Msg msg){
      7b2:	1a 81       	ldd	r17, Y+2	; 0x02
      7b4:	ed 80       	ldd	r14, Y+5	; 0x05
      7b6:	fe 80       	ldd	r15, Y+6	; 0x06
-	int buffer = 2;
-	
-	mcp_write(0x31 + 0x10*buffer, msg.id >> 3);  //TXBnSIDH
      7b8:	b8 01       	movw	r22, r16
      7ba:	75 95       	asr	r23
      7bc:	67 95       	ror	r22
@@ -495,25 +476,20 @@ void can_transmit(Msg msg){
      7c4:	67 95       	ror	r22
      7c6:	81 e5       	ldi	r24, 0x51	; 81
      7c8:	0e 94 ae 05 	call	0xb5c	; 0xb5c <mcp_write>
-	mcp_write(0x32 + 0x10*buffer, msg.id << 5);  //TXBnSIDL
      7cc:	60 2f       	mov	r22, r16
      7ce:	62 95       	swap	r22
      7d0:	66 0f       	add	r22, r22
      7d2:	60 7e       	andi	r22, 0xE0	; 224
      7d4:	82 e5       	ldi	r24, 0x52	; 82
      7d6:	0e 94 ae 05 	call	0xb5c	; 0xb5c <mcp_write>
-	mcp_write(0x35 + 0x10*buffer, msg.length); //TXBnDLC	//RTR will be set to 0 (Data Frame message)
      7da:	6e 2d       	mov	r22, r14
      7dc:	85 e5       	ldi	r24, 0x55	; 85
      7de:	0e 94 ae 05 	call	0xb5c	; 0xb5c <mcp_write>
-	
-	for(int i = 0; i < msg.length; i++){
      7e2:	1e 14       	cp	r1, r14
      7e4:	1f 04       	cpc	r1, r15
      7e6:	84 f4       	brge	.+32     	; 0x808 <can_transmit+0x7a>
      7e8:	00 e0       	ldi	r16, 0x00	; 0
      7ea:	10 e0       	ldi	r17, 0x00	; 0
-		mcp_write(0x36 + 0x10*buffer + i, msg.data[i]); //TXBnDm
      7ec:	eb 81       	ldd	r30, Y+3	; 0x03
      7ee:	fc 81       	ldd	r31, Y+4	; 0x04
      7f0:	e0 0f       	add	r30, r16
@@ -522,21 +498,11 @@ void can_transmit(Msg msg){
      7f6:	86 e5       	ldi	r24, 0x56	; 86
      7f8:	80 0f       	add	r24, r16
      7fa:	0e 94 ae 05 	call	0xb5c	; 0xb5c <mcp_write>
-	
-	mcp_write(0x31 + 0x10*buffer, msg.id >> 3);  //TXBnSIDH
-	mcp_write(0x32 + 0x10*buffer, msg.id << 5);  //TXBnSIDL
-	mcp_write(0x35 + 0x10*buffer, msg.length); //TXBnDLC	//RTR will be set to 0 (Data Frame message)
-	
-	for(int i = 0; i < msg.length; i++){
      7fe:	0f 5f       	subi	r16, 0xFF	; 255
      800:	1f 4f       	sbci	r17, 0xFF	; 255
      802:	0e 15       	cp	r16, r14
      804:	1f 05       	cpc	r17, r15
      806:	91 f7       	brne	.-28     	; 0x7ec <can_transmit+0x5e>
-		mcp_write(0x36 + 0x10*buffer + i, msg.data[i]); //TXBnDm
-	}
-	
-	mcp_request_to_send(buffer == 2, buffer == 1, buffer == 0);	//Request to send - sending will start as soon as the bus is clear
      808:	40 e0       	ldi	r20, 0x00	; 0
      80a:	50 e0       	ldi	r21, 0x00	; 0
      80c:	60 e0       	ldi	r22, 0x00	; 0
@@ -544,10 +510,6 @@ void can_transmit(Msg msg){
      810:	81 e0       	ldi	r24, 0x01	; 1
      812:	90 e0       	ldi	r25, 0x00	; 0
      814:	0e 94 c0 05 	call	0xb80	; 0xb80 <mcp_request_to_send>
-	
-	//TODO: (maybe) print error message?
-	//TXBnCTRL.TXERR and the CANINTF.MERRF bits will be set and an interrupt will be generated on the INT pin if the CANINTE.MERRE bit is set
-}
      818:	26 96       	adiw	r28, 0x06	; 6
      81a:	0f b6       	in	r0, 0x3f	; 63
      81c:	f8 94       	cli
@@ -932,12 +894,6 @@ Direction joy_get_direction(){
      a96:	08 95       	ret
 
 00000a98 <main>:
-#include "menu.h"
-#include "touch.h"
-#include "MCP2515.h"
-
-int main(void)
-{
      a98:	cf 93       	push	r28
      a9a:	df 93       	push	r29
      a9c:	cd b7       	in	r28, 0x3d	; 61
@@ -948,47 +904,29 @@ int main(void)
      aa6:	de bf       	out	0x3e, r29	; 62
      aa8:	0f be       	out	0x3f, r0	; 63
      aaa:	cd bf       	out	0x3d, r28	; 61
-	MCUCR |= (1<<SRE);	//Enable external memory
      aac:	85 b7       	in	r24, 0x35	; 53
      aae:	80 68       	ori	r24, 0x80	; 128
      ab0:	85 bf       	out	0x35, r24	; 53
-	SFIOR |= (1<<XMM2);
      ab2:	80 b7       	in	r24, 0x30	; 48
      ab4:	80 62       	ori	r24, 0x20	; 32
      ab6:	80 bf       	out	0x30, r24	; 48
-	
-	uart_init(9600, NODE_1);
      ab8:	61 e0       	ldi	r22, 0x01	; 1
      aba:	70 e0       	ldi	r23, 0x00	; 0
      abc:	80 e8       	ldi	r24, 0x80	; 128
      abe:	95 e2       	ldi	r25, 0x25	; 37
      ac0:	0e 94 78 0b 	call	0x16f0	; 0x16f0 <uart_init>
-	adc_init();
      ac4:	0e 94 96 03 	call	0x72c	; 0x72c <adc_init>
-	oled_init();
      ac8:	0e 94 33 0a 	call	0x1466	; 0x1466 <oled_init>
-	joy_init();
      acc:	0e 94 19 04 	call	0x832	; 0x832 <joy_init>
-	touch_init();
      ad0:	0e 94 6d 0b 	call	0x16da	; 0x16da <touch_init>
-	menu_init();
      ad4:	0e 94 44 08 	call	0x1088	; 0x1088 <menu_init>
-	spi_master_init(NODE_1);
      ad8:	81 e0       	ldi	r24, 0x01	; 1
      ada:	90 e0       	ldi	r25, 0x00	; 0
      adc:	0e 94 53 0b 	call	0x16a6	; 0x16a6 <spi_master_init>
-	mcp_init();
      ae0:	0e 94 ee 05 	call	0xbdc	; 0xbdc <mcp_init>
-	can_init(MODE_NORMAL); 
      ae4:	80 e0       	ldi	r24, 0x00	; 0
      ae6:	90 e0       	ldi	r25, 0x00	; 0
      ae8:	0e 94 b4 03 	call	0x768	; 0x768 <can_init>
-	
-	//mcp_test();
-	//sram_test();
-	//can_test(); //Not working
-	
-	printf("\r\n%s\r\n", "New run");
      aec:	88 e8       	ldi	r24, 0x88	; 136
      aee:	91 e0       	ldi	r25, 0x01	; 1
      af0:	9f 93       	push	r25
@@ -1002,33 +940,19 @@ int main(void)
      b02:	0f 90       	pop	r0
      b04:	0f 90       	pop	r0
      b06:	0f 90       	pop	r0
-
-	while (1)
-	{	
-		Position position = joy_get_position();
-		Msg msg;
-		msg.id = 42;
      b08:	0f 2e       	mov	r0, r31
      b0a:	fa e2       	ldi	r31, 0x2A	; 42
      b0c:	ef 2e       	mov	r14, r31
      b0e:	f0 2d       	mov	r31, r0
      b10:	c1 2c       	mov	r12, r1
-		msg.length = sizeof(position);
      b12:	0f 2e       	mov	r0, r31
      b14:	f6 e0       	ldi	r31, 0x06	; 6
      b16:	ff 2e       	mov	r15, r31
      b18:	f0 2d       	mov	r31, r0
      b1a:	d1 2c       	mov	r13, r1
-		msg.data = (char*) &position;
      b1c:	8e 01       	movw	r16, r28
      b1e:	09 5f       	subi	r16, 0xF9	; 249
      b20:	1f 4f       	sbci	r17, 0xFF	; 255
-	
-	printf("\r\n%s\r\n", "New run");
-
-	while (1)
-	{	
-		Position position = joy_get_position();
      b22:	0e 94 1c 04 	call	0x838	; 0x838 <joy_get_position>
      b26:	2f 83       	std	Y+7, r18	; 0x07
      b28:	38 87       	std	Y+8, r19	; 0x08
@@ -1036,30 +960,19 @@ int main(void)
      b2c:	5a 87       	std	Y+10, r21	; 0x0a
      b2e:	6b 87       	std	Y+11, r22	; 0x0b
      b30:	7c 87       	std	Y+12, r23	; 0x0c
-		Msg msg;
-		msg.id = 42;
      b32:	4e 2d       	mov	r20, r14
      b34:	e9 82       	std	Y+1, r14	; 0x01
      b36:	ca 82       	std	Y+2, r12	; 0x02
-		msg.length = sizeof(position);
      b38:	fd 82       	std	Y+5, r15	; 0x05
      b3a:	de 82       	std	Y+6, r13	; 0x06
-		msg.data = (char*) &position;
      b3c:	60 2f       	mov	r22, r16
      b3e:	1c 83       	std	Y+4, r17	; 0x04
      b40:	0b 83       	std	Y+3, r16	; 0x03
-		can_transmit(msg);
      b42:	5c 2d       	mov	r21, r12
      b44:	7c 81       	ldd	r23, Y+4	; 0x04
      b46:	8f 2d       	mov	r24, r15
      b48:	9d 2d       	mov	r25, r13
      b4a:	0e 94 c7 03 	call	0x78e	; 0x78e <can_transmit>
-		
-		//for loopback mode only:
-		//Position position_received = *(Position*)can_receive();
-		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
-		
-		menu_run_display();
      b4e:	0e 94 bd 08 	call	0x117a	; 0x117a <menu_run_display>
 	#else
 		//round up by default
@@ -1074,46 +987,24 @@ int main(void)
      b5a:	e3 cf       	rjmp	.-58     	; 0xb22 <main+0x8a>
 
 00000b5c <mcp_write>:
-	char data = spi_master_transmit(0x0); //0x0 = dummy value
-	set_bit(PORTB,PB4);
-	return data;
-}
-
-void mcp_write(char address, char data){
      b5c:	cf 93       	push	r28
      b5e:	df 93       	push	r29
      b60:	d8 2f       	mov	r29, r24
      b62:	c6 2f       	mov	r28, r22
-	clear_bit(PORTB, PB4);
      b64:	c4 98       	cbi	0x18, 4	; 24
-	spi_master_transmit(MCP_WRITE);
      b66:	82 e0       	ldi	r24, 0x02	; 2
      b68:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	spi_master_transmit(address);
      b6c:	8d 2f       	mov	r24, r29
      b6e:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	spi_master_transmit(data);
      b72:	8c 2f       	mov	r24, r28
      b74:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	set_bit(PORTB,PB4);
      b78:	c4 9a       	sbi	0x18, 4	; 24
-}
      b7a:	df 91       	pop	r29
      b7c:	cf 91       	pop	r28
      b7e:	08 95       	ret
 
 00000b80 <mcp_request_to_send>:
-
-void mcp_request_to_send(int TXB2, int TXB1, int TXB0){
-	int command = 0b10000000 | TXB0 | (TXB1 << 1) | (TXB2 << 2);
-	clear_bit(PORTB, PB4);
      b80:	c4 98       	cbi	0x18, 4	; 24
-	spi_master_transmit(data);
-	set_bit(PORTB,PB4);
-}
-
-void mcp_request_to_send(int TXB2, int TXB1, int TXB0){
-	int command = 0b10000000 | TXB0 | (TXB1 << 1) | (TXB2 << 2);
      b82:	88 0f       	add	r24, r24
      b84:	99 1f       	adc	r25, r25
      b86:	88 0f       	add	r24, r24
@@ -1124,76 +1015,45 @@ void mcp_request_to_send(int TXB2, int TXB1, int TXB0){
      b90:	cb 01       	movw	r24, r22
      b92:	88 0f       	add	r24, r24
      b94:	99 1f       	adc	r25, r25
-	clear_bit(PORTB, PB4);
-	spi_master_transmit(command);
      b96:	84 2b       	or	r24, r20
      b98:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	set_bit(PORTB, PB4);
      b9c:	c4 9a       	sbi	0x18, 4	; 24
      b9e:	08 95       	ret
 
 00000ba0 <mcp_bit_modify>:
-	char status = spi_master_transmit(0x00);
-	set_bit(PORTB ,PB4);
-	return status;
-}
-
-void mcp_bit_modify(char address, char mask, char data){
      ba0:	1f 93       	push	r17
      ba2:	cf 93       	push	r28
      ba4:	df 93       	push	r29
      ba6:	18 2f       	mov	r17, r24
      ba8:	d6 2f       	mov	r29, r22
      baa:	c4 2f       	mov	r28, r20
-	clear_bit(PORTB, PB4);
      bac:	c4 98       	cbi	0x18, 4	; 24
-	spi_master_transmit(MCP_BITMOD);	
      bae:	85 e0       	ldi	r24, 0x05	; 5
      bb0:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	spi_master_transmit(address);
      bb4:	81 2f       	mov	r24, r17
      bb6:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	spi_master_transmit(mask);
      bba:	8d 2f       	mov	r24, r29
      bbc:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	spi_master_transmit(data);
      bc0:	8c 2f       	mov	r24, r28
      bc2:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	set_bit(PORTB, PB4);
      bc6:	c4 9a       	sbi	0x18, 4	; 24
-}
      bc8:	df 91       	pop	r29
      bca:	cf 91       	pop	r28
      bcc:	1f 91       	pop	r17
      bce:	08 95       	ret
 
 00000bd0 <mcp_reset>:
-		
-void mcp_reset(){
-	clear_bit(PORTB, PB4);
      bd0:	c4 98       	cbi	0x18, 4	; 24
-	spi_master_transmit(MCP_RESET);	
      bd2:	80 ec       	ldi	r24, 0xC0	; 192
      bd4:	0e 94 68 0b 	call	0x16d0	; 0x16d0 <spi_master_transmit>
-	set_bit(PORTB, PB4);
      bd8:	c4 9a       	sbi	0x18, 4	; 24
      bda:	08 95       	ret
 
 00000bdc <mcp_init>:
-}
-	
-void mcp_init(){
-	mcp_reset();
      bdc:	0e 94 e8 05 	call	0xbd0	; 0xbd0 <mcp_reset>
      be0:	08 95       	ret
 
 00000be2 <draw_list>:
-	}
-	
-
-	return self;
-}
-Menu* draw_list(Menu* self){
      be2:	ef 92       	push	r14
      be4:	ff 92       	push	r15
      be6:	0f 93       	push	r16
@@ -1201,8 +1061,6 @@ Menu* draw_list(Menu* self){
      bea:	cf 93       	push	r28
      bec:	df 93       	push	r29
      bee:	7c 01       	movw	r14, r24
-
-	for(int i = 0; i < self->num_of_entries; i++){
      bf0:	dc 01       	movw	r26, r24
      bf2:	14 96       	adiw	r26, 0x04	; 4
      bf4:	8d 91       	ld	r24, X+
@@ -1213,7 +1071,6 @@ Menu* draw_list(Menu* self){
      bfe:	e4 f4       	brge	.+56     	; 0xc38 <draw_list+0x56>
      c00:	c0 e0       	ldi	r28, 0x00	; 0
      c02:	d0 e0       	ldi	r29, 0x00	; 0
-		oled_print_string(self->entries[i],0,i,5,0);
      c04:	ce 01       	movw	r24, r28
      c06:	88 0f       	add	r24, r24
      c08:	99 1f       	adc	r25, r25
@@ -1232,12 +1089,6 @@ Menu* draw_list(Menu* self){
      c22:	80 81       	ld	r24, Z
      c24:	91 81       	ldd	r25, Z+1	; 0x01
      c26:	0e 94 bd 09 	call	0x137a	; 0x137a <oled_print_string>
-
-	return self;
-}
-Menu* draw_list(Menu* self){
-
-	for(int i = 0; i < self->num_of_entries; i++){
      c2a:	21 96       	adiw	r28, 0x01	; 1
      c2c:	f7 01       	movw	r30, r14
      c2e:	84 81       	ldd	r24, Z+4	; 0x04
@@ -1245,18 +1096,11 @@ Menu* draw_list(Menu* self){
      c32:	c8 17       	cp	r28, r24
      c34:	d9 07       	cpc	r29, r25
      c36:	34 f3       	brlt	.-52     	; 0xc04 <draw_list+0x22>
-		oled_print_string(self->entries[i],0,i,5,0);
-	}
-
-	//Where to go next
-	Direction dir = joy_get_direction();
      c38:	0e 94 2d 05 	call	0xa5a	; 0xa5a <joy_get_direction>
-	if(!joy_moved){//THIS IS NEW
      c3c:	20 91 3e 02 	lds	r18, 0x023E
      c40:	30 91 3f 02 	lds	r19, 0x023F
      c44:	23 2b       	or	r18, r19
      c46:	d9 f4       	brne	.+54     	; 0xc7e <draw_list+0x9c>
-		if((dir == LEFT) & (self->super_menu != NULL)){
      c48:	d7 01       	movw	r26, r14
      c4a:	18 96       	adiw	r26, 0x08	; 8
      c4c:	2d 91       	ld	r18, X+
@@ -1276,26 +1120,16 @@ Menu* draw_list(Menu* self){
      c68:	81 11       	cpse	r24, r1
      c6a:	01 c0       	rjmp	.+2      	; 0xc6e <draw_list+0x8c>
      c6c:	97 01       	movw	r18, r14
-			self = self->super_menu;
-		}
-		joy_moved = 1;		
      c6e:	81 e0       	ldi	r24, 0x01	; 1
      c70:	90 e0       	ldi	r25, 0x00	; 0
      c72:	90 93 3f 02 	sts	0x023F, r25
      c76:	80 93 3e 02 	sts	0x023E, r24
      c7a:	79 01       	movw	r14, r18
      c7c:	06 c0       	rjmp	.+12     	; 0xc8a <draw_list+0xa8>
-	}
-	else if (dir == NEUTRAL){ //THIS IS NEW
      c7e:	8f 3f       	cpi	r24, 0xFF	; 255
      c80:	21 f4       	brne	.+8      	; 0xc8a <draw_list+0xa8>
-		joy_moved = 0;
      c82:	10 92 3f 02 	sts	0x023F, r1
      c86:	10 92 3e 02 	sts	0x023E, r1
-	}
-	
-	return self;
-}
      c8a:	c7 01       	movw	r24, r14
      c8c:	df 91       	pop	r29
      c8e:	cf 91       	pop	r28
@@ -1306,12 +1140,6 @@ Menu* draw_list(Menu* self){
      c98:	08 95       	ret
 
 00000c9a <draw_menu>:
-	super->entries[super->num_of_entries - 1] = malloc(strlen(sub->name) * sizeof(char));
-	super->entries[super->num_of_entries - 1] = sub->name;
-}
-
-//Drawing functions (change to update?)
-Menu* draw_menu(Menu* self){
      c9a:	ef 92       	push	r14
      c9c:	ff 92       	push	r15
      c9e:	0f 93       	push	r16
@@ -1319,8 +1147,6 @@ Menu* draw_menu(Menu* self){
      ca2:	cf 93       	push	r28
      ca4:	df 93       	push	r29
      ca6:	7c 01       	movw	r14, r24
-	
-	for(int i = 0; i < self->num_of_entries; i++){
      ca8:	dc 01       	movw	r26, r24
      caa:	14 96       	adiw	r26, 0x04	; 4
      cac:	8d 91       	ld	r24, X+
@@ -1331,7 +1157,6 @@ Menu* draw_menu(Menu* self){
      cb6:	e4 f4       	brge	.+56     	; 0xcf0 <draw_menu+0x56>
      cb8:	c0 e0       	ldi	r28, 0x00	; 0
      cba:	d0 e0       	ldi	r29, 0x00	; 0
-		oled_print_string(self->entries[i],0,i,5,0);
      cbc:	ce 01       	movw	r24, r28
      cbe:	88 0f       	add	r24, r24
      cc0:	99 1f       	adc	r25, r25
@@ -1350,12 +1175,6 @@ Menu* draw_menu(Menu* self){
      cda:	80 81       	ld	r24, Z
      cdc:	91 81       	ldd	r25, Z+1	; 0x01
      cde:	0e 94 bd 09 	call	0x137a	; 0x137a <oled_print_string>
-}
-
-//Drawing functions (change to update?)
-Menu* draw_menu(Menu* self){
-	
-	for(int i = 0; i < self->num_of_entries; i++){
      ce2:	21 96       	adiw	r28, 0x01	; 1
      ce4:	f7 01       	movw	r30, r14
      ce6:	84 81       	ldd	r24, Z+4	; 0x04
@@ -1363,9 +1182,6 @@ Menu* draw_menu(Menu* self){
      cea:	c8 17       	cp	r28, r24
      cec:	d9 07       	cpc	r29, r25
      cee:	34 f3       	brlt	.-52     	; 0xcbc <draw_menu+0x22>
-		oled_print_string(self->entries[i],0,i,5,0);
-	}
-	oled_invert_rectangle(0,8*(self->cursor),64,8*((self->cursor) + 1));
      cf0:	d7 01       	movw	r26, r14
      cf2:	16 96       	adiw	r26, 0x06	; 6
      cf4:	2d 91       	ld	r18, X+
@@ -1387,12 +1203,7 @@ Menu* draw_menu(Menu* self){
      d14:	80 e0       	ldi	r24, 0x00	; 0
      d16:	90 e0       	ldi	r25, 0x00	; 0
      d18:	0e 94 1d 0b 	call	0x163a	; 0x163a <oled_invert_rectangle>
-	
-	//Where to go next
-	Direction dir = joy_get_direction();
      d1c:	0e 94 2d 05 	call	0xa5a	; 0xa5a <joy_get_direction>
-	if(1){	//THIS IS NEW
-		if((dir == UP) & (self->cursor != 0)){
      d20:	f7 01       	movw	r30, r14
      d22:	26 81       	ldd	r18, Z+6	; 0x06
      d24:	37 81       	ldd	r19, Z+7	; 0x07
@@ -1413,8 +1224,6 @@ Menu* draw_menu(Menu* self){
      d42:	47 c0       	rjmp	.+142    	; 0xdd2 <draw_menu+0x138>
      d44:	c0 e0       	ldi	r28, 0x00	; 0
      d46:	d0 e0       	ldi	r29, 0x00	; 0
-			for (int i = 0; i < 8; i++,i++){
-				oled_invert_rectangle(0,8*(self->cursor) - i - 2,64,8*((self->cursor) + 1) - i - 2);
      d48:	d7 01       	movw	r26, r14
      d4a:	16 96       	adiw	r26, 0x06	; 6
      d4c:	6d 91       	ld	r22, X+
@@ -1442,7 +1251,6 @@ Menu* draw_menu(Menu* self){
      d78:	80 e0       	ldi	r24, 0x00	; 0
      d7a:	90 e0       	ldi	r25, 0x00	; 0
      d7c:	0e 94 1d 0b 	call	0x163a	; 0x163a <oled_invert_rectangle>
-				oled_invert_rectangle(0,8*(self->cursor) - i,64,8*((self->cursor) + 1) - i);
      d80:	f7 01       	movw	r30, r14
      d82:	66 81       	ldd	r22, Z+6	; 0x06
      d84:	77 81       	ldd	r23, Z+7	; 0x07
@@ -1466,23 +1274,11 @@ Menu* draw_menu(Menu* self){
      da8:	80 e0       	ldi	r24, 0x00	; 0
      daa:	90 e0       	ldi	r25, 0x00	; 0
      dac:	0e 94 1d 0b 	call	0x163a	; 0x163a <oled_invert_rectangle>
-				oled_refresh();
      db0:	0e 94 b9 0a 	call	0x1572	; 0x1572 <oled_refresh>
-	
-	//Where to go next
-	Direction dir = joy_get_direction();
-	if(1){	//THIS IS NEW
-		if((dir == UP) & (self->cursor != 0)){
-			for (int i = 0; i < 8; i++,i++){
      db4:	22 96       	adiw	r28, 0x02	; 2
      db6:	c8 30       	cpi	r28, 0x08	; 8
      db8:	d1 05       	cpc	r29, r1
      dba:	31 f6       	brne	.-116    	; 0xd48 <draw_menu+0xae>
-				oled_invert_rectangle(0,8*(self->cursor) - i - 2,64,8*((self->cursor) + 1) - i - 2);
-				oled_invert_rectangle(0,8*(self->cursor) - i,64,8*((self->cursor) + 1) - i);
-				oled_refresh();
-			}
-			self->cursor--;
      dbc:	d7 01       	movw	r26, r14
      dbe:	16 96       	adiw	r26, 0x06	; 6
      dc0:	8d 91       	ld	r24, X+
@@ -1494,8 +1290,6 @@ Menu* draw_menu(Menu* self){
      dcc:	8e 93       	st	-X, r24
      dce:	16 97       	sbiw	r26, 0x06	; 6
      dd0:	88 c0       	rjmp	.+272    	; 0xee2 <draw_menu+0x248>
-		}
-		else if((dir == DOWN) & (self->cursor != (self->num_of_entries - 1))){
      dd2:	91 e0       	ldi	r25, 0x01	; 1
      dd4:	83 30       	cpi	r24, 0x03	; 3
      dd6:	09 f0       	breq	.+2      	; 0xdda <draw_menu+0x140>
@@ -1518,10 +1312,6 @@ Menu* draw_menu(Menu* self){
      df8:	47 c0       	rjmp	.+142    	; 0xe88 <draw_menu+0x1ee>
      dfa:	c0 e0       	ldi	r28, 0x00	; 0
      dfc:	d0 e0       	ldi	r29, 0x00	; 0
-			
-			//---NEW--- ANIMATION FOR DOWNWARDS MOVEMENT
-			for (int i = 0; i < 8; i++,i++){
-				oled_invert_rectangle(0,8*(self->cursor) + i,64,8*((self->cursor) + 1) + i);
      dfe:	d7 01       	movw	r26, r14
      e00:	16 96       	adiw	r26, 0x06	; 6
      e02:	6d 91       	ld	r22, X+
@@ -1547,7 +1337,6 @@ Menu* draw_menu(Menu* self){
      e2a:	80 e0       	ldi	r24, 0x00	; 0
      e2c:	90 e0       	ldi	r25, 0x00	; 0
      e2e:	0e 94 1d 0b 	call	0x163a	; 0x163a <oled_invert_rectangle>
-				oled_invert_rectangle(0,8*(self->cursor) + i + 2,64,8*((self->cursor) + 1) + i + 2);
      e32:	f7 01       	movw	r30, r14
      e34:	66 81       	ldd	r22, Z+6	; 0x06
      e36:	77 81       	ldd	r23, Z+7	; 0x07
@@ -1573,24 +1362,11 @@ Menu* draw_menu(Menu* self){
      e5e:	80 e0       	ldi	r24, 0x00	; 0
      e60:	90 e0       	ldi	r25, 0x00	; 0
      e62:	0e 94 1d 0b 	call	0x163a	; 0x163a <oled_invert_rectangle>
-				oled_refresh();
      e66:	0e 94 b9 0a 	call	0x1572	; 0x1572 <oled_refresh>
-			self->cursor--;
-		}
-		else if((dir == DOWN) & (self->cursor != (self->num_of_entries - 1))){
-			
-			//---NEW--- ANIMATION FOR DOWNWARDS MOVEMENT
-			for (int i = 0; i < 8; i++,i++){
      e6a:	22 96       	adiw	r28, 0x02	; 2
      e6c:	c8 30       	cpi	r28, 0x08	; 8
      e6e:	d1 05       	cpc	r29, r1
      e70:	31 f6       	brne	.-116    	; 0xdfe <draw_menu+0x164>
-				oled_invert_rectangle(0,8*(self->cursor) + i + 2,64,8*((self->cursor) + 1) + i + 2);
-				oled_refresh();
-			}
-			//-------------
-			
-			self->cursor++;
      e72:	d7 01       	movw	r26, r14
      e74:	16 96       	adiw	r26, 0x06	; 6
      e76:	8d 91       	ld	r24, X+
@@ -1602,8 +1378,6 @@ Menu* draw_menu(Menu* self){
      e82:	8e 93       	st	-X, r24
      e84:	16 97       	sbiw	r26, 0x06	; 6
      e86:	2d c0       	rjmp	.+90     	; 0xee2 <draw_menu+0x248>
-		}
-		else if((dir == RIGHT) & (self->sub_menus[self->cursor]->num_of_entries != 0)){ //THIS IS CHANGED
      e88:	22 0f       	add	r18, r18
      e8a:	33 1f       	adc	r19, r19
      e8c:	d7 01       	movw	r26, r14
@@ -1629,9 +1403,6 @@ Menu* draw_menu(Menu* self){
      eb4:	90 e0       	ldi	r25, 0x00	; 0
      eb6:	91 11       	cpse	r25, r1
      eb8:	11 c0       	rjmp	.+34     	; 0xedc <draw_menu+0x242>
-			self = self->sub_menus[self->cursor];
-		}
-		else if((dir == LEFT) & (self->super_menu != NULL)){
      eba:	f7 01       	movw	r30, r14
      ebc:	20 85       	ldd	r18, Z+8	; 0x08
      ebe:	31 85       	ldd	r19, Z+9	; 0x09
@@ -1649,30 +1420,13 @@ Menu* draw_menu(Menu* self){
      ed6:	81 11       	cpse	r24, r1
      ed8:	03 c0       	rjmp	.+6      	; 0xee0 <draw_menu+0x246>
      eda:	03 c0       	rjmp	.+6      	; 0xee2 <draw_menu+0x248>
-			//-------------
-			
-			self->cursor++;
-		}
-		else if((dir == RIGHT) & (self->sub_menus[self->cursor]->num_of_entries != 0)){ //THIS IS CHANGED
-			self = self->sub_menus[self->cursor];
      edc:	7f 01       	movw	r14, r30
      ede:	01 c0       	rjmp	.+2      	; 0xee2 <draw_menu+0x248>
-		}
-		else if((dir == LEFT) & (self->super_menu != NULL)){
-			self = self->super_menu;
      ee0:	79 01       	movw	r14, r18
-		}
-		joy_moved = 1;
      ee2:	81 e0       	ldi	r24, 0x01	; 1
      ee4:	90 e0       	ldi	r25, 0x00	; 0
      ee6:	90 93 3f 02 	sts	0x023F, r25
      eea:	80 93 3e 02 	sts	0x023E, r24
-		joy_moved = 0;
-	}
-	
-
-	return self;
-}
      eee:	c7 01       	movw	r24, r14
      ef0:	df 91       	pop	r29
      ef2:	cf 91       	pop	r28
@@ -1683,12 +1437,6 @@ Menu* draw_menu(Menu* self){
      efc:	08 95       	ret
 
 00000efe <add_entries>:
-	
-}
-//----------NO NEED TO CHANGE THINGS BEYOND THIS----------
-
-//Functions for adding entries and nodes
-void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
      efe:	af 92       	push	r10
      f00:	bf 92       	push	r11
      f02:	cf 92       	push	r12
@@ -1703,8 +1451,6 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
      f14:	e6 2e       	mov	r14, r22
      f16:	f7 2e       	mov	r15, r23
      f18:	ea 01       	movw	r28, r20
-	
-	menu->entries = malloc(num_of_new_entries * sizeof(char*));	//Correct size of double pointer
      f1a:	6a 01       	movw	r12, r20
      f1c:	cc 0c       	add	r12, r12
      f1e:	dd 1c       	adc	r13, r13
@@ -1715,8 +1461,6 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
      f2a:	9c 93       	st	X, r25
      f2c:	8e 93       	st	-X, r24
      f2e:	12 97       	sbiw	r26, 0x02	; 2
-	
-	for(int i = 0; i < num_of_new_entries; i++){
      f30:	1c 16       	cp	r1, r28
      f32:	1d 06       	cpc	r1, r29
      f34:	54 f5       	brge	.+84     	; 0xf8a <add_entries+0x8c>
@@ -1724,7 +1468,6 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
      f38:	bf 2c       	mov	r11, r15
      f3a:	c0 e0       	ldi	r28, 0x00	; 0
      f3c:	d0 e0       	ldi	r29, 0x00	; 0
-		menu->entries[i] = malloc(strlen(entries[i]) * sizeof(char)); //Allocate space for each string
      f3e:	f8 01       	movw	r30, r16
      f40:	e2 80       	ldd	r14, Z+2	; 0x02
      f42:	f3 80       	ldd	r15, Z+3	; 0x03
@@ -1745,7 +1488,6 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
      f62:	d7 01       	movw	r26, r14
      f64:	8d 93       	st	X+, r24
      f66:	9c 93       	st	X, r25
-		menu->entries[i] =  entries[i];								  //Adds each string
      f68:	f5 01       	movw	r30, r10
      f6a:	81 91       	ld	r24, Z+
      f6c:	91 91       	ld	r25, Z+
@@ -1760,25 +1502,12 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
      f7e:	91 83       	std	Z+1, r25	; 0x01
      f80:	80 83       	st	Z, r24
      f82:	22 96       	adiw	r28, 0x02	; 2
-//Functions for adding entries and nodes
-void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
-	
-	menu->entries = malloc(num_of_new_entries * sizeof(char*));	//Correct size of double pointer
-	
-	for(int i = 0; i < num_of_new_entries; i++){
      f84:	cc 16       	cp	r12, r28
      f86:	dd 06       	cpc	r13, r29
      f88:	d1 f6       	brne	.-76     	; 0xf3e <add_entries+0x40>
-		//empty->name = entries[i];
-		//add_sub_menu(menu, empty);
-		//menu->num_of_entries+=1;
-	}
-	//menu->num_of_entries = num_of_new_entries;
-	menu->cursor = 0; //To make sure the cursor is not something else
      f8a:	f8 01       	movw	r30, r16
      f8c:	17 82       	std	Z+7, r1	; 0x07
      f8e:	16 82       	std	Z+6, r1	; 0x06
-}
      f90:	df 91       	pop	r29
      f92:	cf 91       	pop	r28
      f94:	1f 91       	pop	r17
@@ -1792,8 +1521,6 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
      fa4:	08 95       	ret
 
 00000fa6 <add_sub_menu>:
-
-void add_sub_menu(Menu* super, Menu* sub){
      fa6:	ef 92       	push	r14
      fa8:	ff 92       	push	r15
      faa:	0f 93       	push	r16
@@ -1802,19 +1529,14 @@ void add_sub_menu(Menu* super, Menu* sub){
      fb0:	df 93       	push	r29
      fb2:	ec 01       	movw	r28, r24
      fb4:	8b 01       	movw	r16, r22
-	super->num_of_entries += 1;		//Num of entries in super are updated
      fb6:	8c 81       	ldd	r24, Y+4	; 0x04
      fb8:	9d 81       	ldd	r25, Y+5	; 0x05
      fba:	01 96       	adiw	r24, 0x01	; 1
      fbc:	9d 83       	std	Y+5, r25	; 0x05
      fbe:	8c 83       	std	Y+4, r24	; 0x04
-	
-	//Pointers to and from the menus are set correctly
-	sub->super_menu = super;
      fc0:	fb 01       	movw	r30, r22
      fc2:	d1 87       	std	Z+9, r29	; 0x09
      fc4:	c0 87       	std	Z+8, r28	; 0x08
-	super->sub_menus = realloc(super->sub_menus, super->num_of_entries * sizeof(Menu*));
      fc6:	6c 81       	ldd	r22, Y+4	; 0x04
      fc8:	7d 81       	ldd	r23, Y+5	; 0x05
      fca:	66 0f       	add	r22, r22
@@ -1824,7 +1546,6 @@ void add_sub_menu(Menu* super, Menu* sub){
      fd2:	0e 94 13 10 	call	0x2026	; 0x2026 <realloc>
      fd6:	9b 87       	std	Y+11, r25	; 0x0b
      fd8:	8a 87       	std	Y+10, r24	; 0x0a
-	super->sub_menus[super->num_of_entries - 1] = malloc(sizeof(Menu));
      fda:	ec 80       	ldd	r14, Y+4	; 0x04
      fdc:	fd 80       	ldd	r15, Y+5	; 0x05
      fde:	f1 e0       	ldi	r31, 0x01	; 1
@@ -1841,7 +1562,6 @@ void add_sub_menu(Menu* super, Menu* sub){
      ff6:	f7 01       	movw	r30, r14
      ff8:	91 83       	std	Z+1, r25	; 0x01
      ffa:	80 83       	st	Z, r24
-	super->sub_menus[super->num_of_entries - 1] = sub;
      ffc:	ec 81       	ldd	r30, Y+4	; 0x04
      ffe:	fd 81       	ldd	r31, Y+5	; 0x05
     1000:	e1 50       	subi	r30, 0x01	; 1
@@ -1854,9 +1574,6 @@ void add_sub_menu(Menu* super, Menu* sub){
     100e:	f9 1f       	adc	r31, r25
     1010:	11 83       	std	Z+1, r17	; 0x01
     1012:	00 83       	st	Z, r16
-	
-	//Name of entries in the super menu are updated
-	super->entries = realloc(super->entries, super->num_of_entries * sizeof(char*));
     1014:	6c 81       	ldd	r22, Y+4	; 0x04
     1016:	7d 81       	ldd	r23, Y+5	; 0x05
     1018:	66 0f       	add	r22, r22
@@ -1866,7 +1583,6 @@ void add_sub_menu(Menu* super, Menu* sub){
     1020:	0e 94 13 10 	call	0x2026	; 0x2026 <realloc>
     1024:	9b 83       	std	Y+3, r25	; 0x03
     1026:	8a 83       	std	Y+2, r24	; 0x02
-	super->entries[super->num_of_entries - 1] = malloc(strlen(sub->name) * sizeof(char));
     1028:	ec 80       	ldd	r14, Y+4	; 0x04
     102a:	fd 80       	ldd	r15, Y+5	; 0x05
     102c:	f1 e0       	ldi	r31, 0x01	; 1
@@ -1892,7 +1608,6 @@ void add_sub_menu(Menu* super, Menu* sub){
     1056:	f7 01       	movw	r30, r14
     1058:	91 83       	std	Z+1, r25	; 0x01
     105a:	80 83       	st	Z, r24
-	super->entries[super->num_of_entries - 1] = sub->name;
     105c:	f8 01       	movw	r30, r16
     105e:	80 81       	ld	r24, Z
     1060:	91 81       	ldd	r25, Z+1	; 0x01
@@ -1908,7 +1623,6 @@ void add_sub_menu(Menu* super, Menu* sub){
     1074:	f3 1f       	adc	r31, r19
     1076:	91 83       	std	Z+1, r25	; 0x01
     1078:	80 83       	st	Z, r24
-}
     107a:	df 91       	pop	r29
     107c:	cf 91       	pop	r28
     107e:	1f 91       	pop	r17
@@ -1918,12 +1632,6 @@ void add_sub_menu(Menu* super, Menu* sub){
     1086:	08 95       	ret
 
 00001088 <menu_init>:
-	//.type = MENU,
-	.draw = draw_menu
-};
-
-//The initializer - How the menus are related
-void menu_init(){
     1088:	cf 93       	push	r28
     108a:	df 93       	push	r29
     108c:	cd b7       	in	r28, 0x3d	; 61
@@ -1934,8 +1642,6 @@ void menu_init(){
     1096:	de bf       	out	0x3e, r29	; 62
     1098:	0f be       	out	0x3f, r0	; 63
     109a:	cd bf       	out	0x3d, r28	; 61
-	
-	char* control_entr[3] = {"Player1", "Player2", "Player3"};
     109c:	86 e0       	ldi	r24, 0x06	; 6
     109e:	ec e6       	ldi	r30, 0x6C	; 108
     10a0:	f1 e0       	ldi	r31, 0x01	; 1
@@ -1945,7 +1651,6 @@ void menu_init(){
     10a8:	0d 92       	st	X+, r0
     10aa:	8a 95       	dec	r24
     10ac:	e1 f7       	brne	.-8      	; 0x10a6 <menu_init+0x1e>
-	add_entries(&control, control_entr, 3);
     10ae:	43 e0       	ldi	r20, 0x03	; 3
     10b0:	50 e0       	ldi	r21, 0x00	; 0
     10b2:	be 01       	movw	r22, r28
@@ -1954,14 +1659,11 @@ void menu_init(){
     10b8:	8e e1       	ldi	r24, 0x1E	; 30
     10ba:	91 e0       	ldi	r25, 0x01	; 1
     10bc:	0e 94 7f 07 	call	0xefe	; 0xefe <add_entries>
-	add_sub_menu(&options, &control);
     10c0:	6e e1       	ldi	r22, 0x1E	; 30
     10c2:	71 e0       	ldi	r23, 0x01	; 1
     10c4:	8a e3       	ldi	r24, 0x3A	; 58
     10c6:	91 e0       	ldi	r25, 0x01	; 1
     10c8:	0e 94 d3 07 	call	0xfa6	; 0xfa6 <add_sub_menu>
-	
-	char* contro_entr[4] = {"Low", "Medium", "High","Ultra"};
     10cc:	88 e0       	ldi	r24, 0x08	; 8
     10ce:	e2 e7       	ldi	r30, 0x72	; 114
     10d0:	f1 e0       	ldi	r31, 0x01	; 1
@@ -1971,7 +1673,6 @@ void menu_init(){
     10d8:	0d 92       	st	X+, r0
     10da:	8a 95       	dec	r24
     10dc:	e1 f7       	brne	.-8      	; 0x10d6 <menu_init+0x4e>
-	add_entries(&contro, contro_entr, 4);
     10de:	44 e0       	ldi	r20, 0x04	; 4
     10e0:	50 e0       	ldi	r21, 0x00	; 0
     10e2:	be 01       	movw	r22, r28
@@ -1980,21 +1681,16 @@ void menu_init(){
     10e8:	80 e1       	ldi	r24, 0x10	; 16
     10ea:	91 e0       	ldi	r25, 0x01	; 1
     10ec:	0e 94 7f 07 	call	0xefe	; 0xefe <add_entries>
-	add_sub_menu(&options, &contro);
     10f0:	60 e1       	ldi	r22, 0x10	; 16
     10f2:	71 e0       	ldi	r23, 0x01	; 1
     10f4:	8a e3       	ldi	r24, 0x3A	; 58
     10f6:	91 e0       	ldi	r25, 0x01	; 1
     10f8:	0e 94 d3 07 	call	0xfa6	; 0xfa6 <add_sub_menu>
-	
-	add_sub_menu(&main_menu, &options);
     10fc:	6a e3       	ldi	r22, 0x3A	; 58
     10fe:	71 e0       	ldi	r23, 0x01	; 1
     1100:	86 e5       	ldi	r24, 0x56	; 86
     1102:	91 e0       	ldi	r25, 0x01	; 1
     1104:	0e 94 d3 07 	call	0xfa6	; 0xfa6 <add_sub_menu>
-	
-	char* diff_entr[3] = {"Easy", "Medium", "Hard"};
     1108:	86 e0       	ldi	r24, 0x06	; 6
     110a:	ea e7       	ldi	r30, 0x7A	; 122
     110c:	f1 e0       	ldi	r31, 0x01	; 1
@@ -2004,7 +1700,6 @@ void menu_init(){
     1114:	0d 92       	st	X+, r0
     1116:	8a 95       	dec	r24
     1118:	e1 f7       	brne	.-8      	; 0x1112 <menu_init+0x8a>
-	add_entries(&difficulty, diff_entr, 3);
     111a:	43 e0       	ldi	r20, 0x03	; 3
     111c:	50 e0       	ldi	r21, 0x00	; 0
     111e:	be 01       	movw	r22, r28
@@ -2013,14 +1708,11 @@ void menu_init(){
     1124:	88 e4       	ldi	r24, 0x48	; 72
     1126:	91 e0       	ldi	r25, 0x01	; 1
     1128:	0e 94 7f 07 	call	0xefe	; 0xefe <add_entries>
-	add_sub_menu(&main_menu, &difficulty);
     112c:	68 e4       	ldi	r22, 0x48	; 72
     112e:	71 e0       	ldi	r23, 0x01	; 1
     1130:	86 e5       	ldi	r24, 0x56	; 86
     1132:	91 e0       	ldi	r25, 0x01	; 1
     1134:	0e 94 d3 07 	call	0xfa6	; 0xfa6 <add_sub_menu>
-	
-	char* high_entr[4] = {"1. Herman","2. Raoul","3. Alle andre","-inf^inf. Hans"};
     1138:	88 e0       	ldi	r24, 0x08	; 8
     113a:	e0 e8       	ldi	r30, 0x80	; 128
     113c:	f1 e0       	ldi	r31, 0x01	; 1
@@ -2030,7 +1722,6 @@ void menu_init(){
     1144:	0d 92       	st	X+, r0
     1146:	8a 95       	dec	r24
     1148:	e1 f7       	brne	.-8      	; 0x1142 <menu_init+0xba>
-	add_entries(&highscore, high_entr,4);
     114a:	44 e0       	ldi	r20, 0x04	; 4
     114c:	50 e0       	ldi	r21, 0x00	; 0
     114e:	be 01       	movw	r22, r28
@@ -2039,14 +1730,11 @@ void menu_init(){
     1154:	8c e2       	ldi	r24, 0x2C	; 44
     1156:	91 e0       	ldi	r25, 0x01	; 1
     1158:	0e 94 7f 07 	call	0xefe	; 0xefe <add_entries>
-	add_sub_menu(&main_menu, &highscore);
     115c:	6c e2       	ldi	r22, 0x2C	; 44
     115e:	71 e0       	ldi	r23, 0x01	; 1
     1160:	86 e5       	ldi	r24, 0x56	; 86
     1162:	91 e0       	ldi	r25, 0x01	; 1
     1164:	0e 94 d3 07 	call	0xfa6	; 0xfa6 <add_sub_menu>
-	
-}
     1168:	6c 96       	adiw	r28, 0x1c	; 28
     116a:	0f b6       	in	r0, 0x3f	; 63
     116c:	f8 94       	cli
@@ -2058,14 +1746,7 @@ void menu_init(){
     1178:	08 95       	ret
 
 0000117a <menu_run_display>:
-	//
-	
-Menu* current_menu = &main_menu;
-
-void menu_run_display(){
-	oled_clear_screen();
     117a:	0e 94 25 0a 	call	0x144a	; 0x144a <oled_clear_screen>
-	current_menu = current_menu->draw(current_menu);
     117e:	80 91 0e 01 	lds	r24, 0x010E
     1182:	90 91 0f 01 	lds	r25, 0x010F
     1186:	dc 01       	movw	r26, r24
@@ -2076,71 +1757,46 @@ void menu_run_display(){
     1190:	09 95       	icall
     1192:	90 93 0f 01 	sts	0x010F, r25
     1196:	80 93 0e 01 	sts	0x010E, r24
-	oled_refresh();
     119a:	0e 94 b9 0a 	call	0x1572	; 0x1572 <oled_refresh>
     119e:	08 95       	ret
 
 000011a0 <oled_write_data>:
-void oled_write_command(char command){
-	*oled_command = command;
-}
-
-void oled_write_data(char data){
-	if(doublebuffering){
     11a0:	20 91 6a 01 	lds	r18, 0x016A
     11a4:	30 91 6b 01 	lds	r19, 0x016B
     11a8:	23 2b       	or	r18, r19
     11aa:	d1 f0       	breq	.+52     	; 0x11e0 <oled_write_data+0x40>
-		if (oled_back_buffer_index > 1023){
     11ac:	20 91 40 02 	lds	r18, 0x0240
     11b0:	30 91 41 02 	lds	r19, 0x0241
     11b4:	21 15       	cp	r18, r1
     11b6:	94 e0       	ldi	r25, 0x04	; 4
     11b8:	39 07       	cpc	r19, r25
     11ba:	bc f4       	brge	.+46     	; 0x11ea <oled_write_data+0x4a>
-			//printf("Outside of screen!\n");
-			return -1;
-		}
-		oled_back_buffer[oled_back_buffer_index] = data;
     11bc:	40 91 66 01 	lds	r20, 0x0166
     11c0:	50 91 67 01 	lds	r21, 0x0167
     11c4:	fa 01       	movw	r30, r20
     11c6:	e2 0f       	add	r30, r18
     11c8:	f3 1f       	adc	r31, r19
     11ca:	80 83       	st	Z, r24
-		oled_back_buffer_index++;	
     11cc:	80 91 40 02 	lds	r24, 0x0240
     11d0:	90 91 41 02 	lds	r25, 0x0241
     11d4:	01 96       	adiw	r24, 0x01	; 1
     11d6:	90 93 41 02 	sts	0x0241, r25
     11da:	80 93 40 02 	sts	0x0240, r24
     11de:	08 95       	ret
-	}
-	else{
-		*oled_front_buffer = data;
     11e0:	e0 91 64 01 	lds	r30, 0x0164
     11e4:	f0 91 65 01 	lds	r31, 0x0165
     11e8:	80 83       	st	Z, r24
     11ea:	08 95       	ret
 
 000011ec <oled_print_char>:
-			oled_goto_line(line);
-		}
-	}
-}
-
-void oled_print_char(char character, uint8_t font_size, int invert){
     11ec:	ef 92       	push	r14
     11ee:	ff 92       	push	r15
     11f0:	0f 93       	push	r16
     11f2:	1f 93       	push	r17
     11f4:	cf 93       	push	r28
     11f6:	df 93       	push	r29
-	int font_address;
-	if (font_size == 8){
     11f8:	68 30       	cpi	r22, 0x08	; 8
     11fa:	59 f4       	brne	.+22     	; 0x1212 <oled_print_char+0x26>
-		font_address = &font8[character-' '];
     11fc:	08 2f       	mov	r16, r24
     11fe:	10 e0       	ldi	r17, 0x00	; 0
     1200:	00 0f       	add	r16, r16
@@ -2152,11 +1808,8 @@ void oled_print_char(char character, uint8_t font_size, int invert){
     120c:	0b 50       	subi	r16, 0x0B	; 11
     120e:	1d 4f       	sbci	r17, 0xFD	; 253
     1210:	1a c0       	rjmp	.+52     	; 0x1246 <oled_print_char+0x5a>
-	}
-	else if (font_size == 5){
     1212:	65 30       	cpi	r22, 0x05	; 5
     1214:	71 f4       	brne	.+28     	; 0x1232 <oled_print_char+0x46>
-		font_address = &font5[character-' '];
     1216:	08 2f       	mov	r16, r24
     1218:	10 e0       	ldi	r17, 0x00	; 0
     121a:	00 52       	subi	r16, 0x20	; 32
@@ -2171,11 +1824,8 @@ void oled_print_char(char character, uint8_t font_size, int invert){
     122c:	06 5e       	subi	r16, 0xE6	; 230
     122e:	1d 4f       	sbci	r17, 0xFD	; 253
     1230:	0a c0       	rjmp	.+20     	; 0x1246 <oled_print_char+0x5a>
-	}
-	else if (font_size == 4){
     1232:	64 30       	cpi	r22, 0x04	; 4
     1234:	41 f4       	brne	.+16     	; 0x1246 <oled_print_char+0x5a>
-		font_address = &font4[character-' '];
     1236:	08 2f       	mov	r16, r24
     1238:	10 e0       	ldi	r17, 0x00	; 0
     123a:	00 0f       	add	r16, r16
@@ -2184,28 +1834,14 @@ void oled_print_char(char character, uint8_t font_size, int invert){
     1240:	11 1f       	adc	r17, r17
     1242:	02 5e       	subi	r16, 0xE2	; 226
     1244:	1f 4f       	sbci	r17, 0xFF	; 255
-	}
-	if(!invert){
     1246:	45 2b       	or	r20, r21
     1248:	31 f0       	breq	.+12     	; 0x1256 <oled_print_char+0x6a>
-		for (int i = 0; i < font_size; i++){
-			oled_write_data(pgm_read_byte(font_address + i));
-		}	
-	}
-	else{
-		for (int i = 0; i < font_size; i++){
     124a:	e6 2e       	mov	r14, r22
     124c:	f1 2c       	mov	r15, r1
     124e:	1e 14       	cp	r1, r14
     1250:	1f 04       	cpc	r1, r15
     1252:	9c f0       	brlt	.+38     	; 0x127a <oled_print_char+0x8e>
     1254:	1f c0       	rjmp	.+62     	; 0x1294 <oled_print_char+0xa8>
-	}
-	else if (font_size == 4){
-		font_address = &font4[character-' '];
-	}
-	if(!invert){
-		for (int i = 0; i < font_size; i++){
     1256:	e6 2e       	mov	r14, r22
     1258:	f1 2c       	mov	r15, r1
     125a:	1e 14       	cp	r1, r14
@@ -2216,48 +1852,25 @@ void oled_print_char(char character, uint8_t font_size, int invert){
     1264:	fe 01       	movw	r30, r28
     1266:	e0 0f       	add	r30, r16
     1268:	f1 1f       	adc	r31, r17
-			oled_write_data(pgm_read_byte(font_address + i));
     126a:	84 91       	lpm	r24, Z
     126c:	0e 94 d0 08 	call	0x11a0	; 0x11a0 <oled_write_data>
-	}
-	else if (font_size == 4){
-		font_address = &font4[character-' '];
-	}
-	if(!invert){
-		for (int i = 0; i < font_size; i++){
     1270:	21 96       	adiw	r28, 0x01	; 1
     1272:	ce 15       	cp	r28, r14
     1274:	df 05       	cpc	r29, r15
     1276:	b4 f3       	brlt	.-20     	; 0x1264 <oled_print_char+0x78>
     1278:	0d c0       	rjmp	.+26     	; 0x1294 <oled_print_char+0xa8>
-			oled_write_data(pgm_read_byte(font_address + i));
-		}	
-	}
-	else{
-		for (int i = 0; i < font_size; i++){
     127a:	c0 e0       	ldi	r28, 0x00	; 0
     127c:	d0 e0       	ldi	r29, 0x00	; 0
     127e:	fe 01       	movw	r30, r28
     1280:	e0 0f       	add	r30, r16
     1282:	f1 1f       	adc	r31, r17
-			oled_write_data(~pgm_read_byte(font_address + i));
     1284:	84 91       	lpm	r24, Z
     1286:	80 95       	com	r24
     1288:	0e 94 d0 08 	call	0x11a0	; 0x11a0 <oled_write_data>
-		for (int i = 0; i < font_size; i++){
-			oled_write_data(pgm_read_byte(font_address + i));
-		}	
-	}
-	else{
-		for (int i = 0; i < font_size; i++){
     128c:	21 96       	adiw	r28, 0x01	; 1
     128e:	ce 15       	cp	r28, r14
     1290:	df 05       	cpc	r29, r15
     1292:	ac f3       	brlt	.-22     	; 0x127e <oled_print_char+0x92>
-			oled_write_data(~pgm_read_byte(font_address + i));
-		}
-	}
-}
     1294:	df 91       	pop	r29
     1296:	cf 91       	pop	r28
     1298:	1f 91       	pop	r17
@@ -2267,28 +1880,16 @@ void oled_print_char(char character, uint8_t font_size, int invert){
     12a0:	08 95       	ret
 
 000012a2 <oled_read_data>:
-		*oled_front_buffer = data;
-	}	
-}
-
-char oled_read_data(){
-	if(doublebuffering){
     12a2:	80 91 6a 01 	lds	r24, 0x016A
     12a6:	90 91 6b 01 	lds	r25, 0x016B
     12aa:	89 2b       	or	r24, r25
     12ac:	89 f0       	breq	.+34     	; 0x12d0 <oled_read_data+0x2e>
-		if (oled_back_buffer_index > 1023){
     12ae:	80 91 40 02 	lds	r24, 0x0240
     12b2:	90 91 41 02 	lds	r25, 0x0241
     12b6:	81 15       	cp	r24, r1
     12b8:	24 e0       	ldi	r18, 0x04	; 4
     12ba:	92 07       	cpc	r25, r18
     12bc:	5c f4       	brge	.+22     	; 0x12d4 <oled_read_data+0x32>
-			//printf("Outside of screen!\n");
-			//return -1;
-			return 0x00;
-		}
-		return oled_back_buffer[oled_back_buffer_index];
     12be:	20 91 66 01 	lds	r18, 0x0166
     12c2:	30 91 67 01 	lds	r19, 0x0167
     12c6:	f9 01       	movw	r30, r18
@@ -2296,35 +1897,16 @@ char oled_read_data(){
     12ca:	f9 1f       	adc	r31, r25
     12cc:	80 81       	ld	r24, Z
     12ce:	08 95       	ret
-	}
-	else{
-		return 0x00; //Alternatively NULL
     12d0:	80 e0       	ldi	r24, 0x00	; 0
     12d2:	08 95       	ret
-char oled_read_data(){
-	if(doublebuffering){
-		if (oled_back_buffer_index > 1023){
-			//printf("Outside of screen!\n");
-			//return -1;
-			return 0x00;
     12d4:	80 e0       	ldi	r24, 0x00	; 0
-		return oled_back_buffer[oled_back_buffer_index];
-	}
-	else{
-		return 0x00; //Alternatively NULL
-	}
-}
     12d6:	08 95       	ret
 
 000012d8 <oled_goto_line>:
-
-void oled_goto_line(int line){
-	if(doublebuffering){
     12d8:	40 91 6a 01 	lds	r20, 0x016A
     12dc:	50 91 6b 01 	lds	r21, 0x016B
     12e0:	45 2b       	or	r20, r21
     12e2:	d1 f0       	breq	.+52     	; 0x1318 <oled_goto_line+0x40>
-		oled_back_buffer_index = oled_back_buffer_index % 128 + line*128;	
     12e4:	20 91 40 02 	lds	r18, 0x0240
     12e8:	30 91 41 02 	lds	r19, 0x0241
     12ec:	2f 77       	andi	r18, 0x7F	; 127
@@ -2347,33 +1929,17 @@ void oled_goto_line(int line){
     130e:	30 93 41 02 	sts	0x0241, r19
     1312:	20 93 40 02 	sts	0x0240, r18
     1316:	08 95       	ret
-	}
-	else{
-		oled_write_command(0xB0 + line);
     1318:	80 55       	subi	r24, 0x50	; 80
-		oled_write_data(0x00);
-	}
-}
-
-void oled_write_command(char command){
-	*oled_command = command;
     131a:	e0 91 68 01 	lds	r30, 0x0168
     131e:	f0 91 69 01 	lds	r31, 0x0169
     1322:	80 83       	st	Z, r24
     1324:	08 95       	ret
 
 00001326 <oled_goto_column>:
-		oled_write_command(0xB0 + line);
-	}
-}
-
-void oled_goto_column(int column){ 
-	if(doublebuffering){
     1326:	20 91 6a 01 	lds	r18, 0x016A
     132a:	30 91 6b 01 	lds	r19, 0x016B
     132e:	23 2b       	or	r18, r19
     1330:	c1 f0       	breq	.+48     	; 0x1362 <oled_goto_column+0x3c>
-		oled_back_buffer_index = oled_back_buffer_index - oled_back_buffer_index % 128 + column;
     1332:	40 91 40 02 	lds	r20, 0x0240
     1336:	50 91 41 02 	lds	r21, 0x0241
     133a:	9a 01       	movw	r18, r20
@@ -2394,12 +1960,6 @@ void oled_goto_column(int column){
     1358:	90 93 41 02 	sts	0x0241, r25
     135c:	80 93 40 02 	sts	0x0240, r24
     1360:	08 95       	ret
-		oled_write_data(0x00);
-	}
-}
-
-void oled_write_command(char command){
-	*oled_command = command;
     1362:	e0 91 68 01 	lds	r30, 0x0168
     1366:	f0 91 69 01 	lds	r31, 0x0169
     136a:	10 82       	st	Z, r1
@@ -2410,12 +1970,6 @@ void oled_write_command(char command){
     1378:	08 95       	ret
 
 0000137a <oled_print_string>:
-	oled_write_command(0xa6); //set normal display
-	oled_write_command(0xaf); // display on
-	oled_clear_screen(); //Sets all buffer data to 0
-}
-
-void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font_size, int invert){
     137a:	6f 92       	push	r6
     137c:	7f 92       	push	r7
     137e:	8f 92       	push	r8
@@ -2434,16 +1988,12 @@ void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font
     1398:	96 2e       	mov	r9, r22
     139a:	74 2e       	mov	r7, r20
     139c:	82 2e       	mov	r8, r18
-	oled_goto_column(column);
     139e:	86 2f       	mov	r24, r22
     13a0:	90 e0       	ldi	r25, 0x00	; 0
     13a2:	0e 94 93 09 	call	0x1326	; 0x1326 <oled_goto_column>
-	oled_goto_line(line);
     13a6:	87 2d       	mov	r24, r7
     13a8:	90 e0       	ldi	r25, 0x00	; 0
     13aa:	0e 94 6c 09 	call	0x12d8	; 0x12d8 <oled_goto_line>
-	
-	int length = strlen(string);
     13ae:	fe 01       	movw	r30, r28
     13b0:	01 90       	ld	r0, Z+
     13b2:	00 20       	and	r0, r0
@@ -2452,77 +2002,42 @@ void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font
     13b8:	6f 01       	movw	r12, r30
     13ba:	cc 1a       	sub	r12, r28
     13bc:	dd 0a       	sbc	r13, r29
-	for (int i = 0; i < length; i++){
     13be:	1c 14       	cp	r1, r12
     13c0:	1d 04       	cpc	r1, r13
     13c2:	24 f5       	brge	.+72     	; 0x140c <oled_print_string+0x92>
     13c4:	7e 01       	movw	r14, r28
     13c6:	c0 e0       	ldi	r28, 0x00	; 0
     13c8:	d0 e0       	ldi	r29, 0x00	; 0
-		oled_print_char(string[i], font_size, invert);
-		column = column + font_size;
-		if (column > (127 - font_size)){ //if no space for another char
     13ca:	8f e7       	ldi	r24, 0x7F	; 127
     13cc:	90 e0       	ldi	r25, 0x00	; 0
     13ce:	5c 01       	movw	r10, r24
     13d0:	a8 18       	sub	r10, r8
     13d2:	b1 08       	sbc	r11, r1
-			column = 0;
     13d4:	61 2c       	mov	r6, r1
-	oled_goto_column(column);
-	oled_goto_line(line);
-	
-	int length = strlen(string);
-	for (int i = 0; i < length; i++){
-		oled_print_char(string[i], font_size, invert);
     13d6:	a8 01       	movw	r20, r16
     13d8:	68 2d       	mov	r22, r8
     13da:	f7 01       	movw	r30, r14
     13dc:	81 91       	ld	r24, Z+
     13de:	7f 01       	movw	r14, r30
     13e0:	0e 94 f6 08 	call	0x11ec	; 0x11ec <oled_print_char>
-		column = column + font_size;
     13e4:	98 0c       	add	r9, r8
-		if (column > (127 - font_size)){ //if no space for another char
     13e6:	89 2d       	mov	r24, r9
     13e8:	90 e0       	ldi	r25, 0x00	; 0
     13ea:	a8 16       	cp	r10, r24
     13ec:	b9 06       	cpc	r11, r25
     13ee:	54 f4       	brge	.+20     	; 0x1404 <oled_print_string+0x8a>
-			column = 0;
-			line++;
     13f0:	73 94       	inc	r7
-			oled_goto_column(column);
     13f2:	80 e0       	ldi	r24, 0x00	; 0
     13f4:	90 e0       	ldi	r25, 0x00	; 0
     13f6:	0e 94 93 09 	call	0x1326	; 0x1326 <oled_goto_column>
-			oled_goto_line(line);
     13fa:	87 2d       	mov	r24, r7
     13fc:	90 e0       	ldi	r25, 0x00	; 0
     13fe:	0e 94 6c 09 	call	0x12d8	; 0x12d8 <oled_goto_line>
-	int length = strlen(string);
-	for (int i = 0; i < length; i++){
-		oled_print_char(string[i], font_size, invert);
-		column = column + font_size;
-		if (column > (127 - font_size)){ //if no space for another char
-			column = 0;
     1402:	96 2c       	mov	r9, r6
-void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font_size, int invert){
-	oled_goto_column(column);
-	oled_goto_line(line);
-	
-	int length = strlen(string);
-	for (int i = 0; i < length; i++){
     1404:	21 96       	adiw	r28, 0x01	; 1
     1406:	cc 16       	cp	r12, r28
     1408:	dd 06       	cpc	r13, r29
     140a:	29 f7       	brne	.-54     	; 0x13d6 <oled_print_string+0x5c>
-			line++;
-			oled_goto_column(column);
-			oled_goto_line(line);
-		}
-	}
-}
     140c:	df 91       	pop	r29
     140e:	cf 91       	pop	r28
     1410:	1f 91       	pop	r17
@@ -2540,78 +2055,36 @@ void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font
     1428:	08 95       	ret
 
 0000142a <oled_clear_line>:
-	for (uint8_t line = 0; line < 8; line++){
-		oled_clear_line(line);
-	}
-}
-
-void oled_clear_line(int line){
     142a:	cf 93       	push	r28
-	oled_goto_line(line);
     142c:	0e 94 6c 09 	call	0x12d8	; 0x12d8 <oled_goto_line>
-	oled_goto_column(0);
     1430:	80 e0       	ldi	r24, 0x00	; 0
     1432:	90 e0       	ldi	r25, 0x00	; 0
     1434:	0e 94 93 09 	call	0x1326	; 0x1326 <oled_goto_column>
-	for (uint8_t i = 0; i < 128; i++){
     1438:	c0 e0       	ldi	r28, 0x00	; 0
-		oled_write_data(0x00);
     143a:	80 e0       	ldi	r24, 0x00	; 0
     143c:	0e 94 d0 08 	call	0x11a0	; 0x11a0 <oled_write_data>
-}
-
-void oled_clear_line(int line){
-	oled_goto_line(line);
-	oled_goto_column(0);
-	for (uint8_t i = 0; i < 128; i++){
     1440:	cf 5f       	subi	r28, 0xFF	; 255
     1442:	c0 38       	cpi	r28, 0x80	; 128
     1444:	d1 f7       	brne	.-12     	; 0x143a <oled_clear_line+0x10>
-		oled_write_data(0x00);
-	}
-}
     1446:	cf 91       	pop	r28
     1448:	08 95       	ret
 
 0000144a <oled_clear_screen>:
-			oled_write_data(~pgm_read_byte(font_address + i));
-		}
-	}
-}
-
-void oled_clear_screen(){
     144a:	cf 93       	push	r28
     144c:	df 93       	push	r29
     144e:	c0 e0       	ldi	r28, 0x00	; 0
     1450:	d0 e0       	ldi	r29, 0x00	; 0
-	for (uint8_t line = 0; line < 8; line++){
-		oled_clear_line(line);
     1452:	ce 01       	movw	r24, r28
     1454:	0e 94 15 0a 	call	0x142a	; 0x142a <oled_clear_line>
     1458:	21 96       	adiw	r28, 0x01	; 1
-		}
-	}
-}
-
-void oled_clear_screen(){
-	for (uint8_t line = 0; line < 8; line++){
     145a:	c8 30       	cpi	r28, 0x08	; 8
     145c:	d1 05       	cpc	r29, r1
     145e:	c9 f7       	brne	.-14     	; 0x1452 <oled_clear_screen+0x8>
-		oled_clear_line(line);
-	}
-}
     1460:	df 91       	pop	r29
     1462:	cf 91       	pop	r28
     1464:	08 95       	ret
 
 00001466 <oled_init>:
-		oled_write_data(0x00);
-	}
-}
-
-void oled_write_command(char command){
-	*oled_command = command;
     1466:	e0 91 68 01 	lds	r30, 0x0168
     146a:	f0 91 69 01 	lds	r31, 0x0169
     146e:	8e ea       	ldi	r24, 0xAE	; 174
@@ -2699,29 +2172,11 @@ void oled_write_command(char command){
     1564:	f0 91 69 01 	lds	r31, 0x0169
     1568:	8f ea       	ldi	r24, 0xAF	; 175
     156a:	80 83       	st	Z, r24
-	oled_write_command(0xad); //master configuration
-	oled_write_command(0x00);
-	oled_write_command(0xa4); //out follows RAM content
-	oled_write_command(0xa6); //set normal display
-	oled_write_command(0xaf); // display on
-	oled_clear_screen(); //Sets all buffer data to 0
     156c:	0e 94 25 0a 	call	0x144a	; 0x144a <oled_clear_screen>
     1570:	08 95       	ret
 
 00001572 <oled_refresh>:
-		oled_write_command(lower);
-		oled_write_command(0b00010000 | upper);
-	}
-}
-
-void oled_refresh(){
     1572:	cf 93       	push	r28
-		oled_write_data(0x00);
-	}
-}
-
-void oled_write_command(char command){
-	*oled_command = command;
     1574:	e0 91 68 01 	lds	r30, 0x0168
     1578:	f0 91 69 01 	lds	r31, 0x0169
     157c:	10 82       	st	Z, r1
@@ -2729,12 +2184,6 @@ void oled_write_command(char command){
     1582:	f0 91 69 01 	lds	r31, 0x0169
     1586:	80 e1       	ldi	r24, 0x10	; 16
     1588:	80 83       	st	Z, r24
-	uint8_t lower = 0 & 0b00001111; // set column to 0
-	uint8_t upper = 0 >> 4;
-	oled_write_command(lower);
-	oled_write_command(0b00010000 | upper);
-	
-	if(doublebuffering){
     158a:	80 91 6a 01 	lds	r24, 0x016A
     158e:	90 91 6b 01 	lds	r25, 0x016B
     1592:	89 2b       	or	r24, r25
@@ -2742,29 +2191,13 @@ void oled_write_command(char command){
     1596:	40 e0       	ldi	r20, 0x00	; 0
     1598:	50 e0       	ldi	r21, 0x00	; 0
     159a:	60 eb       	ldi	r22, 0xB0	; 176
-		for(int page = 0; page < 8; page++){
-			oled_write_command(0xB0 + page);
-			for(int column = 0; column < 128; column++){
     159c:	c0 e0       	ldi	r28, 0x00	; 0
     159e:	70 e0       	ldi	r23, 0x00	; 0
-		oled_write_data(0x00);
-	}
-}
-
-void oled_write_command(char command){
-	*oled_command = command;
     15a0:	e0 91 68 01 	lds	r30, 0x0168
     15a4:	f0 91 69 01 	lds	r31, 0x0169
     15a8:	60 83       	st	Z, r22
-	oled_write_command(0b00010000 | upper);
-	
-	if(doublebuffering){
-		for(int page = 0; page < 8; page++){
-			oled_write_command(0xB0 + page);
-			for(int column = 0; column < 128; column++){
     15aa:	8c 2f       	mov	r24, r28
     15ac:	97 2f       	mov	r25, r23
-				*oled_front_buffer = oled_back_buffer[column + page*128];
     15ae:	e0 91 64 01 	lds	r30, 0x0164
     15b2:	f0 91 65 01 	lds	r31, 0x0165
     15b6:	9c 01       	movw	r18, r24
@@ -2776,12 +2209,6 @@ void oled_write_command(char command){
     15c6:	b3 1f       	adc	r27, r19
     15c8:	2c 91       	ld	r18, X
     15ca:	20 83       	st	Z, r18
-	oled_write_command(0b00010000 | upper);
-	
-	if(doublebuffering){
-		for(int page = 0; page < 8; page++){
-			oled_write_command(0xB0 + page);
-			for(int column = 0; column < 128; column++){
     15cc:	01 96       	adiw	r24, 0x01	; 1
     15ce:	80 38       	cpi	r24, 0x80	; 128
     15d0:	91 05       	cpc	r25, r1
@@ -2789,36 +2216,16 @@ void oled_write_command(char command){
     15d4:	6f 5f       	subi	r22, 0xFF	; 255
     15d6:	40 58       	subi	r20, 0x80	; 128
     15d8:	5f 4f       	sbci	r21, 0xFF	; 255
-	uint8_t upper = 0 >> 4;
-	oled_write_command(lower);
-	oled_write_command(0b00010000 | upper);
-	
-	if(doublebuffering){
-		for(int page = 0; page < 8; page++){
     15da:	68 3b       	cpi	r22, 0xB8	; 184
     15dc:	09 f7       	brne	.-62     	; 0x15a0 <oled_refresh+0x2e>
-			for(int column = 0; column < 128; column++){
-				*oled_front_buffer = oled_back_buffer[column + page*128];
-			}
-		}	
-	}
-}
     15de:	cf 91       	pop	r28
     15e0:	08 95       	ret
 
 000015e2 <oled_invert_pixel>:
-	oled_goto_column(x);
-	oled_goto_line(y/8);
-	oled_write_data(~(1 << (y % 8)) & oled_read_data());
-}
-
-void oled_invert_pixel(int x, int y){
     15e2:	cf 93       	push	r28
     15e4:	df 93       	push	r29
     15e6:	eb 01       	movw	r28, r22
-	oled_goto_column(x);
     15e8:	0e 94 93 09 	call	0x1326	; 0x1326 <oled_goto_column>
-	oled_goto_line(y/8);
     15ec:	ce 01       	movw	r24, r28
     15ee:	dd 23       	and	r29, r29
     15f0:	0c f4       	brge	.+2      	; 0x15f4 <oled_invert_pixel+0x12>
@@ -2830,7 +2237,6 @@ void oled_invert_pixel(int x, int y){
     15fc:	95 95       	asr	r25
     15fe:	87 95       	ror	r24
     1600:	0e 94 6c 09 	call	0x12d8	; 0x12d8 <oled_goto_line>
-	oled_write_data((1 << (y % 8)) ^ oled_read_data()); //exclusive or
     1604:	0e 94 51 09 	call	0x12a2	; 0x12a2 <oled_read_data>
     1608:	be 01       	movw	r22, r28
     160a:	67 70       	andi	r22, 0x07	; 7
@@ -2853,18 +2259,11 @@ void oled_invert_pixel(int x, int y){
     162c:	e2 f7       	brpl	.-8      	; 0x1626 <oled_invert_pixel+0x44>
     162e:	84 27       	eor	r24, r20
     1630:	0e 94 d0 08 	call	0x11a0	; 0x11a0 <oled_write_data>
-}
     1634:	df 91       	pop	r29
     1636:	cf 91       	pop	r28
     1638:	08 95       	ret
 
 0000163a <oled_invert_rectangle>:
-	}
-	
-	//not finished
-}
-
-void oled_invert_rectangle(int x1, int y1, int x2, int y2){
     163a:	8f 92       	push	r8
     163c:	9f 92       	push	r9
     163e:	af 92       	push	r10
@@ -2881,50 +2280,30 @@ void oled_invert_rectangle(int x1, int y1, int x2, int y2){
     1654:	6b 01       	movw	r12, r22
     1656:	5a 01       	movw	r10, r20
     1658:	79 01       	movw	r14, r18
-	for (int x = x1; x < x2; x++){
     165a:	84 17       	cp	r24, r20
     165c:	95 07       	cpc	r25, r21
     165e:	b4 f4       	brge	.+44     	; 0x168c <oled_invert_rectangle+0x52>
-		for (int y = y1; y < y2; y++){
     1660:	86 2e       	mov	r8, r22
     1662:	9d 2c       	mov	r9, r13
     1664:	0d c0       	rjmp	.+26     	; 0x1680 <oled_invert_rectangle+0x46>
-			oled_invert_pixel(x, y);
     1666:	be 01       	movw	r22, r28
     1668:	c8 01       	movw	r24, r16
     166a:	0e 94 f1 0a 	call	0x15e2	; 0x15e2 <oled_invert_pixel>
-	//not finished
-}
-
-void oled_invert_rectangle(int x1, int y1, int x2, int y2){
-	for (int x = x1; x < x2; x++){
-		for (int y = y1; y < y2; y++){
     166e:	21 96       	adiw	r28, 0x01	; 1
     1670:	ce 15       	cp	r28, r14
     1672:	df 05       	cpc	r29, r15
     1674:	c4 f3       	brlt	.-16     	; 0x1666 <oled_invert_rectangle+0x2c>
-	
-	//not finished
-}
-
-void oled_invert_rectangle(int x1, int y1, int x2, int y2){
-	for (int x = x1; x < x2; x++){
     1676:	0f 5f       	subi	r16, 0xFF	; 255
     1678:	1f 4f       	sbci	r17, 0xFF	; 255
     167a:	0a 15       	cp	r16, r10
     167c:	1b 05       	cpc	r17, r11
     167e:	34 f4       	brge	.+12     	; 0x168c <oled_invert_rectangle+0x52>
-		for (int y = y1; y < y2; y++){
     1680:	ce 14       	cp	r12, r14
     1682:	df 04       	cpc	r13, r15
     1684:	c4 f7       	brge	.-16     	; 0x1676 <oled_invert_rectangle+0x3c>
     1686:	c8 2d       	mov	r28, r8
     1688:	d9 2d       	mov	r29, r9
     168a:	ed cf       	rjmp	.-38     	; 0x1666 <oled_invert_rectangle+0x2c>
-			oled_invert_pixel(x, y);
-		}
-	}
-}
     168c:	df 91       	pop	r29
     168e:	cf 91       	pop	r28
     1690:	1f 91       	pop	r17
@@ -2940,61 +2319,33 @@ void oled_invert_rectangle(int x1, int y1, int x2, int y2){
     16a4:	08 95       	ret
 
 000016a6 <spi_master_init>:
-
-#include "spi.h"
-
-void spi_master_init(int node)
-{
-	if (node == NODE_1){
     16a6:	81 30       	cpi	r24, 0x01	; 1
     16a8:	91 05       	cpc	r25, r1
     16aa:	41 f4       	brne	.+16     	; 0x16bc <spi_master_init+0x16>
-		DDRB |= (1<<DDB4)|(1<<DDB5)|(1<<DDB7); //Set MOSI and SCK output, all others input
     16ac:	87 b3       	in	r24, 0x17	; 23
     16ae:	80 6b       	ori	r24, 0xB0	; 176
     16b0:	87 bb       	out	0x17, r24	; 23
-		DDRB &= ~(1 << DDB6);
     16b2:	be 98       	cbi	0x17, 6	; 23
-
-		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPI2X); //Enable SPI, Master, set clock rate fck/16
     16b4:	81 e5       	ldi	r24, 0x51	; 81
     16b6:	8d b9       	out	0x0d, r24	; 13
-		set_bit(PORTB,PB4); //Disable chip
     16b8:	c4 9a       	sbi	0x18, 4	; 24
     16ba:	08 95       	ret
-	}
-	else if (node == NODE_2){
     16bc:	02 97       	sbiw	r24, 0x02	; 2
     16be:	39 f4       	brne	.+14     	; 0x16ce <spi_master_init+0x28>
-		//Without setting PB0 as an output printf doesn|t work!?!?!?!?
-		DDRB |= (1<<PB0)|(1 << PB1)|(1 << PB2)|(1 << PB7); //Set MOSI, SS and SCK output, all others input
     16c0:	87 b3       	in	r24, 0x17	; 23
     16c2:	87 68       	ori	r24, 0x87	; 135
     16c4:	87 bb       	out	0x17, r24	; 23
-		DDRB &= ~(1 << PB3); //DO NOT TINK IS NECCSCAS RYTSR:
     16c6:	bb 98       	cbi	0x17, 3	; 23
-
-		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0); //Enable SPI, Master, set clock rate fck/16
     16c8:	81 e5       	ldi	r24, 0x51	; 81
     16ca:	8d b9       	out	0x0d, r24	; 13
-		set_bit(PORTB,PB7); //Disable chip
     16cc:	c7 9a       	sbi	0x18, 7	; 24
     16ce:	08 95       	ret
 
 000016d0 <spi_master_transmit>:
-	}
-}
-
-char spi_master_transmit(char cData)
-{
-	SPDR = cData; //Start transmission
     16d0:	8f b9       	out	0x0f, r24	; 15
-	while(!(SPSR & (1<<SPIF))); //Wait for transmission complete	
     16d2:	77 9b       	sbis	0x0e, 7	; 14
     16d4:	fe cf       	rjmp	.-4      	; 0x16d2 <spi_master_transmit+0x2>
-	return SPDR;
     16d6:	8f b1       	in	r24, 0x0f	; 15
-}
     16d8:	08 95       	ret
 
 000016da <touch_init>:
@@ -3003,40 +2354,21 @@ char spi_master_transmit(char cData)
     16de:	08 95       	ret
 
 000016e0 <uart_putchar>:
-	UCSR0C = (((node == NODE_1)<<URSEL0)|(1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bits, 8 data bits //Asynchronous - No parity (?) //URSEL makes sure we won't access UBRRH during operation, but UCSRC. //URSEL should not be set in node 2
-	fdevopen(uart_putchar, uart_getchar);
-}
-
-void uart_putchar(char c){
-	while (!( UCSR0A & (1<<UDRE0))); //Wait for empty transmit buffer
     16e0:	5d 9b       	sbis	0x0b, 5	; 11
     16e2:	fe cf       	rjmp	.-4      	; 0x16e0 <uart_putchar>
-	UDR0 = c; //Put data into buffer, sends the data
     16e4:	8c b9       	out	0x0c, r24	; 12
     16e6:	08 95       	ret
 
 000016e8 <uart_getchar>:
-}
-
-unsigned char uart_getchar(){
-	while (!( UCSR0A & (1<<RXC0)));
     16e8:	5f 9b       	sbis	0x0b, 7	; 11
     16ea:	fe cf       	rjmp	.-4      	; 0x16e8 <uart_getchar>
-	return UDR0;
     16ec:	8c b1       	in	r24, 0x0c	; 12
     16ee:	08 95       	ret
 
 000016f0 <uart_init>:
-#include <stdio.h>
-#include <avr/io.h>
-
-#include "uart.h"
-
-void uart_init(int baudRate, int node){
     16f0:	cf 93       	push	r28
     16f2:	df 93       	push	r29
     16f4:	eb 01       	movw	r28, r22
-	int UBRR = ((long)F_CPU/((long)16*baudRate) - 1);
     16f6:	aa 27       	eor	r26, r26
     16f8:	97 fd       	sbrc	r25, 7
     16fa:	a0 95       	com	r26
@@ -3066,27 +2398,21 @@ void uart_init(int baudRate, int node){
     172a:	0e 94 97 0e 	call	0x1d2e	; 0x1d2e <__divmodsi4>
     172e:	21 50       	subi	r18, 0x01	; 1
     1730:	31 09       	sbc	r19, r1
-	UBRR0L = UBRR;
     1732:	29 b9       	out	0x09, r18	; 9
-    UBRR0H = (UBRR>>8);
     1734:	30 bd       	out	0x20, r19	; 32
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0); //Enable receiver and transmitter 
     1736:	88 e1       	ldi	r24, 0x18	; 24
     1738:	8a b9       	out	0x0a, r24	; 10
-	UCSR0C = (((node == NODE_1)<<URSEL0)|(1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bits, 8 data bits //Asynchronous - No parity (?) //URSEL makes sure we won't access UBRRH during operation, but UCSRC. //URSEL should not be set in node 2
     173a:	21 97       	sbiw	r28, 0x01	; 1
     173c:	11 f4       	brne	.+4      	; 0x1742 <uart_init+0x52>
     173e:	8e e8       	ldi	r24, 0x8E	; 142
     1740:	01 c0       	rjmp	.+2      	; 0x1744 <uart_init+0x54>
     1742:	8e e0       	ldi	r24, 0x0E	; 14
     1744:	80 bd       	out	0x20, r24	; 32
-	fdevopen(uart_putchar, uart_getchar);
     1746:	64 e7       	ldi	r22, 0x74	; 116
     1748:	7b e0       	ldi	r23, 0x0B	; 11
     174a:	80 e7       	ldi	r24, 0x70	; 112
     174c:	9b e0       	ldi	r25, 0x0B	; 11
     174e:	0e 94 e6 10 	call	0x21cc	; 0x21cc <fdevopen>
-}
     1752:	df 91       	pop	r29
     1754:	cf 91       	pop	r28
     1756:	08 95       	ret
