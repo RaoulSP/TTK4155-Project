@@ -39,10 +39,13 @@ SUBDIRS :=
 C_SRCS +=  \
 ../adc.c \
 ../can.c \
+../dac.c \
 ../mcp.c \
-../Node2.c \
+../main.c \
+../motor_driver.c \
 ../pwm.c \
 ../spi.c \
+../TWI_Master.c \
 ../uart.c \
 ../utils.c
 
@@ -56,40 +59,52 @@ ASM_SRCS +=
 OBJS +=  \
 adc.o \
 can.o \
+dac.o \
 mcp.o \
-Node2.o \
+main.o \
+motor_driver.o \
 pwm.o \
 spi.o \
+TWI_Master.o \
 uart.o \
 utils.o
 
 OBJS_AS_ARGS +=  \
 adc.o \
 can.o \
+dac.o \
 mcp.o \
-Node2.o \
+main.o \
+motor_driver.o \
 pwm.o \
 spi.o \
+TWI_Master.o \
 uart.o \
 utils.o
 
 C_DEPS +=  \
 adc.d \
 can.d \
+dac.d \
 mcp.d \
-Node2.d \
+main.d \
+motor_driver.d \
 pwm.d \
 spi.d \
+TWI_Master.d \
 uart.d \
 utils.d
 
 C_DEPS_AS_ARGS +=  \
 adc.d \
 can.d \
+dac.d \
 mcp.d \
-Node2.d \
+main.d \
+motor_driver.d \
 pwm.d \
 spi.d \
+TWI_Master.d \
 uart.d \
 utils.d
 
@@ -107,6 +122,12 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
+
+
 
 
 

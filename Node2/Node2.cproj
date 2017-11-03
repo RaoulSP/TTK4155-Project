@@ -133,6 +133,12 @@
     <Compile Include="can.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="dac.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="dac.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="joy.h">
       <SubType>compile</SubType>
     </Compile>
@@ -145,7 +151,13 @@
     <Compile Include="MCP2515.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Node2.c">
+    <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="motor_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="motor_driver.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="pwm.c">
@@ -158,6 +170,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TWI_Master.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TWI_Master.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="uart.c">
