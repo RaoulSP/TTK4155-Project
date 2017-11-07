@@ -29,7 +29,7 @@ int main(void)
 	menu_init();
 	spi_master_init(NODE_1);
 	mcp_init();
-	can_init(MODE_NORMAL); 
+	can_init(MODE_LOOPBACK); 
 	
 	//mcp_test();
 	//sram_test();
@@ -40,21 +40,49 @@ int main(void)
 	while (1)
 	{	
 		Position position = joy_get_position();
+		char* string = "Hellu";
+		int intolini = 3;
+		
 		Msg msg;
 		msg.id = 42;
-		msg.length = sizeof(position);
-		msg.data = (char*) &position;
+		msg.length = strlen(string) + 1;
+		msg.data = string;
+	
+
+		Msg msg3;
+		msg3.id = 39;
+		msg3.length = sizeof(intolini);
+		msg3.data = (char*) &intolini;
+		
 		can_transmit(msg);
+		can_transmit(msg3);
+		
+		Msg msg2 = can_receive();
+		
+		if(msg2.id == 42){
+		printf("%s\r\n", msg2.data);
+		}
+		else if(msg2.id == 39){
+		}
+		free(msg2.data);
+		
+		
+		
+		/*
+		//for loopback mode only:
+		Position position_received = *(Position*)can_receive();
+		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		*/
 		
 		//for loopback mode only:
-		//Position position_received = *(Position*)can_receive();
+
+		//Position position_received = *(Position*)msg2.data;
 		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		
+		
 		
 		menu_run_display();
 		_delay_ms(50);
-		
-		
-		
 		
 		
 		/* //For later!
@@ -74,6 +102,7 @@ int main(void)
 		
 		//sending a string over CAN still doesn't seem to work
 
+	
 		
 	}
 }	

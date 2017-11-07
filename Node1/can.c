@@ -31,28 +31,40 @@ void can_transmit(Msg msg){
 	//TODO: (maybe) print error message?
 	//TXBnCTRL.TXERR and the CANINTF.MERRF bits will be set and an interrupt will be generated on the INT pin if the CANINTE.MERRE bit is set
 }
-
 /*
+char* can_receive(){
+	uint8_t data_length = mcp_read(0x65) & 0b00001111;
+	char data[data_length];
+	for(int i = 0; i < data_length; i++){
+		data[i] = mcp_read(0x66 + i);  //Read data
+	}
+	mcp_bit_modify(0x2C, 1, 0);	//CANINTF - Sets RX0IF to 0
+	return data;
+	
+	//TODO: Add something to read the standard identifier of the message received
+	//use Msg type? Return Msg type and access data using "can_receive().data"?
+}
+//Versions of can_receive:
+*/ 
+
+//Kind of working. Some pointer prroblems?
 Msg can_receive(){
 	int buffer = 0; //n = 1 or 2
 	
 	Msg msg;
 	msg.id = ((int)mcp_read(0x61 + 0x10*buffer) << 3) | (mcp_read(0x62 + 0x10*buffer) >> 5); //Put together RXBnSIDH and RXBnSIDL
 	msg.length = mcp_read(0x65 + 0x10*buffer) & 0b00001111; //RXBnDLC
-	msg.data[msg.length];
+	msg.data = malloc(msg.length);
 	
 	for(int i = 0; i < msg.length; i++){
 		msg.data[i] = mcp_read(0x66 + 0x10*buffer + i);
+		//printf("%c", msg.data[i]);
 	}
-	
+	//printf("%s", msg.data);
 	mcp_bit_modify(0x2C, buffer + 1, 0);	//CANINTF - Sets RX0IF to 0
 	return msg;
 	
-	//TODO: Add something to read the standard identifier of the message received
-	//use Msg type? Return Msg type and access data using "can_receive().data"?
 }
-*/
-
 
 /* //Not working?
 Msg can_receive(){
@@ -70,21 +82,6 @@ Msg can_receive(){
 	}
 }
 */
-
-
- //"Original"
-char* can_receive(){
-	uint8_t data_length = mcp_read(0x65) & 0b00001111;
-	char data[data_length];
-	for(int i = 0; i < data_length; i++){
-		data[i] = mcp_read(0x66 + i);  //Read data
-	}
-	mcp_bit_modify(0x2C, 1, 0);	//CANINTF - Sets RX0IF to 0
-	return data;
-	
-	//TODO: Add something to read the standard identifier of the message received
-	//use Msg type? Return Msg type and access data using "can_receive().data"?
-}
 
 
 /*
@@ -148,7 +145,6 @@ void can_transmit(Msg msg){
 	}
 	//TODO: (maybe) print error message? TXBnCTRL.TXERR and the CANINTF.MERRF bits will be set and an interrupt will be generated on the INT pin if the CANINTE.MERRE bit is set
 }
-
 
 
 void can_transmit(Msg msg){

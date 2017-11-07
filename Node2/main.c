@@ -1,4 +1,5 @@
 #define F_CPU 16000000
+#define NODE_2 2
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -20,7 +21,7 @@
 int scoring_allowed = 1;
 int main(void)
 {	
-	uart_init(9600);
+	uart_init(9600, NODE_2);
 	spi_master_init();
     mcp_reset();
 	can_init(MODE_NORMAL);
@@ -37,9 +38,9 @@ int main(void)
 	while(1)
 	{
 		Position position_received = *(Position*)can_receive();
-		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 		
-		
+		/*
 		motor_move_servo((((float)position_received.x)*1.2/200.0)+1.5);
 		motor_move_dc(position_received);
 		
@@ -49,6 +50,7 @@ int main(void)
 		//printf("%d\r\n", score);
 		
 		//printf("%d\r\n",adc_read());
+		*/
 		_delay_ms(50);
 	}
 }
