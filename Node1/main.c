@@ -66,8 +66,6 @@ int main(void)
 		}
 		free(msg2.data);
 		
-		
-		
 		/*
 		//for loopback mode only:
 		Position position_received = *(Position*)can_receive();
