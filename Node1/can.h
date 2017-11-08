@@ -3,15 +3,16 @@
 
 typedef struct can_msg_t {
 	int id;
-	//char data[8];
-	char* data;
 	int length;
+	char* data;
 } Msg;
 
 void can_init(int mode);
 void can_transmit(Msg msg); 
 Msg can_receive();
-//char* can_receive();
-int can_test();
+void can_test();
+
+void can_receive_at_location(char* write_location);
+void can_receive_and_switch();
 
 #endif /* CAN_H_ */

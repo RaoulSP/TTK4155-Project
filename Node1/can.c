@@ -16,7 +16,7 @@ void can_init(int mode){
 }
 
 void can_transmit(Msg msg){
-	int buffer = 2;
+	int buffer = 2; //n = 1, 2 or 3
 	
 	mcp_write(0x31 + 0x10*buffer, msg.id >> 3);  //TXBnSIDH
 	mcp_write(0x32 + 0x10*buffer, msg.id << 5);  //TXBnSIDL
@@ -31,7 +31,24 @@ void can_transmit(Msg msg){
 	//TODO: (maybe) print error message?
 	//TXBnCTRL.TXERR and the CANINTF.MERRF bits will be set and an interrupt will be generated on the INT pin if the CANINTE.MERRE bit is set
 }
-/*
+
+Msg can_receive(){
+	int buffer = 0; //n = 1 or 2
+	
+	Msg msg;
+	msg.id = ((int)mcp_read(0x61 + 0x10*buffer) << 3) | (mcp_read(0x62 + 0x10*buffer) >> 5); //Put together RXBnSIDH and RXBnSIDL
+	msg.length = mcp_read(0x65 + 0x10*buffer) & 0b00001111; //RXBnDLC
+	msg.data = malloc(msg.length);
+	
+	for(int i = 0; i < msg.length; i++){
+		msg.data[i] = mcp_read(0x66 + 0x10*buffer + i);
+	}
+	
+	mcp_bit_modify(0x2C, buffer + 1, 0);	//CANINTF - Sets RX0IF to 0
+	return msg;
+}
+
+/* //Original
 char* can_receive(){
 	uint8_t data_length = mcp_read(0x65) & 0b00001111;
 	char data[data_length];
@@ -46,25 +63,6 @@ char* can_receive(){
 }
 //Versions of can_receive:
 */ 
-
-//Kind of working. Some pointer prroblems?
-Msg can_receive(){
-	int buffer = 0; //n = 1 or 2
-	
-	Msg msg;
-	msg.id = ((int)mcp_read(0x61 + 0x10*buffer) << 3) | (mcp_read(0x62 + 0x10*buffer) >> 5); //Put together RXBnSIDH and RXBnSIDL
-	msg.length = mcp_read(0x65 + 0x10*buffer) & 0b00001111; //RXBnDLC
-	msg.data = malloc(msg.length);
-	
-	for(int i = 0; i < msg.length; i++){
-		msg.data[i] = mcp_read(0x66 + 0x10*buffer + i);
-		//printf("%c", msg.data[i]);
-	}
-	//printf("%s", msg.data);
-	mcp_bit_modify(0x2C, buffer + 1, 0);	//CANINTF - Sets RX0IF to 0
-	return msg;
-	
-}
 
 /* //Not working?
 Msg can_receive(){
@@ -84,25 +82,21 @@ Msg can_receive(){
 */
 
 
-/*
-int can_test(){ 
+
+void can_test(){ 
 	mcp_bit_modify(MCP_CANCTRL, 0xFF, MODE_LOOPBACK);
 	char* test_string = "test123";
 	Msg msg;
 	msg.id = 42;
-	msg.length = sizeof(test_string);
+	msg.length = (strlen(test_string) + 1);
 	msg.data = test_string;
 	can_transmit(msg);
-	printf("Sent '%s'... ", test_string);
-	_delay_ms(10);
-	printf("received '%s'\r\n",can_receive());
-	return 0; 
+	printf("CAN: Sent '%s'... received '%s'\r\n", test_string, can_receive().data);
 	
 	//TODO: Make it work. Currently receiving nothing
 	//Possibly add logic to return 1
 	//mcp_bit_modify back to the original CAN_MODE
 }
-*/
 
 
 
@@ -214,3 +208,62 @@ void can_transmit(Msg msg){
 	//TODO: (maybe) print error message? TXBnCTRL.TXERR and the CANINTF.MERRF bits will be set and an interrupt will be generated on the INT pin if the CANINTE.MERRE bit is set
 }
 */
+
+void can_receive_at_location(char* write_location){
+	int buffer = 0; //n = 1 or 2
+	
+	Msg msg;
+	msg.id = ((int)mcp_read(0x61 + 0x10*buffer) << 3) | (mcp_read(0x62 + 0x10*buffer) >> 5); //Put together RXBnSIDH and RXBnSIDL
+	msg.length = mcp_read(0x65 + 0x10*buffer) & 0b00001111; //RXBnDLC
+	msg.data = write_location;
+	
+	for(int i = 0; i < msg.length; i++){
+		msg.data[i] = mcp_read(0x66 + 0x10*buffer + i);
+	}
+	
+	mcp_bit_modify(0x2C, buffer + 1, 0);	//CANINTF - Sets RX0IF to 0
+}
+
+void can_receive_and_switch(){
+	int buffer = 0; //n = 1 or 2
+	//char* string_location = NULL;
+	
+	Msg msg;
+	msg.id = ((int)mcp_read(0x61 + 0x10*buffer) << 3) | (mcp_read(0x62 + 0x10*buffer) >> 5); //Put together RXBnSIDH and RXBnSIDL
+	msg.length = mcp_read(0x65 + 0x10*buffer) & 0b00001111; //RXBnDLC
+	switch(msg.id){
+		case 1:
+			//msg.data = ;//address to some string?
+		case 11:
+			//msg.data = //address to some struct?
+			break;
+		case 42:
+			//msg.data = //address to some int? etc.
+			break;
+		/*case 666:
+			msg.data = malloc(msg.length);
+			string_location = msg.data;
+			break;
+		case 667:
+			msg.data = malloc(msg.length);
+			for(int i = 0; i < msg.length; i++){
+				msg.data[i] = mcp_read(0x66 + 0x10*buffer + i);
+			}
+			printf("%s",msg.data);
+			free(msg.data);
+			break;*/
+		default:
+			printf("unknown CAN msg received");
+			mcp_bit_modify(0x2C, buffer + 1, 0);
+			return;
+	}
+	
+	for(int i = 0; i < msg.length; i++){
+		msg.data[i] = mcp_read(0x66 + 0x10*buffer + i);
+	}
+	
+	//free(string_location);
+	//printf("%s",msg.data);
+	
+	mcp_bit_modify(0x2C, buffer + 1, 0);	//CANINTF - Sets RX0IF to 0
+}

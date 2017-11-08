@@ -30,5 +30,5 @@ Position joy_get_position();
 Position_polar joy_get_position_polar();
 Direction joy_get_direction();
 
-void joy_print(int all);
+void joy_print();
 #endif /* JOY_H_ */

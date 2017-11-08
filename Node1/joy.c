@@ -120,7 +120,8 @@ Direction joy_get_direction(){
 	return NEUTRAL;
 } 
 
-void joy_print(int all){
+void joy_print(){
+	/*
 	if(all){
 		printf("x = ");
 		printf("%d  ", adc_read('x'));
@@ -128,13 +129,15 @@ void joy_print(int all){
 		printf("y = ");
 		printf("%d  ", adc_read('y'));
 	}
+	*/
 	
 	Position pos = joy_get_position();
 	Position_polar pos_pol = joy_get_position_polar();
 	
 	printf("X = ");
-	printf("%d  ", pos.x);
+	printf("x = %d, y = %d, X= %d, Y = %d, Z = %d, amplitude = %d, angle = %d, direction = %d\r\n", adc_read('x'), adc_read('y'), pos.x, pos.y, pos.z, pos_pol.amplitude, pos_pol.angle, joy_get_direction());
 	
+	/*
 	printf("Y = ");
 	printf("%d  ", pos.y);
 	
@@ -149,5 +152,6 @@ void joy_print(int all){
 	
 	printf("Middle button= ");
 	printf("%d  \r", pos.z);
+	*/
 	
 }

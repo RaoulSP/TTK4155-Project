@@ -1,5 +1,6 @@
-#define F_CPU 16000000
+#define NODE_1 1
 #define NODE_2 2
+#define F_CPU 16000000
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -16,9 +17,8 @@
 #include "motor_driver.h"
 #include "TWI_Master.h"
 
-
-
 int scoring_allowed = 1;
+
 int main(void)
 {	
 	uart_init(9600, NODE_2);
@@ -29,28 +29,37 @@ int main(void)
 	adc_init();
 	TWI_Master_Initialise();
 	motor_init();
-	sei(); //fisk
-	
+	sei(); //enable interrupts
 	
 	int score = 0;
 
-
 	while(1)
 	{
-		Position position_received = *(Position*)can_receive();
-		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		Position position_received;
+		Msg msg_received;
+		msg_received = can_receive();
 		
-		/*
-		motor_move_servo((((float)position_received.x)*1.2/200.0)+1.5);
+		switch (msg_received.id){
+			case 42:
+				position_received = *(Position*)msg_received.data;
+				break;
+			default:
+				printf("ID unknown");
+		}
+		free(msg_received.data);
+		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		
+		
+		//motor_move_servo((((float)position_received.y)*1.2/200.0)+1.5);
 		motor_move_dc(position_received);
 		
 		
 		score += check_if_scored();
-		printf("SCORE = %d\r\n", score);
+		//printf("SCORE = %d\r\n", score);
 		//printf("%d\r\n", score);
 		
 		//printf("%d\r\n",adc_read());
-		*/
+		
 		_delay_ms(50);
 	}
 }

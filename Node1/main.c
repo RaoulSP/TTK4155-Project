@@ -1,4 +1,5 @@
 #define NODE_1 1
+#define NODE_2 2
 #define F_CPU 4915200
 
 #include <avr/io.h>
@@ -19,9 +20,10 @@
 int main(void)
 {
 	MCUCR |= (1<<SRE);	//Enable external memory
-	SFIOR |= (1<<XMM2);
+	SFIOR |= (1<<XMM2); //
 	
 	uart_init(9600, NODE_1);
+	printf("\r\n\x1b[4mReset\x1b[0m \r\n");
 	adc_init();
 	oled_init();
 	joy_init();
@@ -29,42 +31,73 @@ int main(void)
 	menu_init();
 	spi_master_init(NODE_1);
 	mcp_init();
-	can_init(MODE_LOOPBACK); 
+	can_init(MODE_NORMAL); 
 	
 	//mcp_test();
-	//sram_test();
-	//can_test(); //Not working
+	//sram_test(); //Not working
+	//can_test();
 	
-	printf("\r\n%s\r\n", "New run");
-
 	while (1)
 	{	
 		Position position = joy_get_position();
+		Msg msg;
+		msg.id = 42;
+		msg.length = sizeof(position);
+		msg.data = (char*) &position;
+		can_transmit(msg);
+		
+		/*
+		Position position_received;
+		Msg msg_received;
+		msg_received = can_receive();
+				
+		switch (msg_received.id){
+			case 42:
+				position_received = *(Position*)msg_received.data;
+				break;
+			default:
+				printf("ID unknown");
+		}
+		free(msg_received.data);
+		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		*/
+		menu_run_display();
+		_delay_ms(50);
+		
+		
+		/*
+		Position position = joy_get_position();
 		char* string = "Hellu";
-		int intolini = 3;
+		int intolini = 100;
 		
 		Msg msg;
 		msg.id = 42;
 		msg.length = strlen(string) + 1;
 		msg.data = string;
-	
+		
+		Msg msg2;
+		msg2.id = 39;
+		msg2.length = sizeof(intolini);
+		msg2.data = (char*) &intolini;
+		
 
-		Msg msg3;
-		msg3.id = 39;
-		msg3.length = sizeof(intolini);
-		msg3.data = (char*) &intolini;
-		
 		can_transmit(msg);
-		can_transmit(msg3);
+		_delay_ms(1000);
+		can_transmit(msg2);
+
 		
-		Msg msg2 = can_receive();
+		Msg msg3 = can_receive();
 		
-		if(msg2.id == 42){
-		printf("%s\r\n", msg2.data);
+		if(msg3.id == 42){
+			printf("%s\r\n", msg3.data);
 		}
-		else if(msg2.id == 39){
+		else if(msg3.id == 39){
+			printf("%d\r\n", *msg3.data);
 		}
-		free(msg2.data);
+		free(msg3.data);
+		*/
+		
+		//joy_print(); //Crashes everything
 		
 		/*
 		//for loopback mode only:
@@ -73,14 +106,12 @@ int main(void)
 		*/
 		
 		//for loopback mode only:
-
-		//Position position_received = *(Position*)msg2.data;
+		//Position position_received = *(Position*)msg3.data;
 		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 		
 		
 		
-		menu_run_display();
-		_delay_ms(50);
+		
 		
 		
 		/* //For later!

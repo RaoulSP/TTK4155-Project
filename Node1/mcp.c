@@ -55,7 +55,7 @@ void mcp_init(){
 }
 
 int mcp_test(){
-	mcp_request_to_send(1,1,1);
+	mcp_request_to_send(1,1,1); //This messes up the following CAN transmission
 	int result = mcp_read_status();
 	printf("Testing MCP, expected %d, should be 84", result); //(1,1,1) should print 64 + 16 + 4 = 84
 	if (result == 84){
