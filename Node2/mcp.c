@@ -1,5 +1,6 @@
-#include "spi.h"
 #include <avr/io.h>
+
+#include "spi.h"
 #include "MCP2515.h"
 
 char mcp_read(char address){
@@ -8,7 +9,6 @@ char mcp_read(char address){
 	spi_master_transmit(address);
 	char ret = spi_master_transmit(0x0); //0x0 = dummy value
 	set_bit(PORTB,PB7);
-	/*printf(ret);*/
 	return ret;
 }
 
@@ -49,3 +49,7 @@ void mcp_reset(){
 	spi_master_transmit(MCP_RESET);
 	set_bit(PORTB, PB7);
 } 
+
+void mcp_init(){
+	mcp_reset();
+}

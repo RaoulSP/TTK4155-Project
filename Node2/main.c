@@ -22,43 +22,44 @@ int scoring_allowed = 1;
 int main(void)
 {	
 	uart_init(9600, NODE_2);
+	printf("\r\n\x1b[4mReset\x1b[0m \r\n");
+	adc_init();
 	spi_master_init();
-    mcp_reset();
+    mcp_init();
 	can_init(MODE_NORMAL);
 	pwm_init();
-	adc_init();
 	TWI_Master_Initialise();
 	motor_init();
-	sei(); //enable interrupts
+	sei(); //enable the use of interrupts
 	
 	int score = 0;
 
 	while(1)
 	{
 		Position position_received;
-		Msg msg_received;
-		msg_received = can_receive();
+		Msg msg_received = can_receive();
 		
 		switch (msg_received.id){
-			case 42:
+			case 1: //For short strings
+				printf("%s",msg_received.data);
+				break;
+			case 13: //For sending integers
+				printf("%d", *(int*)msg_received.data);
+				break;
+			case 42: //For sending positions
 				position_received = *(Position*)msg_received.data;
 				break;
 			default:
-				printf("ID unknown");
+				printf("ID unknown\r");
 		}
 		free(msg_received.data);
-		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 		
-		
-		//motor_move_servo((((float)position_received.y)*1.2/200.0)+1.5);
 		motor_move_dc(position_received);
-		
-		
 		score += check_if_scored();
-		//printf("SCORE = %d\r\n", score);
-		//printf("%d\r\n", score);
 		
-		//printf("%d\r\n",adc_read());
+		//motor_move_servo((((float)position_received.y) * 1.2 / 200.0) + 1.5); //Maps -100,100 to 0.9,2.1
+		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
+		//printf("SCORE = %d\r\n", score);
 		
 		_delay_ms(50);
 	}
@@ -69,7 +70,7 @@ int check_if_scored()
 	int trigger_value = 200;
 	int adc_val = adc_read();
 	//printf("ADC VAL = %d\r\n", adc_val);
-	if (adc_val < trigger_value && scoring_allowed){
+	if (adc_val < trigger_value && scoring_allowed){ //Can't score again until the adc value goes up
 		scoring_allowed = 0;
 		return 1;
 	}
@@ -78,6 +79,9 @@ int check_if_scored()
 	}
 	return 0;
 }
+
+
+
 
 /*--TODO
 "Create a driver for the timer/counter module which allows you to use the pwm functionality (fast-pwm).

@@ -11,21 +11,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
   3 .comment      00000030  00000000  00000000  00002530  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 000002a0  00000000  00000000  00002560  2**0
+  4 .debug_aranges 00000290  00000000  00000000  00002560  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00002e37  00000000  00000000  00002800  2**0
+  5 .debug_info   00002caf  00000000  00000000  000027f0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000f5d  00000000  00000000  00005637  2**0
+  6 .debug_abbrev 00000f43  00000000  00000000  0000549f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000d71  00000000  00000000  00006594  2**0
+  7 .debug_line   00000d28  00000000  00000000  000063e2  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000864  00000000  00000000  00007308  2**2
+  8 .debug_frame  00000804  00000000  00000000  0000710c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000874  00000000  00000000  00007b6c  2**0
+  9 .debug_str    00000854  00000000  00000000  00007910  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00002367  00000000  00000000  000083e0  2**0
+ 10 .debug_loc    000021a0  00000000  00000000  00008164  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000260  00000000  00000000  0000a747  2**0
+ 11 .debug_ranges 00000238  00000000  00000000  0000a304  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -1066,11 +1066,11 @@ int main(void)
      b32:	80 2f       	mov	r24, r16
      b34:	9e 81       	ldd	r25, Y+6	; 0x06
      b36:	0e 94 c7 03 	call	0x78e	; 0x78e <can_transmit>
-				printf("ID unknown");
+				printf("ID unknown\r");
 		}
 		free(msg_received.data);
-		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 		*/
+
 		menu_run_display();
      b3a:	0e 94 b3 08 	call	0x1166	; 0x1166 <menu_run_display>
 	#else

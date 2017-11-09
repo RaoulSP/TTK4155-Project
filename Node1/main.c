@@ -47,92 +47,47 @@ int main(void)
 		can_transmit(msg);
 		
 		/*
+		char* string = "Hellu";
+		Msg msg_string;
+		msg_string.id = 1;
+		msg_string.length = strlen(string) + 1;
+		msg_string.data = string;
+		can_transmit(msg_string);
+		*/
+		
+		/*
+		int intolini = 123;
+		Msg msg_int;
+		msg_int.id = 13;
+		msg_int.length = sizeof(intolini);
+		msg_int.data = (char*) &intolini;
+		can_transmit(msg_int);
+		*/
+		
+		/*
+		//For Loopback mode:
 		Position position_received;
-		Msg msg_received;
-		msg_received = can_receive();
+		Msg msg_received = can_receive();
 				
 		switch (msg_received.id){
-			case 42:
+			case 1: //For short strings
+				printf("%s",msg_received.data);
+				break;
+			case 13: //For sending integers
+				printf("%d", *(int*)msg_received.data);
+				break;
+			case 42: //For sending positions
 				position_received = *(Position*)msg_received.data;
+				printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 				break;
 			default:
-				printf("ID unknown");
+				printf("ID unknown\r");
 		}
 		free(msg_received.data);
-		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
 		*/
+
 		menu_run_display();
 		_delay_ms(50);
-		
-		
-		/*
-		Position position = joy_get_position();
-		char* string = "Hellu";
-		int intolini = 100;
-		
-		Msg msg;
-		msg.id = 42;
-		msg.length = strlen(string) + 1;
-		msg.data = string;
-		
-		Msg msg2;
-		msg2.id = 39;
-		msg2.length = sizeof(intolini);
-		msg2.data = (char*) &intolini;
-		
-
-		can_transmit(msg);
-		_delay_ms(1000);
-		can_transmit(msg2);
-
-		
-		Msg msg3 = can_receive();
-		
-		if(msg3.id == 42){
-			printf("%s\r\n", msg3.data);
-		}
-		else if(msg3.id == 39){
-			printf("%d\r\n", *msg3.data);
-		}
-		free(msg3.data);
-		*/
-		
-		//joy_print(); //Crashes everything
-		
-		/*
-		//for loopback mode only:
-		Position position_received = *(Position*)can_receive();
-		printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
-		*/
-		
-		//for loopback mode only:
-		//Position position_received = *(Position*)msg3.data;
-		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
-		
-		
-		
-		
-		
-		
-		/* //For later!
-		char* test = "Hello";
-		//int test = 1234;
-		
-		Msg msg;
-		msg.id = 42;
-		msg.length = 7;
-		msg.data = test;
-		can_transmit(msg);
-		
-		//for loopback mode only:
-		char* test_received = can_receive().data; //Sending this MAKES THE MCU REBOOT
-		printf("%s\r", test_received);
-		*/
-		
-		//sending a string over CAN still doesn't seem to work
-
-	
-		
 	}
 }	
 	

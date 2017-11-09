@@ -9,7 +9,7 @@ void mcp_request_to_send(int TXB2, int TXB1, int TXB0);
 char mcp_read_status();
 void mcp_bit_modify(char address, char mask, char data);
 void mcp_reset();
-
+void mcp_init();
 
 
 #endif /* MCP_H_ */
