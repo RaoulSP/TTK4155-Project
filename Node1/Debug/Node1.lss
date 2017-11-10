@@ -21,11 +21,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  00000804  00000000  00000000  0000710c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000854  00000000  00000000  00007910  2**0
+  9 .debug_str    000007e0  00000000  00000000  00007910  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000021a0  00000000  00000000  00008164  2**0
+ 10 .debug_loc    000021a0  00000000  00000000  000080f0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000238  00000000  00000000  0000a304  2**0
+ 11 .debug_ranges 00000238  00000000  00000000  0000a290  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -3010,7 +3010,14 @@ char spi_master_transmit(char cData)
     16c4:	08 95       	ret
 
 000016c6 <touch_init>:
+#include <avr/io.h>
+
+#include "touch.h"
+
+void touch_init(){
+	clear_bit(DDRB, PB0); //Set DDR to input for button
     16c6:	b8 98       	cbi	0x17, 0	; 23
+	clear_bit(DDRB, PB1); //Set DDR to input for button
     16c8:	b9 98       	cbi	0x17, 1	; 23
     16ca:	08 95       	ret
 

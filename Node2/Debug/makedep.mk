@@ -14,7 +14,11 @@ main.c
 
 motor_driver.c
 
+PID.c
+
 pwm.c
+
+solenoid.c
 
 spi.c
 

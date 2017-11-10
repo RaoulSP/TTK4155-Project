@@ -43,7 +43,9 @@ C_SRCS +=  \
 ../mcp.c \
 ../main.c \
 ../motor_driver.c \
+../PID.c \
 ../pwm.c \
+../solenoid.c \
 ../spi.c \
 ../TWI_Master.c \
 ../uart.c \
@@ -63,7 +65,9 @@ dac.o \
 mcp.o \
 main.o \
 motor_driver.o \
+PID.o \
 pwm.o \
+solenoid.o \
 spi.o \
 TWI_Master.o \
 uart.o \
@@ -76,7 +80,9 @@ dac.o \
 mcp.o \
 main.o \
 motor_driver.o \
+PID.o \
 pwm.o \
+solenoid.o \
 spi.o \
 TWI_Master.o \
 uart.o \
@@ -89,7 +95,9 @@ dac.d \
 mcp.d \
 main.d \
 motor_driver.d \
+PID.d \
 pwm.d \
+solenoid.d \
 spi.d \
 TWI_Master.d \
 uart.d \
@@ -102,7 +110,9 @@ dac.d \
 mcp.d \
 main.d \
 motor_driver.d \
+PID.d \
 pwm.d \
+solenoid.d \
 spi.d \
 TWI_Master.d \
 uart.d \
@@ -145,10 +155,14 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+
+
+
 ./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=16000000UL  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 

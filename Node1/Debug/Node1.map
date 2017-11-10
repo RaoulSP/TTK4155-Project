@@ -188,7 +188,7 @@ Discarded input sections
                 0x00000000       0x20 sram.o
  .debug_ranges  0x00000000       0x40 sram.o
  .debug_line    0x00000000       0xda sram.o
- .debug_str     0x00000000      0x1c3 sram.o
+ .debug_str     0x00000000      0x1c0 sram.o
  .comment       0x00000000       0x31 sram.o
  .debug_frame   0x00000000       0x98 sram.o
  .text          0x00000000        0x0 touch.o
@@ -1266,28 +1266,28 @@ END GROUP
  .debug_frame   0x00000728       0x8c touch.o
  .debug_frame   0x000007b4       0x50 uart.o
 
-.debug_str      0x00000000      0x854
+.debug_str      0x00000000      0x7e0
  *(.debug_str)
- .debug_str     0x00000000      0x133 adc.o
-                                0x16c (size before relaxing)
- .debug_str     0x00000133       0xc1 can.o
-                                0x204 (size before relaxing)
- .debug_str     0x000001f4      0x16e joy.o
-                                0x2c8 (size before relaxing)
- .debug_str     0x00000362       0xb3 main.o
-                                0x284 (size before relaxing)
- .debug_str     0x00000415       0x56 mcp.o
-                                0x212 (size before relaxing)
- .debug_str     0x0000046b      0x139 menu.o
-                                0x32e (size before relaxing)
- .debug_str     0x000005a4      0x1bb oled.o
-                                0x365 (size before relaxing)
- .debug_str     0x0000075f       0x16 spi.o
-                                0x179 (size before relaxing)
- .debug_str     0x00000775       0x89 touch.o
-                                0x1ac (size before relaxing)
- .debug_str     0x000007fe       0x56 uart.o
-                                0x1a9 (size before relaxing)
+ .debug_str     0x00000000      0x130 adc.o
+                                0x169 (size before relaxing)
+ .debug_str     0x00000130       0xc1 can.o
+                                0x201 (size before relaxing)
+ .debug_str     0x000001f1      0x16e joy.o
+                                0x2c5 (size before relaxing)
+ .debug_str     0x0000035f       0xb3 main.o
+                                0x281 (size before relaxing)
+ .debug_str     0x00000412       0x56 mcp.o
+                                0x20f (size before relaxing)
+ .debug_str     0x00000468      0x139 menu.o
+                                0x32b (size before relaxing)
+ .debug_str     0x000005a1      0x184 oled.o
+                                0x362 (size before relaxing)
+ .debug_str     0x00000725       0x16 spi.o
+                                0x176 (size before relaxing)
+ .debug_str     0x0000073b       0x4f touch.o
+                                0x1a6 (size before relaxing)
+ .debug_str     0x0000078a       0x56 uart.o
+                                0x1a6 (size before relaxing)
 
 .debug_loc      0x00000000     0x21a0
  *(.debug_loc)

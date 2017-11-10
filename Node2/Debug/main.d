@@ -16,7 +16,8 @@ main.d main.o: .././main.c \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\math.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
  .././MCP2515.h .././uart.h .././spi.h .././can.h .././mcp.h .././joy.h \
- .././pwm.h .././adc.h .././motor_driver.h .././TWI_Master.h
+ .././pwm.h .././adc.h .././motor_driver.h .././TWI_Master.h \
+ .././solenoid.h .././PID.h
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -69,3 +70,7 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 .././motor_driver.h:
 
 .././TWI_Master.h:
+
+.././solenoid.h:
+
+.././PID.h:
