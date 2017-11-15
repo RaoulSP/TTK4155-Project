@@ -3,7 +3,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "joy.h"
+#include "../lib/joy.h"
 #include "pwm.h"
 
 //Rename files to motor.c and motor.h?

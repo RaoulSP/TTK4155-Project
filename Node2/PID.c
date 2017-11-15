@@ -73,7 +73,7 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, struct PID_DATA *
 	} else if (ret < -MAX_INT) {
 		ret = -MAX_INT;
 	}
-	printf("I term: %d\r\n",i_term);
+	//printf("I term: %d\r\n",i_term);
 	return -((int16_t)ret);
 }
 

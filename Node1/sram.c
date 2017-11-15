@@ -1,5 +1,7 @@
 #include <avr/io.h>
 
+
+
 void sram_test(void)
 {
 	volatile char *ext_ram = (char *) 0x1C00; // Start address for the SRAM. //This and ext_ram_size are modified from original, now that OLED double buffering is on.

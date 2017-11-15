@@ -93,63 +93,91 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols>
-    <ListValues>
-      <Value>DEBUG</Value>
-      <Value>F_CPU=16000000UL</Value>
-    </ListValues>
-  </avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>libm</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-</AvrGcc>
+        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+            <Value>F_CPU=16000000UL</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="adc.c">
+    <Compile Include="..\lib\adc.c">
       <SubType>compile</SubType>
+      <Link>adc.c</Link>
     </Compile>
-    <Compile Include="adc.h">
+    <Compile Include="..\lib\adc.h">
       <SubType>compile</SubType>
+      <Link>adc.h</Link>
     </Compile>
-    <Compile Include="can.c">
+    <Compile Include="..\lib\can.c">
       <SubType>compile</SubType>
+      <Link>can.c</Link>
     </Compile>
-    <Compile Include="can.h">
+    <Compile Include="..\lib\can.h">
       <SubType>compile</SubType>
+      <Link>can.h</Link>
+    </Compile>
+    <Compile Include="..\lib\joy.h">
+      <SubType>compile</SubType>
+      <Link>joy.h</Link>
+    </Compile>
+    <Compile Include="..\lib\mcp.c">
+      <SubType>compile</SubType>
+      <Link>mcp.c</Link>
+    </Compile>
+    <Compile Include="..\lib\mcp.h">
+      <SubType>compile</SubType>
+      <Link>mcp.h</Link>
+    </Compile>
+    <Compile Include="..\lib\spi.c">
+      <SubType>compile</SubType>
+      <Link>spi.c</Link>
+    </Compile>
+    <Compile Include="..\lib\spi.h">
+      <SubType>compile</SubType>
+      <Link>spi.h</Link>
+    </Compile>
+    <Compile Include="..\lib\uart.c">
+      <SubType>compile</SubType>
+      <Link>uart.c</Link>
+    </Compile>
+    <Compile Include="..\lib\uart.h">
+      <SubType>compile</SubType>
+      <Link>uart.h</Link>
+    </Compile>
+    <Compile Include="..\lib\utils.c">
+      <SubType>compile</SubType>
+      <Link>utils.c</Link>
+    </Compile>
+    <Compile Include="..\lib\utils.h">
+      <SubType>compile</SubType>
+      <Link>utils.h</Link>
     </Compile>
     <Compile Include="dac.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="dac.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="joy.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="mcp.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="mcp.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="MCP2515.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
@@ -179,28 +207,10 @@
     <Compile Include="solenoid.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="spi.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="spi.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="TWI_Master.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="TWI_Master.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="uart.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="uart.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="utils.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="utils.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

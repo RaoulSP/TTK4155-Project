@@ -37,19 +37,19 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../adc.c \
-../can.c \
+../../lib/adc.c \
+../../lib/can.c \
+../../lib/mcp.c \
+../../lib/spi.c \
+../../lib/uart.c \
+../../lib/utils.c \
 ../dac.c \
-../mcp.c \
 ../main.c \
 ../motor_driver.c \
 ../PID.c \
 ../pwm.c \
 ../solenoid.c \
-../spi.c \
-../TWI_Master.c \
-../uart.c \
-../utils.c
+../TWI_Master.c
 
 
 PREPROCESSING_SRCS += 
@@ -61,62 +61,62 @@ ASM_SRCS +=
 OBJS +=  \
 adc.o \
 can.o \
-dac.o \
 mcp.o \
+spi.o \
+uart.o \
+utils.o \
+dac.o \
 main.o \
 motor_driver.o \
 PID.o \
 pwm.o \
 solenoid.o \
-spi.o \
-TWI_Master.o \
-uart.o \
-utils.o
+TWI_Master.o
 
 OBJS_AS_ARGS +=  \
 adc.o \
 can.o \
-dac.o \
 mcp.o \
+spi.o \
+uart.o \
+utils.o \
+dac.o \
 main.o \
 motor_driver.o \
 PID.o \
 pwm.o \
 solenoid.o \
-spi.o \
-TWI_Master.o \
-uart.o \
-utils.o
+TWI_Master.o
 
 C_DEPS +=  \
 adc.d \
 can.d \
-dac.d \
 mcp.d \
+spi.d \
+uart.d \
+utils.d \
+dac.d \
 main.d \
 motor_driver.d \
 PID.d \
 pwm.d \
 solenoid.d \
-spi.d \
-TWI_Master.d \
-uart.d \
-utils.d
+TWI_Master.d
 
 C_DEPS_AS_ARGS +=  \
 adc.d \
 can.d \
-dac.d \
 mcp.d \
+spi.d \
+uart.d \
+utils.d \
+dac.d \
 main.d \
 motor_driver.d \
 PID.d \
 pwm.d \
 solenoid.d \
-spi.d \
-TWI_Master.d \
-uart.d \
-utils.d
+TWI_Master.d
 
 OUTPUT_FILE_PATH +=Node2.elf
 
@@ -158,6 +158,13 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+./%.o: ../../lib/%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=16000000UL  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
 
 ./%.o: .././%.c
 	@echo Building file: $<

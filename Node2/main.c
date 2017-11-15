@@ -1,27 +1,21 @@
-#define NODE_1 1
-#define NODE_2 2
-
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/interrupt.h>
-
-#include "MCP2515.h"
-#include "uart.h"
-#include "spi.h"
-#include "can.h"
-#include "mcp.h"
-#include "joy.h"
+#include "../lib/uart.h"
+#include "../lib/can.h"
+#include "../lib/joy.h"
+#include "../lib/adc.h"
 #include "pwm.h"
-#include "adc.h"
 #include "motor_driver.h"
 #include "TWI_Master.h"
 #include "solenoid.h"
 #include "PID.h"
 
+#include <util/delay.h>
+#include <avr/interrupt.h>
+
+
 //Interrupt flags
 struct GLOBAL_FLAGS {
-	uint8_t pidTimer : 1;
-	//uint8_t dummy : 7;
+	uint8_t pid_timer : 1;
+	uint8_t dummy : 7;
 } volatile gFlags = {0, 0};
 
 
@@ -37,8 +31,8 @@ ISR(TIMER0_OVF_vect)
 	if (i < TIME_INTERVAL) {
 		i++;
 	} else {
-		gFlags.pidTimer = 1;
-		i               = 0;
+		gFlags.pid_timer = 1;
+		i                = 0;
 	}
 }
 
@@ -52,28 +46,25 @@ int main(void)
 	TIMSK0 = (1 << TOIE0);
 	TCNT0  = 0;
 	
-	uart_init(9600, NODE_2);
-	printf("\r\n\x1b[4mReset\x1b[0m \r\n");
+	uart_init(9600);
 	adc_init();
-	spi_master_init();
-    mcp_init();
 	can_init(MODE_NORMAL);
 	pwm_init();
 	TWI_Master_Initialise();
 	motor_init();
 	solenoid_init();
 	sei(); //enable the use of interrupts
-
-
 		
 	int score = 0;
 	printf("PUTTY IS STILL ALIVE, YEAH!!!!!\r\n");
 	
+	
+	
 	//initialize PID
 	//Gains
-	double K_p = 0.020;
-	double K_d = 0.01; // K_d is actually K_d/T
-	double K_i = 0.0012;
+	double K_p = 0.09;
+	double K_d = 0.00; // K_d is actually K_d/T
+	double K_i = 0.000;
 	pidData_t pid;
 	
 	pid_Init(K_p, K_i, K_d, &pid);
@@ -81,8 +72,16 @@ int main(void)
 	Position position_received;
 	Msg msg_received;
 	
+	int motor_position = 0;
+	int motor_position_past = 0;
+	int motor_speed = 0;
+	
+	
 	while(1)
 	{
+		
+		
+		
 		//printf("K_i: %d\r\n", (int)(K_i*SCALING_FACTOR));
 		msg_received = can_receive();
 		
@@ -122,10 +121,17 @@ int main(void)
 		//motor_move_dc(discrete_voltage);
 		//_delay_ms(50);
 		
+		
+		
 	
-		if (gFlags.pidTimer == 1) {
+		if (gFlags.pid_timer == 1) {
+			motor_position_past = motor_position;
+			motor_position = motor_encoder_read();
+			motor_speed = motor_position_past - motor_position;
+			discrete_voltage = pid_Controller(position_received.y*5, motor_speed, &pid); //position_received.y*40
+			
 			//printf("ye\r\n");
-			discrete_voltage = pid_Controller(position_received.y*40, motor_encoder_read(), &pid);
+			//discrete_voltage = pid_Controller(position_received.y*40, motor_encoder_read(), &pid); //position_received.y*40
 			//printf("Discrete voltage: %d\r\n, discrete_voltage);
 			//discrete_voltage = discrete_voltage;
 			if (discrete_voltage > 255)
@@ -139,10 +145,13 @@ int main(void)
 				printf("Discrete voltage: %d\r\n", discrete_voltage);
 			}
 			//printf("Discrete voltage: %d\r\n", discrete_voltage);
+			printf("Y= %d\r\n",position_received.y);
+			printf("disc= %d\r\n",discrete_voltage);
 			motor_move_dc(discrete_voltage);
 			//printf("Discrete voltage: %d\r\n", discrete_voltage);
-			gFlags.pidTimer = 0;
+			gFlags.pid_timer = 0;
 		}
+		_delay_ms(50);
 	}
 	
 	

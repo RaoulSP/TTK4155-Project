@@ -2,25 +2,25 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-adc.c
+..\lib\adc.c
 
-can.c
+..\lib\can.c
 
-joy.c
+..\lib\joy.c
+
+..\lib\mcp.c
+
+..\lib\spi.c
+
+..\lib\uart.c
 
 main.c
-
-mcp.c
 
 menu.c
 
 oled.c
 
-spi.c
-
 sram.c
 
 touch.c
-
-uart.c
 

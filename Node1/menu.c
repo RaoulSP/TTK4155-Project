@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include "joy.h"
+#include "../lib/joy.h"
 #include "menu.h"
 #include "oled.h"
 

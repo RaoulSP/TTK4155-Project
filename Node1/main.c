@@ -1,68 +1,39 @@
-#define NODE_1 1
-#define NODE_2 2
-#define F_CPU 4915200
-
-#include <avr/io.h>
 #include <util/delay.h>
 
-#include "adc.h"
-#include "joy.h"
-#include "spi.h"
-#include "mcp.h"
-#include "can.h"
-#include "uart.h"
+#include "../lib/uart.h"
+#include "../lib/can.h"
+#include "../lib/adc.h"
+#include "../lib/joy.h"
 #include "oled.h"
 #include "sram.h"
 #include "menu.h"
 #include "touch.h"
-#include "MCP2515.h"
+
 
 int main(void)
 {
 	MCUCR |= (1<<SRE);	//Enable external memory
-	SFIOR |= (1<<XMM2); //
+	SFIOR |= (1<<XMM2); 
 	
-	uart_init(9600, NODE_1);
-	printf("\r\n\x1b[4mReset\x1b[0m \r\n");
+	uart_init(9600);
+	can_init(MODE_NORMAL); 
+	
 	adc_init();
 	oled_init();
 	joy_init();
 	touch_init();
 	menu_init();
-	spi_master_init(NODE_1);
-	mcp_init();
-	can_init(MODE_NORMAL); 
-	
-	//mcp_test();
-	//sram_test(); //Not working
-	//can_test();
 	
 	while (1)
 	{	
 		Position position = joy_get_position();
+
 		Msg msg;
 		msg.id = 42;
 		msg.length = sizeof(position);
 		msg.data = (char*) &position;
+		//printf("%d\r\n",position.x);
 		can_transmit(msg);
-		
-		/*
-		char* string = "Hellu";
-		Msg msg_string;
-		msg_string.id = 1;
-		msg_string.length = strlen(string) + 1;
-		msg_string.data = string;
-		can_transmit(msg_string);
-		*/
-		
-		/*
-		int intolini = 123;
-		Msg msg_int;
-		msg_int.id = 13;
-		msg_int.length = sizeof(intolini);
-		msg_int.data = (char*) &intolini;
-		can_transmit(msg_int);
-		*/
 		
 		/*
 		//For Loopback mode:
@@ -87,7 +58,7 @@ int main(void)
 		*/
 
 		menu_run_display();
-		_delay_ms(50);
+		//_delay_ms(50);
 	}
 }	
 	

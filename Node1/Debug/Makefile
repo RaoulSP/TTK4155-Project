@@ -37,17 +37,17 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../adc.c \
-../can.c \
-../joy.c \
+../../lib/adc.c \
+../../lib/can.c \
+../../lib/joy.c \
+../../lib/mcp.c \
+../../lib/spi.c \
+../../lib/uart.c \
 ../main.c \
-../mcp.c \
 ../menu.c \
 ../oled.c \
-../spi.c \
 ../sram.c \
-../touch.c \
-../uart.c
+../touch.c
 
 
 PREPROCESSING_SRCS += 
@@ -60,53 +60,53 @@ OBJS +=  \
 adc.o \
 can.o \
 joy.o \
-main.o \
 mcp.o \
+spi.o \
+uart.o \
+main.o \
 menu.o \
 oled.o \
-spi.o \
 sram.o \
-touch.o \
-uart.o
+touch.o
 
 OBJS_AS_ARGS +=  \
 adc.o \
 can.o \
 joy.o \
-main.o \
 mcp.o \
+spi.o \
+uart.o \
+main.o \
 menu.o \
 oled.o \
-spi.o \
 sram.o \
-touch.o \
-uart.o
+touch.o
 
 C_DEPS +=  \
 adc.d \
 can.d \
 joy.d \
-main.d \
 mcp.d \
+spi.d \
+uart.d \
+main.d \
 menu.d \
 oled.d \
-spi.d \
 sram.d \
-touch.d \
-uart.d
+touch.d
 
 C_DEPS_AS_ARGS +=  \
 adc.d \
 can.d \
 joy.d \
-main.d \
 mcp.d \
+spi.d \
+uart.d \
+main.d \
 menu.d \
 oled.d \
-spi.d \
 sram.d \
-touch.d \
-uart.d
+touch.d
 
 OUTPUT_FILE_PATH +=Node1.elf
 
@@ -144,6 +144,13 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+./%.o: ../../lib/%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
 
 ./%.o: .././%.c
 	@echo Building file: $<

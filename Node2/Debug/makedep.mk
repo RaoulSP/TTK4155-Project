@@ -2,13 +2,19 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-adc.c
+..\lib\adc.c
 
-can.c
+..\lib\can.c
+
+..\lib\mcp.c
+
+..\lib\spi.c
+
+..\lib\uart.c
+
+..\lib\utils.c
 
 dac.c
-
-mcp.c
 
 main.c
 
@@ -20,11 +26,5 @@ pwm.c
 
 solenoid.c
 
-spi.c
-
 TWI_Master.c
-
-uart.c
-
-utils.c
 
