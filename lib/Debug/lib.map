@@ -120,7 +120,7 @@ Discarded input sections
                 0x00000000       0x28 adc.o
  .debug_ranges  0x00000000       0x18 adc.o
  .debug_line    0x00000000       0xc5 adc.o
- .debug_str     0x00000000      0x174 adc.o
+ .debug_str     0x00000000      0x167 adc.o
  .comment       0x00000000       0x31 adc.o
  .debug_frame   0x00000000       0x34 adc.o
  .text          0x00000000        0x0 can.o
@@ -139,7 +139,7 @@ Discarded input sections
                 0x00000000       0x30 can.o
  .debug_ranges  0x00000000       0x20 can.o
  .debug_line    0x00000000      0x17e can.o
- .debug_str     0x00000000      0x1db can.o
+ .debug_str     0x00000000      0x1ce can.o
  .comment       0x00000000       0x31 can.o
  .debug_frame   0x00000000       0xb4 can.o
  .text          0x00000000        0x0 joy.o
@@ -173,7 +173,7 @@ Discarded input sections
                 0x00000000       0x48 joy.o
  .debug_ranges  0x00000000       0x38 joy.o
  .debug_line    0x00000000      0x188 joy.o
- .debug_str     0x00000000      0x2d0 joy.o
+ .debug_str     0x00000000      0x2c3 joy.o
  .comment       0x00000000       0x31 joy.o
  .debug_frame   0x00000000      0x15c joy.o
  COMMON         0x00000000        0x4 joy.o
@@ -208,7 +208,7 @@ Discarded input sections
                 0x00000000       0x58 mcp.o
  .debug_ranges  0x00000000       0x48 mcp.o
  .debug_line    0x00000000      0x150 mcp.o
- .debug_str     0x00000000      0x22a mcp.o
+ .debug_str     0x00000000      0x21d mcp.o
  .comment       0x00000000       0x31 mcp.o
  .debug_frame   0x00000000       0xd4 mcp.o
  .text          0x00000000        0x0 spi.o
@@ -225,7 +225,7 @@ Discarded input sections
                 0x00000000       0x28 spi.o
  .debug_ranges  0x00000000       0x18 spi.o
  .debug_line    0x00000000       0xc1 spi.o
- .debug_str     0x00000000      0x17c spi.o
+ .debug_str     0x00000000      0x16f spi.o
  .comment       0x00000000       0x31 spi.o
  .debug_frame   0x00000000       0x34 spi.o
  .text          0x00000000        0x0 uart.o
@@ -244,7 +244,7 @@ Discarded input sections
                 0x00000000       0x30 uart.o
  .debug_ranges  0x00000000       0x20 uart.o
  .debug_line    0x00000000       0xe4 uart.o
- .debug_str     0x00000000      0x1ac uart.o
+ .debug_str     0x00000000      0x19f uart.o
  .comment       0x00000000       0x31 uart.o
  .debug_frame   0x00000000       0x44 uart.o
  .text          0x00000000        0x0 utils.o
@@ -261,7 +261,7 @@ Discarded input sections
                 0x00000000       0x20 utils.o
  .debug_ranges  0x00000000       0x10 utils.o
  .debug_line    0x00000000       0xe2 utils.o
- .debug_str     0x00000000      0x127 utils.o
+ .debug_str     0x00000000      0x11a utils.o
  .comment       0x00000000       0x31 utils.o
  .debug_frame   0x00000000       0x70 utils.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr5\libm.a(atan2.o)
@@ -962,10 +962,10 @@ END GROUP
  *(.debug_frame)
  .debug_frame   0x00000000       0x24 lib.o
 
-.debug_str      0x00000000      0x116
+.debug_str      0x00000000      0x109
  *(.debug_str)
- .debug_str     0x00000000      0x116 lib.o
-                                0x14a (size before relaxing)
+ .debug_str     0x00000000      0x109 lib.o
+                                0x13d (size before relaxing)
 
 .debug_loc
  *(.debug_loc)

@@ -1,5 +1,7 @@
 #include "oled.h"
 #include "fonts.h"
+#include "interrupt_flags.h"
+#include <avr/io.h>
 
 int doublebuffering = 1;
 int oled_back_buffer_index = 0;
@@ -33,6 +35,8 @@ void oled_init(){
 	oled_write_command(0xa6); //set normal display
 	oled_write_command(0xaf); // display on
 	oled_clear_screen(); //Sets all buffer data to 0
+	
+	
 }
 
 void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font_size, int invert){
@@ -208,3 +212,6 @@ void oled_invert_rectangle(int x1, int y1, int x2, int y2){
 		}
 	}
 }
+
+
+

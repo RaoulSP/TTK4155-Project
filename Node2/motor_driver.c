@@ -6,14 +6,11 @@
 #include "../lib/joy.h"
 #include "pwm.h"
 
-//Rename files to motor.c and motor.h?
-
 void motor_init(){
 	//MOTOR 
 	DDRH |= (1 << PH1); //Set motor direction pin as output
 	DDRH |= (1 << DDH4); //Set motor enable pin as output
 	PORTH |= (1 << PH4); //Set motor enable pin high
-	//PORTB |= ((1 << PH1) | (1 << PH4)); //This sets pull-up R for SCL and SDA. Is this really needed? Ask the studass?	
 	
 	//ENCODER
 	DDRH |= (1 << PH5); //OE as output

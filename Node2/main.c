@@ -11,40 +11,26 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-
-//Interrupt flags
 struct GLOBAL_FLAGS {
 	uint8_t pid_timer : 1;
-	uint8_t dummy : 7;
-} volatile gFlags = {0, 0};
-
+} volatile global_flags = {0};
 
 int scoring_allowed = 1;
 
-
-//Interrupt routines
-//PID timer - called with interval 0.01s
-#define TIME_INTERVAL (long long)(0.01 * F_CPU) / 255
-ISR(TIMER0_OVF_vect)
+ISR(TIMER3_COMPA_vect) //PID timer - called with interval 0.01s
 {
-	static uint16_t i = 0;
-	if (i < TIME_INTERVAL) {
-		i++;
-	} else {
-		gFlags.pid_timer = 1;
-		i                = 0;
-	}
+	global_flags.pid_timer = 1;
 }
-
-// Set up timer, enable timer/counter 0 overflow interrupt
-
 
 int main(void)
 {	
-	// Set up timer, enable timer/counter 0 overflow interrupt
-	TCCR0B = (1 << CS00); // clock source to be used by the Timer/Counter clkI/O
-	TIMSK0 = (1 << TOIE0);
-	TCNT0  = 0;
+	// Set up timer, enable timer/counter compare match interrupt
+	TCCR3A = (1 << WGM31) | (1 << WGM30);				//Compare match mode
+	TCCR3B = (1 << WGM33) | (1 << WGM32) | (1 << CS31); //clock source to be used by the Timer/Counter clkI/O/8
+	TIMSK3 = (1 << OCIE3A);								//Interrupt on compare match
+
+	OCR3AH = 0b01001110;
+	OCR3AL = 0b00100000; //Sets the value for the compare match to 20000
 	
 	uart_init(9600);
 	adc_init();
@@ -55,34 +41,26 @@ int main(void)
 	solenoid_init();
 	sei(); //enable the use of interrupts
 		
-	int score = 0;
-	printf("PUTTY IS STILL ALIVE, YEAH!!!!!\r\n");
-	
-	
-	
 	//initialize PID
-	//Gains
-	double K_p = 0.09;
-	double K_d = 0.00; // K_d is actually K_d/T
-	double K_i = 0.000;
+	double K_p = 0.075;
+	double K_d = 0;
+	double K_i = 0;
 	pidData_t pid;
 	
 	pid_Init(K_p, K_i, K_d, &pid);
 	int16_t discrete_voltage = 0;
+	
 	Position position_received;
 	Msg msg_received;
+	int score = 0;
+	int z_released = 1;
 	
 	int motor_position = 0;
 	int motor_position_past = 0;
 	int motor_speed = 0;
 	
-	
 	while(1)
 	{
-		
-		
-		
-		//printf("K_i: %d\r\n", (int)(K_i*SCALING_FACTOR));
 		msg_received = can_receive();
 		
 		switch (msg_received.id){
@@ -100,40 +78,31 @@ int main(void)
 		}
 		free(msg_received.data);
 		
-		//motor_move_dc(position_received);
 		score += check_if_scored();
 		
-		//motor_move_servo((((float)position_received.y) * 1.2 / 200.0) + 1.5); //Maps -100,100 to 0.9,2.1
-		//printf("x:%4d y:%4d z:%4d\r", position_received.x,position_received.y,position_received.z);
-		//printf("SCORE = %d\r\n", score);
-		
-		if (position_received.z == 1)
+		motor_move_servo((((float)position_received.y) * 1.2 / 200.0) + 1.5); //Maps -100,100 to 0.9,2.1
+
+		if (position_received.z == 1 && z_released == 1)
 		{
 			solenoid_kick();
+			z_released = 0;
+		}
+		else if(position_received.z == 0){
+			z_released = 1;
 		}
 		
-
-		
-		//printf("%d\r\n",motor_encoder_read());
-		//discrete_voltage = pid_Controller(0, motor_encoder_read(), &pid);
-		//discrete_voltage = discrete_voltage;
-		//printf("Volt from pid: %d\r\n", discrete_voltage);
-		//motor_move_dc(discrete_voltage);
-		//_delay_ms(50);
-		
-		
-		
 	
-		if (gFlags.pid_timer == 1) {
+		if (global_flags.pid_timer == 1) {
 			motor_position_past = motor_position;
 			motor_position = motor_encoder_read();
-			motor_speed = motor_position_past - motor_position;
-			discrete_voltage = pid_Controller(position_received.y*5, motor_speed, &pid); //position_received.y*40
+			printf("%d\r\n",motor_position);
+			motor_speed = motor_position - motor_position_past;
 			
-			//printf("ye\r\n");
-			//discrete_voltage = pid_Controller(position_received.y*40, motor_encoder_read(), &pid); //position_received.y*40
-			//printf("Discrete voltage: %d\r\n, discrete_voltage);
-			//discrete_voltage = discrete_voltage;
+			printf("MOTOR SPEED= %d\r\n",motor_speed);
+			printf("Pos_rec_x= %d\r\n\r\n",position_received.x*20);
+			
+			discrete_voltage = pid_Controller(position_received.y*20, motor_speed, &pid);
+
 			if (discrete_voltage > 255)
 			{
 				discrete_voltage = 255;
@@ -144,14 +113,9 @@ int main(void)
 				discrete_voltage = -255;
 				printf("Discrete voltage: %d\r\n", discrete_voltage);
 			}
-			//printf("Discrete voltage: %d\r\n", discrete_voltage);
-			printf("Y= %d\r\n",position_received.y);
-			printf("disc= %d\r\n",discrete_voltage);
 			motor_move_dc(discrete_voltage);
-			//printf("Discrete voltage: %d\r\n", discrete_voltage);
-			gFlags.pid_timer = 0;
+			global_flags.pid_timer = 0;
 		}
-		_delay_ms(50);
 	}
 	
 	
@@ -171,32 +135,3 @@ int check_if_scored()
 	}
 	return 0;
 }
-
-
-
-
-/*--TODO
-"Create a driver for the timer/counter module which allows you to use the pwm functionality (fast-pwm).
-If you also implement the timer interrupt it might save you time when implementing the controller since
-most of you would want to use timer interrupt there."
-
-"Create a pwm and/or servo driver which will use your controller output as an input and calculate
-the correct duty cycle/on time which you will provide to your time/counter driver. Also implement
-safety features which will never let the pwm go out of valid range for the servo."
-
-IMPLEMENT safety features
-
-
-Automatic? --> "Read values from the IR sensor and print them to the terminal to find the appropriate thresholds settings."
-
-*/
-
-/*--NOTES
-Signal period 20 ms
-
-PW of 1.5 ms centers the servo
-0.9 ms, minimum
-2.1 ms, maximum
-
-1.5 ms +/- 0.6 ms
-*/

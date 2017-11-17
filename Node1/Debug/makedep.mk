@@ -14,6 +14,8 @@
 
 ..\lib\uart.c
 
+game.c
+
 main.c
 
 menu.c

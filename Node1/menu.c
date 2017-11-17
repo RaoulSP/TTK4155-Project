@@ -2,10 +2,15 @@
 #include "../lib/joy.h"
 #include "menu.h"
 #include "oled.h"
+#include <avr/io.h>
+#include "interrupt_flags.h"
+#include <avr/interrupt.h>
+
 
 //Flags
 int joy_moved = 0;
-
+int animation_stepup = 0;
+int animation_stepdown = 0;
 //----------INITIALIZATION--------------
 //The name of the menus and their functions
 Menu main_menu = {
@@ -15,25 +20,26 @@ Menu main_menu = {
 	.super_menu = NULL,
 	.sub_menus = NULL,
 	//.type = MENU,
-	.draw = &draw_menu
+	.draw = draw_menu,
+	.action = run_game
 };
 
 Menu difficulty = {
 	.name = "Difficulty",
 	//.type = MENU,
-	.draw = &draw_menu
+	.draw = draw_menu
 };
 
 Menu options = {
-	.name = "Options",
+	.name = "Play Game",
 	//.type = MENU,
-	.draw = &draw_menu
+	.draw = draw_menu,
 };
 
 Menu highscore = {
 	.name = "High score",
 	//.type = LIST,
-	.draw = &draw_list
+	.draw = draw_list
 };
 
 Menu control = {
@@ -68,9 +74,19 @@ void menu_init(){
 	char* high_entr[4] = {"1. Herman","2. Raoul","3. Alle andre","-inf^inf. Hans"};
 	add_entries(&highscore, high_entr,4);
 	add_sub_menu(&main_menu, &highscore);
+		
+	//Initialize interrupts
+	// Set up timer, enable timer/counter compare match interrupt
+	TCCR1A = (1 << WGM11) | (1 << WGM10);				//Compare match mode
+	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); //clock source to be used by the Timer/Counter clkI/O/8
+	TIMSK = (1 << OCIE1A);								//Interrupt on compare match
+	int OCRA_num = (long)F_CPU/(refresh_rate*8);
+		
+	OCR1AH = OCRA_num >> 8;
+	OCR1AL = OCRA_num; //Sets the value for the compare match to 10240
 	
 }
-//----------NO NEED TO CHANGE THINGS BEYOND THIS----------
+//----------NO NEED TO CHANGE THINGS BEYOND THIS POINT----------
 
 //Functions for adding entries and nodes
 void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
@@ -118,26 +134,38 @@ Menu* draw_menu(Menu* self){
 	
 	//Where to go next
 	Direction dir = joy_get_direction();
-	if(1){	//THIS IS NEW
-		if((dir == UP) & (self->cursor != 0)){
+	if(1){//THIS MUST CHANGE
+		if((dir == UP)){// & (self->cursor != 0)){
 			for (int i = 0; i < 8; i++,i++){
 				oled_invert_rectangle(0,8*(self->cursor) - i - 2,64,8*((self->cursor) + 1) - i - 2);
 				oled_invert_rectangle(0,8*(self->cursor) - i,64,8*((self->cursor) + 1) - i);
 				oled_refresh();
 			}
 			self->cursor--;
-		}
-		else if((dir == DOWN) & (self->cursor != (self->num_of_entries - 1))){
-			
-			//---NEW--- ANIMATION FOR DOWNWARDS MOVEMENT
-			for (int i = 0; i < 8; i++,i++){
-				oled_invert_rectangle(0,8*(self->cursor) + i,64,8*((self->cursor) + 1) + i);
-				oled_invert_rectangle(0,8*(self->cursor) + i + 2,64,8*((self->cursor) + 1) + i + 2);
-				oled_refresh();
+			//Wrapping
+			if(self->cursor == -1){
+				self->cursor = 2;
 			}
-			//-------------
-			
+						
+		}
+		else if((dir == DOWN)){// & (self->cursor != (self->num_of_entries - 1))){
+
+
+ 			//---NEW--- ANIMATION FOR DOWNWARDS MOVEMENT
+ 			for (int i = 0; i < 8; i++,i++){
+	 				oled_invert_rectangle(0,8*(self->cursor) + i,64,8*((self->cursor) + 1) + i);
+	 				oled_invert_rectangle(0,8*(self->cursor) + i + 2,64,8*((self->cursor) + 1) + i + 2);
+	 				oled_refresh();
+ 			}
+ 			//-------------
+
 			self->cursor++;
+			//Wrapping
+			if(self->cursor == self->num_of_entries){
+				self->cursor = 0;
+			}
+	
+			
 		}
 		else if((dir == RIGHT) & (self->sub_menus[self->cursor]->num_of_entries != 0)){ //THIS IS CHANGED
 			self = self->sub_menus[self->cursor];
@@ -150,7 +178,6 @@ Menu* draw_menu(Menu* self){
 	else if (dir == NEUTRAL){ //THIS IS NEW
 		joy_moved = 0;
 	}
-	
 
 	return self;
 }
@@ -185,5 +212,19 @@ Menu* current_menu = &main_menu;
 void menu_run_display(){
 	oled_clear_screen();
 	current_menu = current_menu->draw(current_menu);
+	current_menu->action();
 	oled_refresh();
+}
+
+void run_game(){
+	if(joy_get_position().z == 1){
+		state = in_game;
+	}
+	
+}
+
+//Oled refresh timer - called with interval 0.016s (60FPS)
+ISR(TIMER1_COMPA_vect)
+{
+	oled_refresh_timer = 1;
 }

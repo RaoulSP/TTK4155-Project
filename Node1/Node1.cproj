@@ -141,6 +141,10 @@
       <SubType>compile</SubType>
       <Link>mcp.h</Link>
     </Compile>
+    <Compile Include="..\lib\settings.h">
+      <SubType>compile</SubType>
+      <Link>settings.h</Link>
+    </Compile>
     <Compile Include="..\lib\spi.c">
       <SubType>compile</SubType>
       <Link>spi.c</Link>
@@ -158,6 +162,15 @@
       <Link>uart.h</Link>
     </Compile>
     <Compile Include="fonts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="game.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="game.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="interrupt_flags.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">

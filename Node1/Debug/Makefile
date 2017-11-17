@@ -43,6 +43,7 @@ C_SRCS +=  \
 ../../lib/mcp.c \
 ../../lib/spi.c \
 ../../lib/uart.c \
+../game.c \
 ../main.c \
 ../menu.c \
 ../oled.c \
@@ -63,6 +64,7 @@ joy.o \
 mcp.o \
 spi.o \
 uart.o \
+game.o \
 main.o \
 menu.o \
 oled.o \
@@ -76,6 +78,7 @@ joy.o \
 mcp.o \
 spi.o \
 uart.o \
+game.o \
 main.o \
 menu.o \
 oled.o \
@@ -89,6 +92,7 @@ joy.d \
 mcp.d \
 spi.d \
 uart.d \
+game.d \
 main.d \
 menu.d \
 oled.d \
@@ -102,6 +106,7 @@ joy.d \
 mcp.d \
 spi.d \
 uart.d \
+game.d \
 main.d \
 menu.d \
 oled.d \
@@ -122,6 +127,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
