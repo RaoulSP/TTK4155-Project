@@ -1,5 +1,4 @@
 #include "settings.h"
-#include <avr/io.h>
 #include "spi.h"
 
 void spi_master_init()

@@ -65,11 +65,11 @@ void motor_move_dc(int discrete_voltage){
 		discrete_voltage = -255;
 	}
 	
-	if (discrete_voltage >= 5){
+	if (discrete_voltage >= 0){
 		PORTH |= (1 << PH1); //Set direction
 		voltage = discrete_voltage;
 	}
-	else if (discrete_voltage < -5){
+	else if (discrete_voltage < 0){
 		PORTH &= ~(1 << PH1); //Set other direction
 		voltage = -discrete_voltage;
 	}
@@ -80,7 +80,7 @@ void motor_move_dc(int discrete_voltage){
 	msg[0] = ((dac_address << 1) | 0); //0 = write, 1 = read
 	msg[1] = 0b00000000; //Command byte: R2, R1, R0, Rst, PD, A2, A1, A0
 	msg[2] = voltage; //Value of 0-255, maps to 0V-5V
-	TWI_Start_Transceiver_With_Data(msg, length);
+	TWI_Start_Transceiver_With_Data(msg, length); //To do: Move some of this code to DAC module?
 	
 	//Just for fun, no ifs:
 	//PORTH |= ((pos.y > 0) << PH1); //Set direction

@@ -1,6 +1,3 @@
-#include <util/delay.h>
-#include <avr/io.h>
-
 #include "../lib/uart.h"
 #include "../lib/can.h"
 #include "../lib/adc.h"
@@ -10,50 +7,48 @@
 #include "sram.h"
 #include "menu.h"
 #include "touch.h"
+#include "game.h"
 
 
-//IDs:
-/*
-typedef enum can_id_t {
-	COMMAND, //can ask for status, "on/off and calibrated or not"
-	STATUS,
-	STRING,
-	OCCLUDED,
-	POSITION
-} Can_id;
-*/
-//1 = Command 
-//2 = Status
-//3 = String
-//4 = Occluded
-//5 = Position
-//4 = PID calibration?
-//5++ = Random strings
-
-//Interrupt flags
-
+//Global variables
 volatile int game_occluded = 0;
 volatile int game_second_passed = 0;
 volatile int oled_refresh_timer = 0;
 volatile int game_interrupt_flag = 1;
-State state = in_game;
+State state = in_menu;
 
 int main(void)
 {
+	
 	MCUCR |= (1<<SRE);	//Enable external memory
 	SFIOR |= (1<<XMM2); 
 	
 	uart_init(9600);
-	printf("\033[4m\r\nreset\033[0m\r\n");
-	can_init(MODE_NORMAL); 
+	can_init(MODE_NORMAL);
 	adc_init();
 	oled_init();
 	joy_init();
 	touch_init();
 	menu_init();
 	sei();
-	
-	while (1){	
+	//sram_test();
+	while (1)
+	{
+		//joy_print();
+		if (can_message_received){
+			Msg msg_received =  can_receive();
+			switch (msg_received.id){
+				case OCCLUDED:
+					game_occluded = 1;
+					break;
+				
+				default:
+					printf("ID unknown\r");
+			}
+			free(msg_received.data);
+			can_message_received = 0;
+		}
+		
 		switch (state){
 			case in_menu:
 				if(oled_refresh_timer == 1){
@@ -68,7 +63,9 @@ int main(void)
 				break;
 		}
 	}
+	
 }	
+
 	
 	
 	/*--TODO--
@@ -155,4 +152,43 @@ int main(void)
 	\r\n is a proper new line! This combination works in Putty, Bray's and Termite
 	
 	sizeof(int) = 2 bytes
+	*/
+	/*
+	State state;
+	
+	while (1){
+		switch (state){
+			case in_menu:
+			if(oled_refresh_timer == 1){
+				menu_run_display();
+				oled_refresh_timer = 0;
+			}
+			break;
+			case in_game:
+			if(game_interrupt_flag == 1){
+				game_run();
+			}
+			break;
+			
+			case menu_main:
+			oled_print_string("Main menu")
+			menu_add_link(&options,page);
+			menu_add_link(&about,popup);
+			if(z_pressed){
+				state = selected;
+			}
+			
+			break;
+			
+			case menu_main:
+			draw_page(main_menu)?
+			break;
+		}
+		if(z_pressed){
+			state = selected.state?;
+		}
+		if(down_pressed){
+			state = selected.state?;
+		}
+	}
 	*/

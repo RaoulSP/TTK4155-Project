@@ -1,5 +1,6 @@
-#include <avr/io.h>
+#include "../lib/settings.h"
 #include "touch.h"
+#include "../lib/adc.h"
 
 void touch_init(){
 	clear_bit(DDRB, PB0); //Set DDR to input for button

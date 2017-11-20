@@ -16,5 +16,3 @@ spi.c
 
 uart.c
 
-utils.c
-

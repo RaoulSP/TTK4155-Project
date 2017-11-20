@@ -1,8 +1,7 @@
-#include <util/delay.h>
-
 #include "joy.h"
 #include "adc.h"
 #include "settings.h"
+#include "math.h"
 
 int x;
 int y;
@@ -30,7 +29,6 @@ void joy_calibrate(){
 	ymax = 0;
 	ymin = 255;
 	
-	printf("Calibrating...\r\n");
 	oled_print_string("Please calibrate joystick!",0,0,8,0);
 	oled_refresh();
 	
@@ -41,22 +39,17 @@ void joy_calibrate(){
 		
 		if (x > xmax){
 			xmax = x;
-			printf("%d \r\n", xmax);
 		}
 		if (y > ymax){
 			ymax = y;
-			printf("%d \r\n", ymax);
 		}
 		if (x < xmin){
 			xmin = x;
-			printf("%d \r\n", xmin);
 		}
 		if (y < ymin){
 			ymin = y;
-			printf("%d \r\n", ymin);
 		}
 	}
-	printf("Calibrated.\r\n");
 	oled_clear_screen();
 	oled_print_string("Calibrated!",0,0,8,0);
 	oled_refresh();
@@ -84,6 +77,8 @@ Position joy_get_position(){
 		pos.x = x;
 		pos.y = y;
 		pos.z = z;
+		pos.r_slider = adc_read('r');
+		//printf("%d\r\n",pos.r_slider);
 		
 		if (x < 4 && x > -4)
 		{
@@ -106,7 +101,6 @@ Position_polar joy_get_position_polar(){
 
 Direction joy_get_direction(){ 
 	Position_polar pos_pol  = joy_get_position_polar();
-	
 	if(pos_pol.amplitude > 80){
 		if (pos_pol.angle > 135){
 			return LEFT;
@@ -130,6 +124,5 @@ Direction joy_get_direction(){
 void joy_print(){
 	Position pos = joy_get_position();
 	Position_polar pos_pol = joy_get_position_polar();
-	
 	printf("x = %4d, y = %4d, X= %4d, Y = %4d, Z = %1d, amplitude = %4d, angle = %4d, direction = %2d\r", adc_read('x'), adc_read('y'), pos.x, pos.y, pos.z, pos_pol.amplitude, pos_pol.angle, joy_get_direction());
 }

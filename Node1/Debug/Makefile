@@ -44,8 +44,8 @@ C_SRCS +=  \
 ../../lib/spi.c \
 ../../lib/uart.c \
 ../game.c \
-../node1.c \
 ../menu.c \
+../node1.c \
 ../oled.c \
 ../sram.c \
 ../touch.c
@@ -65,8 +65,8 @@ mcp.o \
 spi.o \
 uart.o \
 game.o \
-node1.o \
 menu.o \
+node1.o \
 oled.o \
 sram.o \
 touch.o
@@ -79,8 +79,8 @@ mcp.o \
 spi.o \
 uart.o \
 game.o \
-node1.o \
 menu.o \
+node1.o \
 oled.o \
 sram.o \
 touch.o
@@ -93,8 +93,8 @@ mcp.d \
 spi.d \
 uart.d \
 game.d \
-node1.d \
 menu.d \
+node1.d \
 oled.d \
 sram.d \
 touch.d
@@ -107,8 +107,8 @@ mcp.d \
 spi.d \
 uart.d \
 game.d \
-node1.d \
 menu.d \
+node1.d \
 oled.d \
 sram.d \
 touch.d

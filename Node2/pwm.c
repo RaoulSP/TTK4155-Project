@@ -1,5 +1,4 @@
-#define F_CPU 16000000
-#include <avr/io.h>
+#include "../lib/settings.h"
 #include "pwm.h"
 
 uint16_t pwm_top = 0;

@@ -12,8 +12,6 @@
 
 ..\lib\uart.c
 
-..\lib\utils.c
-
 dac.c
 
 node2.c

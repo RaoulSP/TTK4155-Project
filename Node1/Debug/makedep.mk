@@ -16,9 +16,9 @@
 
 game.c
 
-node1.c
-
 menu.c
+
+node1.c
 
 oled.c
 

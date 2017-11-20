@@ -10,7 +10,7 @@ volatile int can_message_received = 0;
 void can_init(int mode){
 	mcp_init();
 	
-	mcp_bit_modify(0x2B,0b00000011, 0b00000011); //Disables interrupts from empty buffers WHAT!?!??
+	mcp_bit_modify(0x2B,0b00000011, 0b00000011); //enable receive msg interrupt
 	mcp_bit_modify(MCP_RXB0CTRL, 0b01100000, 0b01100000); //Disable filters
 	mcp_bit_modify(MCP_CANCTRL, 0xFF, mode); //Sets operation mode 
 	//TODO: Filter initialization

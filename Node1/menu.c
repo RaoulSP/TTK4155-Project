@@ -1,15 +1,21 @@
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <avr/io.h>
 #include "../lib/joy.h"
+#include "../lib/interrupt_flags.h"
 #include "menu.h"
 #include "oled.h"
-#include <avr/io.h>
-#include "../lib/interrupt_flags.h"
-
 
 //Flags
 int joy_moved = 0;
 int animation_stepup = 0;
 int animation_stepdown = 0;
+int transition = 0;
+Direction transition_dir = NEUTRAL;
+int transition_count = 0;
+int transition_step = 1;
+int joy_held = 0;
 //----------INITIALIZATION--------------
 //The name of the menus and their functions
 Menu main_menu = {
@@ -19,77 +25,89 @@ Menu main_menu = {
 	.super_menu = NULL,
 	.sub_menus = NULL,
 	//.type = MENU,
-	.draw = draw_menu,
-	.action = run_game
+	.draw = draw_menu
 };
 
 Menu difficulty = {
 	.name = "Difficulty",
 	//.type = MENU,
-	.draw = draw_menu
+	.draw = draw_menu,
+	.action = action_start_transition_right
 };
 
 Menu options = {
-	.name = "Play Game",
+	.name = "options",
 	//.type = MENU,
 	.draw = draw_menu,
-	.action = run_game
+	.action = action_start_transition_right
 };
 
 Menu highscore = {
 	.name = "High score",
 	//.type = LIST,
-	.draw = draw_list
+	.draw = draw_list,
+	.action = action_start_transition_right
 };
 
 Menu control = {
 	.name = "Control",
 	//.type = MENU,
-	.draw = draw_menu
+	.draw = draw_menu,
+	.action = action_start_transition_right
 };
 
 Menu contro = {
 	.name = "Graphics",
 	//.type = MENU,
-	.draw = draw_menu
+	.draw = draw_menu,
+	.action = action_start_transition_right
 };
+
+Menu toggle = {
+	.name = "Hans",
+	//.type = MENU,
+	.draw = draw_menu,
+	.action = action_toggle_name
+};
+
+Menu play_game= {
+	.name = "Play game",
+	//.type = MENU,
+	.draw = draw_menu,
+	.action = action_run_game
+};
+
+
+Menu* current_menu = &main_menu;
 
 //The initializer - How the menus are related
 void menu_init(){
+	add_sub_menu(&main_menu, &play_game);
 	
 	char* control_entr[3] = {"Player1", "Player2", "Player3"};
-	add_entries(&control, control_entr, 3);
+	add_list_entries(&control, control_entr, 3);
 	add_sub_menu(&options, &control);
 	
 	char* contro_entr[4] = {"Low", "Medium", "High","Ultra"};
-	add_entries(&contro, contro_entr, 4);
+	add_list_entries(&contro, contro_entr, 4);
 	add_sub_menu(&options, &contro);
 	
 	add_sub_menu(&main_menu, &options);
+	add_sub_menu(&main_menu, &toggle);
 	
 	char* diff_entr[3] = {"Easy", "Medium", "Hard"};
-	add_entries(&difficulty, diff_entr, 3);
+	add_list_entries(&difficulty, diff_entr, 3);
 	add_sub_menu(&main_menu, &difficulty);
 	
 	char* high_entr[4] = {"1. Herman","2. Raoul","3. Alle andre","-inf^inf. Hans"};
-	add_entries(&highscore, high_entr,4);
+	add_list_entries(&highscore, high_entr,4);
 	add_sub_menu(&main_menu, &highscore);
-		
-	//Initialize interrupts
-	// Set up timer, enable timer/counter compare match interrupt
-	TCCR1A = (1 << WGM11) | (1 << WGM10);				//Compare match mode
-	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); //clock source to be used by the Timer/Counter clkI/O/8
-	TIMSK = (1 << OCIE1A);								//Interrupt on compare match
-	int OCRA_num = (long)F_CPU/(refresh_rate*8);
-		
-	OCR1AH = OCRA_num >> 8;
-	OCR1AL = OCRA_num; //Sets the value for the compare match to 10240
 	
 }
 //----------NO NEED TO CHANGE THINGS BEYOND THIS POINT----------
 
 //Functions for adding entries and nodes
-void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
+void add_list_entries(Menu* menu, char* entries[], int num_of_new_entries){
 	
 	menu->entries = malloc(num_of_new_entries * sizeof(char*));	//Correct size of double pointer
 	
@@ -125,8 +143,8 @@ void add_sub_menu(Menu* super, Menu* sub){
 }
 
 //Drawing functions (change to update?)
-Menu* draw_menu(Menu* self){
-	
+void draw_menu(Menu* self){
+	//Print the menu
 	for(int i = 0; i < self->num_of_entries; i++){
 		oled_print_string(self->entries[i],0,i,5,0);
 	}
@@ -135,102 +153,129 @@ Menu* draw_menu(Menu* self){
 	//Where to go next
 	Direction dir = joy_get_direction();
 	Position pos = joy_get_position();
-	if(1){//THIS MUST CHANGE
-		if((dir == UP)){// & (self->cursor != 0)){
-			for (int i = 0; i < 8; i++,i++){
-				oled_invert_rectangle(0,8*(self->cursor) - i - 2,64,8*((self->cursor) + 1) - i - 2);
-				oled_invert_rectangle(0,8*(self->cursor) - i,64,8*((self->cursor) + 1) - i);
-				oled_refresh();
-			}
-			self->cursor--;
-			//Wrapping
-			if(self->cursor == -1){
-				self->cursor = 2;
-			}
-						
+	if(transition == 0){
+		switch(dir){
+			case UP:
+				transition = 1;
+				transition_dir = UP;
+				break;
+			case DOWN:
+				transition = 1;
+				transition_dir = DOWN;
+				break;
+			case LEFT:
+				if (self->super_menu != NULL){
+					self = self->super_menu;
+					joy_held = 1;
+					transition = 1;
+				}
+				break;
+			case RIGHT:
+				if (self->sub_menus[self->cursor]->num_of_entries != 0){
+					self = self->sub_menus[self->cursor];
+					joy_held = 1;
+					transition = 1;
+				}
+				break;
+			case NEUTRAL:
+				if(pos.z  == 1 && self->sub_menus[self->cursor]->action != NULL){
+					self->sub_menus[self->cursor]->action(self);
+				}
+				break;
 		}
-		else if((dir == DOWN)){// & (self->cursor != (self->num_of_entries - 1))){
-
-
- 			//---NEW--- ANIMATION FOR DOWNWARDS MOVEMENT
- 			for (int i = 0; i < 8; i++,i++){
-	 				oled_invert_rectangle(0,8*(self->cursor) + i,64,8*((self->cursor) + 1) + i);
-	 				oled_invert_rectangle(0,8*(self->cursor) + i + 2,64,8*((self->cursor) + 1) + i + 2);
-	 				oled_refresh();
- 			}
- 			//-------------
-
-			self->cursor++;
-			//Wrapping
-			if(self->cursor == self->num_of_entries){
-				self->cursor = 0;
-			}
-	
-			
-		}
-		else if((dir == RIGHT) && (self->sub_menus[self->cursor]->num_of_entries != 0)){ //THIS IS CHANGED
-			self = self->sub_menus[self->cursor];
-		}
-		else if((dir == LEFT) && (self->super_menu != NULL)){
-			self = self->super_menu;
+	}
+	else{
+		if (transition_dir == UP || transition_dir == DOWN){
+			menu_transition(self, transition_dir);
 		}
 		else if(dir == NEUTRAL){
-			if(pos.z  == 1){
-				self->action();
-			}
+			joy_held = 0;
+			transition = 0;
 		}
-		joy_moved = 1;
 	}
-	else if (dir == NEUTRAL){ //THIS IS NEW
-		if(pos.z  == 1){
-			self->action();
-		}
-		joy_moved = 0;
-	}
-
-	return self;
 }
-Menu* draw_list(Menu* self){
+void draw_list(Menu* self){
 
 	for(int i = 0; i < self->num_of_entries; i++){
 		oled_print_string(self->entries[i],0,i,5,0);
 	}
-
 	//Where to go next
 	Direction dir = joy_get_direction();
-	if(!joy_moved){//THIS IS NEW
-		if((dir == LEFT) & (self->super_menu != NULL)){
-			self = self->super_menu;
-		}
-		joy_moved = 1;		
+	if((dir == LEFT) & (self->super_menu != NULL)){
+		self = self->super_menu;
 	}
-	else if (dir == NEUTRAL){ //THIS IS NEW
-		joy_moved = 0;
-	}
-	
-	return self;
 }
 
 //Action functions
-//void action_game(){}
-//void action_animation(){}
-	//
+void action_run_game(Menu* self){
+	state = in_game;
+}
+void action_start_transition_right(Menu* self){
+	joy_held = 1;
+	transition = 1;
+}
+void action_toggle_name(Menu* self){	//TEST FOR CHECK BOXES IN OPTIONS
+	self->entries[self->cursor]= "Herman";
 	
-Menu* current_menu = &main_menu;
+}
+//void action_animation(){}
 
 void menu_run_display(){
 	oled_clear_screen();
-	current_menu = current_menu->draw(current_menu);
+	current_menu->draw(current_menu);
+	printf(current_menu->name);
 	oled_refresh();
 }
-
-void run_game(){
-	state = in_game;
-	
+void menu_transition(Menu *self, Direction dir){
+	//If done with transition
+	if (transition_count == 8){
+		//wrapping
+		if(transition_dir == UP){
+			if(self->cursor == -1){
+				self->cursor = 4;
+			}
+			else{
+				self->cursor--;
+			}
+		}
+		else if(transition_dir == DOWN){
+			//wrapping
+			if(self->cursor == self->num_of_entries){
+				self->cursor = 0;
+			}
+			else{
+				self->cursor++;
+			}
+		}
+		transition_count = 0;
+		transition_dir = NEUTRAL;
+		transition = 0;
+	}
+	//Update the transition
+	else if(transition == 1 && (transition_dir == UP || transition_dir == DOWN)){
+		int sign = 1;
+		if(transition_dir == UP){
+			sign = -1;
+		}
+		
+		int x1 = 0;
+		int x2 = 64;
+		int y1 = 8*(self->cursor) + sign*transition_count;
+		int y2 = 8*(self->cursor + 1) + sign*transition_count;
+		int y11= y1 + sign*transition_step;
+		int y22= y2 + sign*transition_step;
+		
+		if (transition_dir == UP){
+			oled_invert_rectangle(x1,y11,x2,y22);
+			oled_invert_rectangle(x1,y1,x2,y2);
+			
+		}
+		else{
+			oled_invert_rectangle(x1,y1,x2,y2);
+			oled_invert_rectangle(x1,y11,x2,y22);
+			
+		}
+		transition_count++;
+	}
 }
 
-//Oled refresh timer - called with interval 0.016s (60FPS)
-ISR(TIMER1_COMPA_vect)
-{
-	oled_refresh_timer = 1;
-}

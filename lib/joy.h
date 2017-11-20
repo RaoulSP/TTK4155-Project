@@ -1,5 +1,5 @@
 typedef struct joy_position_t{
-	int x, y, z;
+	int x, y, z, r_slider;
 } Position;
 
 typedef struct joy_position_pol_t{

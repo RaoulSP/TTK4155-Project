@@ -53,24 +53,3 @@ void mcp_init(){
 	spi_master_init();
 	mcp_reset();
 }
-
-int mcp_test(){
-	mcp_request_to_send(1,1,1); //This messes up the following CAN transmission
-	int result = mcp_read_status();
-	printf("Testing MCP, expected %d, should be 84", result); //(1,1,1) should print 64 + 16 + 4 = 84
-	if (result == 84){
-		printf("\t...OK\r\n");
-		return 0;
-	}
-	else{
-		printf("\t...NOT OK\r\n");
-		return 1;
-	}
-}
-
-/*Testing code taken from main.c - this test doesn't work correctly, even when SPI and MCP are working.
-	char* STREAING = "Hans er sist!";
-	mcp_write(0x1, STREAING, 13);
-	char* arr = (mcp_read(0x1), 13);
-	printf("%s\n",arr);
-*/

@@ -42,7 +42,6 @@ C_SRCS +=  \
 ../../lib/mcp.c \
 ../../lib/spi.c \
 ../../lib/uart.c \
-../../lib/utils.c \
 ../dac.c \
 ../node2.c \
 ../motor_driver.c \
@@ -64,7 +63,6 @@ can.o \
 mcp.o \
 spi.o \
 uart.o \
-utils.o \
 dac.o \
 node2.o \
 motor_driver.o \
@@ -79,7 +77,6 @@ can.o \
 mcp.o \
 spi.o \
 uart.o \
-utils.o \
 dac.o \
 node2.o \
 motor_driver.o \
@@ -94,7 +91,6 @@ can.d \
 mcp.d \
 spi.d \
 uart.d \
-utils.d \
 dac.d \
 node2.d \
 motor_driver.d \
@@ -109,7 +105,6 @@ can.d \
 mcp.d \
 spi.d \
 uart.d \
-utils.d \
 dac.d \
 node2.d \
 motor_driver.d \
@@ -157,19 +152,17 @@ LINKER_SCRIPT_DEP+=
 
 
 
-
-
 ./%.o: ../../lib/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=16000000UL  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=16000000UL  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 

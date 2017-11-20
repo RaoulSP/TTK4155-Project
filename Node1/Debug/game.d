@@ -10,8 +10,12 @@ game.d game.o: .././game.c .././oled.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\version.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\fuse.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\lock.h \
- .././game.h .././../lib/joy.h .././../lib/uart.h .././../lib/can.h \
- .././../lib/mcp.h .././../lib/MCP2515.h .././../lib/interrupt_flags.h \
+ .././game.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\stdio.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stdarg.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stddef.h \
+ .././../lib/joy.h .././../lib/uart.h .././../lib/can.h .././../lib/mcp.h \
+ .././../lib/MCP2515.h .././../lib/interrupt_flags.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
  .././../lib/settings.h .././../lib/settings.h
 
@@ -40,6 +44,12 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\lock.h:
 
 .././game.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\stdio.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stdarg.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stddef.h:
 
 .././../lib/joy.h:
 

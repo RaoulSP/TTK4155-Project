@@ -174,13 +174,13 @@
     <Compile Include="game.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="node1.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="menu.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="menu.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="node1.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="oled.c">
@@ -199,6 +199,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="touch.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="uart.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

@@ -1,11 +1,11 @@
 #include "oled.h"
 #include "game.h"
+#include <stdio.h>
 #include "../lib/joy.h"
 #include "../lib/uart.h"
 #include "../lib/can.h"
 #include "../lib/interrupt_flags.h"
 #include "../lib/settings.h"
-
 
 int score = 0;
 int initiated = 0;
@@ -23,14 +23,13 @@ void game_init(){
 	}
 	*/
 	
-	int OCRA_num = (long)F_CPU/(8);						//Prescale with 256 to get seconds
+	int OCRA_num = (long)F_CPU/(256);						//Prescale with 256 to get seconds
 	OCR3AH = OCRA_num >> 8;
 	OCR3AL = OCRA_num;									//Sets the value for the compare match to 10240
 	TCCR3A = (1 << WGM31) | (1 << WGM30);				//Compare match mode
-	TCCR3B = (1 << WGM33) | (1 << WGM32) | (1 << CS31); //clock source to be used by the Timer/Counter clkI/O/8
+	TCCR3B = (1 << WGM33) | (1 << WGM32) | (1 << CS32); //clock source to be used by the Timer/Counter clkI/O/8
 	ETIMSK = (1 << OCIE3A);								//Interrupt on compare match
 }
-
 
 void game_run(){
 	if (!initiated){
@@ -44,7 +43,7 @@ void game_run(){
 		sprintf(str,"%5d",game_time);
 		//oled_clear_line(1);
 		oled_print_string(str,0,0,8,0);
-		oled_print_string("raoHan er best",0,1,8,0);
+		oled_print_string("herms er best",0,1,8,0);
 		oled_refresh();
 		game_second_passed = 0;
 		
@@ -56,8 +55,21 @@ void game_run(){
 	msg.length = sizeof(position);
 	msg.data = (char*) &position;
 	can_transmit(msg);
+	
+	printf("l = %d\r\n",msg.length);
 	//can_transmit(can_construct_msg(42, sizeof(position), (char*) &position));
 	
+	//GET SCORE
+	if (game_occluded){
+		score++;
+		char scr[5];
+		sprintf(scr,"%5d",score);
+		oled_print_string(scr,5,5,8,0);
+		oled_refresh();
+		game_occluded = 0;
+	}
+	
+	/*
 	//GET SCORE
 	if (can_message_received){
 		Msg msg_received = can_receive();
@@ -72,6 +84,7 @@ void game_run(){
 		free(msg_received.data);
 	}
 	can_message_received = 0;
+	*/
 }
 
 ISR(TIMER3_COMPA_vect){

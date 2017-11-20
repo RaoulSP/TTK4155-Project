@@ -1,4 +1,3 @@
-#include <util/delay.h>
 #include "adc.h"
 /*ISR(INT2_vect)
 {
@@ -7,8 +6,8 @@
 
 #ifdef NODE_1
 	void adc_init(){
-	clear_bit(DDRE, PE0); //Set DDR to input for interrupt flag
-}
+		clear_bit(DDRE, PE0); //Set DDR to input for interrupt flag
+	}
 	uint8_t adc_read(char channel){
 		volatile char *ext_adc = (char *) 0x1400; 
 		if (channel == 'x'){

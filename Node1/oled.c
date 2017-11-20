@@ -36,7 +36,14 @@ void oled_init(){
 	oled_write_command(0xaf); // display on
 	oled_clear_screen(); //Sets all buffer data to 0
 	
-	
+	//Set up timer, enable timer/counter compare match interrupt for 60 FPS
+	TCCR1A = (1 << WGM11) | (1 << WGM10);				//Compare match mode
+	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); //clock source to be used by the Timer/Counter clkI/O/8
+	TIMSK = (1 << OCIE1A);								//Interrupt on compare match
+	int OCRA_num = (long)F_CPU/(refresh_rate*8);
+		
+	OCR1AH = OCRA_num >> 8;
+	OCR1AL = OCRA_num; //Sets the value for the compare match to 10240
 }
 
 void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font_size, int invert){
@@ -213,5 +220,7 @@ void oled_invert_rectangle(int x1, int y1, int x2, int y2){
 	}
 }
 
-
-
+ISR(TIMER1_COMPA_vect)
+{
+	oled_refresh_timer = 1;
+}

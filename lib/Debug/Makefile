@@ -43,8 +43,7 @@ C_SRCS +=  \
 ../lib.c \
 ../mcp.c \
 ../spi.c \
-../uart.c \
-../utils.c
+../uart.c
 
 
 PREPROCESSING_SRCS += 
@@ -60,8 +59,7 @@ joy.o \
 lib.o \
 mcp.o \
 spi.o \
-uart.o \
-utils.o
+uart.o
 
 OBJS_AS_ARGS +=  \
 adc.o \
@@ -70,8 +68,7 @@ joy.o \
 lib.o \
 mcp.o \
 spi.o \
-uart.o \
-utils.o
+uart.o
 
 C_DEPS +=  \
 adc.d \
@@ -80,8 +77,7 @@ joy.d \
 lib.d \
 mcp.d \
 spi.d \
-uart.d \
-utils.d
+uart.d
 
 C_DEPS_AS_ARGS +=  \
 adc.d \
@@ -90,8 +86,7 @@ joy.d \
 lib.d \
 mcp.d \
 spi.d \
-uart.d \
-utils.d
+uart.d
 
 OUTPUT_FILE_PATH +=lib.elf
 
@@ -107,8 +102,6 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
-
-
 
 
 
