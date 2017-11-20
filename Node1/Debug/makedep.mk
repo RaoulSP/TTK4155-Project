@@ -16,7 +16,7 @@
 
 game.c
 
-main.c
+node1.c
 
 menu.c
 

@@ -44,7 +44,7 @@ C_SRCS +=  \
 ../../lib/spi.c \
 ../../lib/uart.c \
 ../game.c \
-../main.c \
+../node1.c \
 ../menu.c \
 ../oled.c \
 ../sram.c \
@@ -65,7 +65,7 @@ mcp.o \
 spi.o \
 uart.o \
 game.o \
-main.o \
+node1.o \
 menu.o \
 oled.o \
 sram.o \
@@ -79,7 +79,7 @@ mcp.o \
 spi.o \
 uart.o \
 game.o \
-main.o \
+node1.o \
 menu.o \
 oled.o \
 sram.o \
@@ -93,7 +93,7 @@ mcp.d \
 spi.d \
 uart.d \
 game.d \
-main.d \
+node1.d \
 menu.d \
 oled.d \
 sram.d \
@@ -107,7 +107,7 @@ mcp.d \
 spi.d \
 uart.d \
 game.d \
-main.d \
+node1.d \
 menu.d \
 oled.d \
 sram.d \

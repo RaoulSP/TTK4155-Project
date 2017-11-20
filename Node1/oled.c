@@ -1,6 +1,6 @@
 #include "oled.h"
 #include "fonts.h"
-#include "interrupt_flags.h"
+#include "../lib/interrupt_flags.h"
 #include <avr/io.h>
 
 int doublebuffering = 1;

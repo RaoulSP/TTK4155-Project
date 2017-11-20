@@ -1,6 +1,8 @@
 
 #include "pid.h"
 #include <avr/io.h>
+#include "../lib/interrupt_flags.h"
+
 
 /*! \brief Initialization of PID controller parameters.
  *
@@ -23,6 +25,14 @@ void pid_Init(double p_factor, double i_factor, double d_factor, struct PID_DATA
 	// Limits to avoid overflow
 	pid->maxError    = MAX_INT / (pid->P_Factor + 1);
 	pid->maxSumError = MAX_I_TERM / (pid->I_Factor + 1);
+	
+	// Set up timer, enable timer/counter compare match interrupt
+	TCCR3A = (1 << WGM31) | (1 << WGM30);				//Compare match mode
+	TCCR3B = (1 << WGM33) | (1 << WGM32) | (1 << CS31); //clock source to be used by the Timer/Counter clkI/O/8
+	TIMSK3 = (1 << OCIE3A);								//Interrupt on compare match
+
+	OCR3AH = 0b01001110;
+	OCR3AL = 0b00100000; //Sets the value for the compare match to 20000
 }
 
 /*! \brief PID control algorithm.
@@ -84,4 +94,9 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, struct PID_DATA *
 void pid_Reset_Integrator(pidData_t *pid_st)
 {
 	pid_st->sumError = 0;
+}
+
+
+ISR(TIMER3_COMPA_vect){ //PID timer - called with interval 0.01s
+	pid_timer = 1;
 }

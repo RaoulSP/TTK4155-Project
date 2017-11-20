@@ -125,6 +125,10 @@
       <SubType>compile</SubType>
       <Link>can.h</Link>
     </Compile>
+    <Compile Include="..\lib\interrupt_flags.h">
+      <SubType>compile</SubType>
+      <Link>interrupt_flags.h</Link>
+    </Compile>
     <Compile Include="..\lib\joy.c">
       <SubType>compile</SubType>
       <Link>joy.c</Link>
@@ -170,10 +174,7 @@
     <Compile Include="game.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="interrupt_flags.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="main.c">
+    <Compile Include="node1.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="menu.c">

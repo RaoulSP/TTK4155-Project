@@ -3,8 +3,18 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "motor_driver.h"
 #include "../lib/joy.h"
 #include "pwm.h"
+#include "PID.h"
+
+int motor_position = 0;
+int motor_position_past = 0;
+int motor_speed = 0;
+
+//initialize PID
+pidData_t pid;
+
 
 void motor_init(){
 	//MOTOR 
@@ -19,6 +29,10 @@ void motor_init(){
 	DDRK = 0b00000000; //Encoder vals as input 
 	motor_encoder_reset();
 	
+	double K_p = 0.075;	//0.075
+	double K_d = 0;		//0
+	double K_i = 0.00;	//0
+	pid_Init(K_p, K_i, K_d, &pid);
 }
 
 void motor_encoder_reset() {
@@ -26,8 +40,6 @@ void motor_encoder_reset() {
 	_delay_us(20);
 	PORTH |= (1 << PH6);
 }
-
-
 
 int motor_encoder_read(){
 	PORTH &= ~(1 << PH5);
@@ -44,13 +56,22 @@ int motor_encoder_read(){
 }
 
 void motor_move_dc(int discrete_voltage){
+	int voltage = 0;
 	
-	if (discrete_voltage >= 0){
-		PORTH |= (1 << PH1); //Set direction
+	if (discrete_voltage > 255){
+		discrete_voltage = 255;
 	}
-	else if (discrete_voltage < 0){
+	else if (discrete_voltage < -255){
+		discrete_voltage = -255;
+	}
+	
+	if (discrete_voltage >= 5){
+		PORTH |= (1 << PH1); //Set direction
+		voltage = discrete_voltage;
+	}
+	else if (discrete_voltage < -5){
 		PORTH &= ~(1 << PH1); //Set other direction
-		discrete_voltage = -discrete_voltage;
+		voltage = -discrete_voltage;
 	}
 	
 	int dac_address = 0b0101000;
@@ -58,12 +79,23 @@ void motor_move_dc(int discrete_voltage){
 	char msg[3];
 	msg[0] = ((dac_address << 1) | 0); //0 = write, 1 = read
 	msg[1] = 0b00000000; //Command byte: R2, R1, R0, Rst, PD, A2, A1, A0
-	msg[2] = discrete_voltage; //Value of 0-255, maps to 0V-5V
+	msg[2] = voltage; //Value of 0-255, maps to 0V-5V
 	TWI_Start_Transceiver_With_Data(msg, length);
 	
 	//Just for fun, no ifs:
 	//PORTH |= ((pos.y > 0) << PH1); //Set direction
 	//int voltage = (abs(pos.y) > 10) * abs(pos.y); //Set voltage to magnitude of pos.y, or 0
+}
+
+void motor_move_dc_with_pid(int position){
+	motor_position_past = motor_position;
+	motor_position = motor_encoder_read();
+	motor_speed = motor_position - motor_position_past; //normalize
+
+	int discrete_voltage = pid_Controller(position*20, motor_speed, &pid);
+
+	motor_move_dc(discrete_voltage);
+	//To do: Read timer register to normalize time
 }
 
 void motor_move_servo(float ms){

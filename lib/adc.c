@@ -30,7 +30,7 @@
 		return (uint8_t) *ext_adc;
 }
 #else
-	void adc_init(){
+	void adc_init(){ //ADC input pin is not specified. A0 default? otherwise set multiplexer
 		ADCSRA |= (1 << ADEN); //Enable
 		ADMUX |= ((1 << REFS1) | (1 << REFS0)); //00 = AREF, internal VREF turned off; 01 = AVCC with external capacitor at AREF pin; 11 = 2.56V
 		ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)); //div 128

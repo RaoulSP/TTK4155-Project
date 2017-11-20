@@ -44,7 +44,7 @@ C_SRCS +=  \
 ../../lib/uart.c \
 ../../lib/utils.c \
 ../dac.c \
-../main.c \
+../node2.c \
 ../motor_driver.c \
 ../PID.c \
 ../pwm.c \
@@ -66,7 +66,7 @@ spi.o \
 uart.o \
 utils.o \
 dac.o \
-main.o \
+node2.o \
 motor_driver.o \
 PID.o \
 pwm.o \
@@ -81,7 +81,7 @@ spi.o \
 uart.o \
 utils.o \
 dac.o \
-main.o \
+node2.o \
 motor_driver.o \
 PID.o \
 pwm.o \
@@ -96,7 +96,7 @@ spi.d \
 uart.d \
 utils.d \
 dac.d \
-main.d \
+node2.d \
 motor_driver.d \
 PID.d \
 pwm.d \
@@ -111,7 +111,7 @@ spi.d \
 uart.d \
 utils.d \
 dac.d \
-main.d \
+node2.d \
 motor_driver.d \
 PID.d \
 pwm.d \

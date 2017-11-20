@@ -1,24 +1,30 @@
-#include "settings.h"
 #include <stdlib.h>
 #include <string.h>
 #include <util/delay.h>
-#include "can.h"
 
+#include "can.h"
+#include "settings.h"
+#include "interrupt_flags.h"
+volatile int can_message_received = 0;
 
 void can_init(int mode){
 	mcp_init();
 	
-	mcp_bit_modify(0x2B,0b00011100, 0b00000000); //Disables interrupts from empty buffers
+	mcp_bit_modify(0x2B,0b00000011, 0b00000011); //Disables interrupts from empty buffers WHAT!?!??
 	mcp_bit_modify(MCP_RXB0CTRL, 0b01100000, 0b01100000); //Disable filters
 	mcp_bit_modify(MCP_CANCTRL, 0xFF, mode); //Sets operation mode 
-	
 	//TODO: Filter initialization
 	//NOTES: CANINTE.TXInE
 	//priority bits? TXP
+	
+	#ifdef NODE_1
+	MCUCR |= (1 << ISC01);
+	GICR |= (1 << INT0);
+	#endif
 }
 
 void can_transmit(Msg msg){
-	int buffer = 2; //n = 1, 2 or 3
+	int buffer = 2; //n = 1, 2 or 3, buffer = n - 1
 	
 	mcp_write(0x31 + 0x10*buffer, msg.id >> 3);  //TXBnSIDH
 	mcp_write(0x32 + 0x10*buffer, msg.id << 5);  //TXBnSIDL
@@ -35,7 +41,7 @@ void can_transmit(Msg msg){
 }
 
 Msg can_receive(){
-	int buffer = 0; //n = 1 or 2
+	int buffer = 0; //n = 1 or 2, buffer = n - 1
 	
 	Msg msg;
 	msg.id = ((int)mcp_read(0x61 + 0x10*buffer) << 3) | (mcp_read(0x62 + 0x10*buffer) >> 5); //Put together RXBnSIDH and RXBnSIDL
@@ -46,9 +52,20 @@ Msg can_receive(){
 		msg.data[i] = mcp_read(0x66 + 0x10*buffer + i);
 	}
 	
-	mcp_bit_modify(0x2C, buffer + 1, 0); //CANINTF - Sets RX0IF to 0
+	mcp_bit_modify(0x2C, buffer + 1, 0); //CANINTF - Sets RXnIF to 0
 	return msg;
 }
+
+Msg can_construct_msg(int id, int length, char* data){
+	Msg msg = {id,length,data};
+	return msg;
+} 
+
+ISR(INT0_vect){
+	can_message_received = 1;
+	//printf("ISR: %d\r\n", can_message_received);
+}
+
 
 //void can_test(){ 
 	//mcp_bit_modify(MCP_CANCTRL, 0xFF, MODE_LOOPBACK);

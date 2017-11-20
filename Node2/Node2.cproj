@@ -138,6 +138,10 @@
       <SubType>compile</SubType>
       <Link>can.h</Link>
     </Compile>
+    <Compile Include="..\lib\interrupt_flags.h">
+      <SubType>compile</SubType>
+      <Link>interrupt_flags.h</Link>
+    </Compile>
     <Compile Include="..\lib\joy.h">
       <SubType>compile</SubType>
       <Link>joy.h</Link>
@@ -180,7 +184,7 @@
     <Compile Include="dac.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="main.c">
+    <Compile Include="node2.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="motor_driver.c">

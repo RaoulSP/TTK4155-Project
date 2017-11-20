@@ -1,15 +1,12 @@
-typedef struct joy_position_t
-{
+typedef struct joy_position_t{
 	int x, y, z;
 } Position;
 
-typedef struct joy_position_pol_t
-{
+typedef struct joy_position_pol_t{
 	int angle, amplitude;
 } Position_polar;
 
-typedef enum joy_direction_t
-{
+typedef enum joy_direction_t{
 	RIGHT,
 	UP,
 	LEFT,

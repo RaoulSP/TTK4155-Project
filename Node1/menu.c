@@ -3,8 +3,7 @@
 #include "menu.h"
 #include "oled.h"
 #include <avr/io.h>
-#include "interrupt_flags.h"
-#include <avr/interrupt.h>
+#include "../lib/interrupt_flags.h"
 
 
 //Flags
@@ -34,6 +33,7 @@ Menu options = {
 	.name = "Play Game",
 	//.type = MENU,
 	.draw = draw_menu,
+	.action = run_game
 };
 
 Menu highscore = {
@@ -105,7 +105,7 @@ void add_entries(Menu* menu, char* entries[], int num_of_new_entries){
 		//add_sub_menu(menu, empty);
 		//menu->num_of_entries+=1;
 	}
-	//menu->num_of_entries = num_of_new_entries;
+	menu->num_of_entries = num_of_new_entries;
 	menu->cursor = 0; //To make sure the cursor is not something else
 }
 
@@ -134,6 +134,7 @@ Menu* draw_menu(Menu* self){
 	
 	//Where to go next
 	Direction dir = joy_get_direction();
+	Position pos = joy_get_position();
 	if(1){//THIS MUST CHANGE
 		if((dir == UP)){// & (self->cursor != 0)){
 			for (int i = 0; i < 8; i++,i++){
@@ -167,15 +168,23 @@ Menu* draw_menu(Menu* self){
 	
 			
 		}
-		else if((dir == RIGHT) & (self->sub_menus[self->cursor]->num_of_entries != 0)){ //THIS IS CHANGED
+		else if((dir == RIGHT) && (self->sub_menus[self->cursor]->num_of_entries != 0)){ //THIS IS CHANGED
 			self = self->sub_menus[self->cursor];
 		}
-		else if((dir == LEFT) & (self->super_menu != NULL)){
+		else if((dir == LEFT) && (self->super_menu != NULL)){
 			self = self->super_menu;
+		}
+		else if(dir == NEUTRAL){
+			if(pos.z  == 1){
+				self->action();
+			}
 		}
 		joy_moved = 1;
 	}
 	else if (dir == NEUTRAL){ //THIS IS NEW
+		if(pos.z  == 1){
+			self->action();
+		}
 		joy_moved = 0;
 	}
 
@@ -212,14 +221,11 @@ Menu* current_menu = &main_menu;
 void menu_run_display(){
 	oled_clear_screen();
 	current_menu = current_menu->draw(current_menu);
-	current_menu->action();
 	oled_refresh();
 }
 
 void run_game(){
-	if(joy_get_position().z == 1){
-		state = in_game;
-	}
+	state = in_game;
 	
 }
 

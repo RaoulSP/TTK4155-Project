@@ -45,7 +45,7 @@ void mcp_bit_modify(char address, char mask, char data){
 		
 void mcp_reset(){
 	clear_bit(PORTB, MCP_PIN);
-	spi_master_transmit(MCP_RESET);	
+	spi_master_transmit(MCP_RESET);
 	set_bit(PORTB, MCP_PIN);
 }
 	
