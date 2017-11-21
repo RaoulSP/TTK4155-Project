@@ -23,11 +23,3 @@ char spi_master_transmit(char cData)
 	while(!(SPSR & (1<<SPIF))); //Wait for transmission complete	
 	return SPDR;
 }
-
-
-/*This testing code is taken from main.c - this test doesn't work correctly, even when SPI is working. (?)
-	char k = (spi_master_transmit('a'));
-	printf("%c\r\n",k);
-	char z = (spi_master_transmit('a'));
-	printf("%c\r\n",z);
-*/

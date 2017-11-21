@@ -1,6 +1,6 @@
 #include "oled.h"
 #include "fonts.h"
-#include "../lib/interrupt_flags.h"
+#include "../lib/interrupts.h"
 #include <avr/io.h>
 
 int doublebuffering = 1;
@@ -9,7 +9,6 @@ int oled_back_buffer_index = 0;
 volatile uint8_t *oled_command = 0x1000;
 volatile uint8_t *oled_back_buffer = 0x1800;
 volatile uint8_t *oled_front_buffer = 0x1200;
-
 
 void oled_init(){
 	oled_write_command(0xae); //display off
@@ -34,16 +33,13 @@ void oled_init(){
 	oled_write_command(0xa4); //out follows RAM content
 	oled_write_command(0xa6); //set normal display
 	oled_write_command(0xaf); // display on
-	oled_clear_screen(); //Sets all buffer data to 0
+	oled_clear_screen();	  //Sets all buffer data to 0
 	
 	//Set up timer, enable timer/counter compare match interrupt for 60 FPS
-	TCCR1A = (1 << WGM11) | (1 << WGM10);				//Compare match mode
-	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); //clock source to be used by the Timer/Counter clkI/O/8
-	TIMSK = (1 << OCIE1A);								//Interrupt on compare match
-	int OCRA_num = (long)F_CPU/(refresh_rate*8);
-		
-	OCR1AH = OCRA_num >> 8;
-	OCR1AL = OCRA_num; //Sets the value for the compare match to 10240
+	TCCR2 = (1 << CS22) | (1 << CS21) | (1 << CS20) | (1 << WGM21);  //clock source to be used by the Timer/Counter clkI/O/1024 -  CTC mode
+	TIMSK = (1 << OCIE2);					
+	int OCRA_num = (long)F_CPU/(refresh_rate*1024);
+	OCR2 = OCRA_num; //Sets the value for the compare match to 80
 }
 
 void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font_size, int invert){
@@ -107,7 +103,6 @@ void oled_write_command(char command){
 void oled_write_data(char data){
 	if(doublebuffering){
 		if (oled_back_buffer_index > 1023){
-			//printf("Outside of screen!\n");
 			return -1;
 		}
 		oled_back_buffer[oled_back_buffer_index] = data;
@@ -121,8 +116,6 @@ void oled_write_data(char data){
 char oled_read_data(){
 	if(doublebuffering){
 		if (oled_back_buffer_index > 1023){
-			//printf("Outside of screen!\n");
-			//return -1;
 			return 0x00;
 		}
 		return oled_back_buffer[oled_back_buffer_index];
@@ -209,12 +202,10 @@ void oled_draw_line(int x1, int y1, int x2, int y2){
 		}
 	}
 	
-	//not finished
+	//TODO: make it draw correctly in every direction
 }
 
 void oled_invert_rectangle(int x1, int y1, int x2, int y2){
-	//NEW
-	//Swap
 	if(y1 > y2){
 		int temp = y1;
 		y1 = y2;
@@ -228,7 +219,7 @@ void oled_invert_rectangle(int x1, int y1, int x2, int y2){
 	}
 	int t = 255 << y1%8;		//Top line to be filled
 	int b = 255 >> 8 - y2%8;	//Bottom line to be filled
-	if(y1/8 != y2/8){ //Over several lines
+	if(y1/8 != y2/8){			//Over several lines
 		//Filling top
 		oled_goto_line(y1/8);
 		for(int x = x1; x < x2; x++){
@@ -260,7 +251,13 @@ void oled_invert_rectangle(int x1, int y1, int x2, int y2){
 	}
 }
 
-ISR(TIMER1_COMPA_vect)
+ISR(TIMER2_COMP_vect)
 {
-	oled_refresh_timer = 1;
+	if(state == in_menu){
+		oled_refresh_timer = 1;	
+	}
+	else if(state == in_game){
+		game_time_passed = 1;
+	}
+	
 }

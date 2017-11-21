@@ -8,19 +8,19 @@
 
 ..\lib\mcp.c
 
+..\lib\pwm.c
+
 ..\lib\spi.c
 
 ..\lib\uart.c
 
-dac.c
-
 node2.c
 
-motor_driver.c
+motor.c
 
 PID.c
 
-pwm.c
+servo.c
 
 solenoid.c
 

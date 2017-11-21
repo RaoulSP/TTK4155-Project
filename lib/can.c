@@ -4,7 +4,7 @@
 
 #include "can.h"
 #include "settings.h"
-#include "interrupt_flags.h"
+#include "interrupts.h"
 volatile int can_message_received = 0;
 
 void can_init(int mode){
@@ -18,6 +18,7 @@ void can_init(int mode){
 	//priority bits? TXP
 	
 	#ifdef NODE_1
+	//External interrupt
 	MCUCR |= (1 << ISC01);
 	GICR |= (1 << INT0);
 	#endif

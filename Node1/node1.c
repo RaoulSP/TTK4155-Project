@@ -1,8 +1,9 @@
+#include <stdlib.h>
 #include "../lib/uart.h"
 #include "../lib/can.h"
 #include "../lib/adc.h"
 #include "../lib/joy.h"
-#include "../lib/interrupt_flags.h"
+#include "../lib/interrupts.h"
 #include "oled.h"
 #include "sram.h"
 #include "menu.h"
@@ -12,14 +13,14 @@
 
 //Global variables
 volatile int game_occluded = 0;
-volatile int game_second_passed = 0;
+volatile int game_time_passed = 1;
 volatile int oled_refresh_timer = 0;
 volatile int game_interrupt_flag = 1;
 State state = in_menu;
 
 int main(void)
 {
-	
+
 	MCUCR |= (1<<SRE);	//Enable external memory
 	SFIOR |= (1<<XMM2); 
 	
@@ -32,10 +33,8 @@ int main(void)
 	menu_init();
 	sei();
 	//sram_test();
-	
-	printf("%d\n", 255<<8 - 9%8);
 	while (1)
-	{
+	{	
 		//joy_print();
 		if (can_message_received){
 			Msg msg_received =  can_receive();

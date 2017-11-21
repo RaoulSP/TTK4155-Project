@@ -5,7 +5,6 @@
 
 #define refresh_rate 60
 
-
 void oled_init();
 
 void oled_print_string(char * string, uint8_t column, uint8_t line, uint8_t font_size, int invert);

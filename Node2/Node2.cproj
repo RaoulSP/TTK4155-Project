@@ -93,31 +93,31 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols>
-    <ListValues>
-      <Value>DEBUG</Value>
-    </ListValues>
-  </avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>libm</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-</AvrGcc>
+        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
@@ -137,9 +137,9 @@
       <SubType>compile</SubType>
       <Link>can.h</Link>
     </Compile>
-    <Compile Include="..\lib\interrupt_flags.h">
+    <Compile Include="..\lib\interrupts.h">
       <SubType>compile</SubType>
-      <Link>interrupt_flags.h</Link>
+      <Link>interrupts.h</Link>
     </Compile>
     <Compile Include="..\lib\joy.h">
       <SubType>compile</SubType>
@@ -152,6 +152,14 @@
     <Compile Include="..\lib\mcp.h">
       <SubType>compile</SubType>
       <Link>mcp.h</Link>
+    </Compile>
+    <Compile Include="..\lib\pwm.c">
+      <SubType>compile</SubType>
+      <Link>pwm.c</Link>
+    </Compile>
+    <Compile Include="..\lib\pwm.h">
+      <SubType>compile</SubType>
+      <Link>pwm.h</Link>
     </Compile>
     <Compile Include="..\lib\spi.c">
       <SubType>compile</SubType>
@@ -169,19 +177,13 @@
       <SubType>compile</SubType>
       <Link>uart.h</Link>
     </Compile>
-    <Compile Include="dac.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="dac.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="node2.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="motor_driver.c">
+    <Compile Include="motor.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="motor_driver.h">
+    <Compile Include="motor.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="PID.c">
@@ -190,10 +192,10 @@
     <Compile Include="PID.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="pwm.c">
+    <Compile Include="servo.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="pwm.h">
+    <Compile Include="servo.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="solenoid.c">

@@ -5,8 +5,9 @@
 #include "../lib/can.h"
 #include "../lib/joy.h"
 #include "../lib/adc.h"
-#include "pwm.h"
-#include "motor_driver.h"
+#include "../lib/pwm.h"
+#include "servo.h"
+#include "motor.h"
 #include "TWI_Master.h"
 #include "solenoid.h"
 #include "PID.h"
@@ -17,7 +18,6 @@ int scoring_allowed = 1;
 
 int main(void)
 {	
-	sei(); //enable the use of interrupts
 	uart_init(9600);
 	adc_init();
 	can_init(MODE_NORMAL);
@@ -25,18 +25,17 @@ int main(void)
 	TWI_Master_Initialise();
 	motor_init();
 	solenoid_init();
-
-	//DAC module not used!
 	
+	sei();
 	
 	Position position_received = {0,0,0};
 	int z_released = 1;
 	Msg msg_received;
-	int i = 0;
+		
 	while(1)
 	{
-		i++;
-		//printf("%d\r\n",i);
+		check_if_scored();
+		
 		//CAN RECEIVE
 		msg_received = can_receive();
 		switch (msg_received.id){
@@ -54,22 +53,16 @@ int main(void)
 		}
 		free(msg_received.data);
 		
-		//printf("%d\r\n",position_received.r_slider);
 		//UPDATE MOTORS		
-		int r_slider_mean = position_received.r_slider/2;
+		int r_slider_mean = 128;
 		int r_around_zero = position_received.r_slider - r_slider_mean;
 		float r = r_around_zero*100/128;
-		motor_move_servo((((float)r) * 1.2 / 200.0) + 1.5);
-		printf("%d\r\n",r);
+		servo_set_angle((((float)r) * 1.2 / 200.0) + 1.5);
 		
+		printf("r = %d\r\n", position_received.r_slider);
 		
-		//motor_move_servo((((float)position_received.y) * 1.2 / 200.0) + 1.5); //Maps -100,100 to 0.9,2.1
-		
-		//printf("Z: %d Released: %d Timer: %d\r", position_received.z, z_released, solenoid_timer);
-		//printf("%d\r\n", solenoid_timer);
-		if (position_received.z == 1 && z_released == 1 && solenoid_timer == 0){ //Solenoid out?
+		if (position_received.z == 1 && z_released == 1 && solenoid_timer == 0){
 			solenoid_kick();
-			//printf("hei");
 			z_released = 0;
 		}
 		if(position_received.z == 0){
@@ -77,10 +70,9 @@ int main(void)
 		}
 		
 		if (pid_timer == 1) {
-			//motor_move_dc_with_pid(position_received.y);
+			motor_move_with_pid(position_received.y);
 			pid_timer = 0;
 		}
-		
 	}
 }
 
@@ -91,14 +83,22 @@ int check_if_scored()
 	int adc_val = adc_read();
 	
 	if (adc_val < lower_trigger_value && scoring_allowed){ //Can't score again until the adc value goes up
+		can_transmit(can_construct_msg(OCCLUDED, 0, 0));
 		scoring_allowed = 0;
-		//can_transmit(can_construct_msg(OCCLUDED, 0, 0));
-		//printf("OCCLUDED\r");
 		return 1;
 	}
 	else if (adc_val >= upper_trigger_value){
 		scoring_allowed = 1;
-		//printf("........\r");
 	}
 	return 0;
 }
+
+/* ----TODO----
+
+-Make node 2 sleep until the game starts and make it sleep when it ends. Connect interrupt from
+ I/O board to ext int on arduino
+
+-Check if scored should be called something else
+
+
+*/

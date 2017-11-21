@@ -108,7 +108,7 @@
     <Compile Include="can.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="interrupt_flags.h">
+    <Compile Include="interrupts.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="joy.c">
@@ -127,6 +127,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="MCP2515.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="pwm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="pwm.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="settings.h">

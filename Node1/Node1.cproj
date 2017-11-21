@@ -125,9 +125,9 @@
       <SubType>compile</SubType>
       <Link>can.h</Link>
     </Compile>
-    <Compile Include="..\lib\interrupt_flags.h">
+    <Compile Include="..\lib\interrupts.h">
       <SubType>compile</SubType>
-      <Link>interrupt_flags.h</Link>
+      <Link>interrupts.h</Link>
     </Compile>
     <Compile Include="..\lib\joy.c">
       <SubType>compile</SubType>
@@ -144,6 +144,14 @@
     <Compile Include="..\lib\mcp.h">
       <SubType>compile</SubType>
       <Link>mcp.h</Link>
+    </Compile>
+    <Compile Include="..\lib\pwm.c">
+      <SubType>compile</SubType>
+      <Link>pwm.c</Link>
+    </Compile>
+    <Compile Include="..\lib\pwm.h">
+      <SubType>compile</SubType>
+      <Link>pwm.h</Link>
     </Compile>
     <Compile Include="..\lib\settings.h">
       <SubType>compile</SubType>
@@ -180,6 +188,12 @@
     <Compile Include="menu.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="music.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="music.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="node1.c">
       <SubType>compile</SubType>
     </Compile>
@@ -187,6 +201,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="oled.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="servo.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="servo.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="sram.c">

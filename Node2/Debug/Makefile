@@ -40,13 +40,13 @@ C_SRCS +=  \
 ../../lib/adc.c \
 ../../lib/can.c \
 ../../lib/mcp.c \
+../../lib/pwm.c \
 ../../lib/spi.c \
 ../../lib/uart.c \
-../dac.c \
 ../node2.c \
-../motor_driver.c \
+../motor.c \
 ../PID.c \
-../pwm.c \
+../servo.c \
 ../solenoid.c \
 ../TWI_Master.c
 
@@ -61,13 +61,13 @@ OBJS +=  \
 adc.o \
 can.o \
 mcp.o \
+pwm.o \
 spi.o \
 uart.o \
-dac.o \
 node2.o \
-motor_driver.o \
+motor.o \
 PID.o \
-pwm.o \
+servo.o \
 solenoid.o \
 TWI_Master.o
 
@@ -75,13 +75,13 @@ OBJS_AS_ARGS +=  \
 adc.o \
 can.o \
 mcp.o \
+pwm.o \
 spi.o \
 uart.o \
-dac.o \
 node2.o \
-motor_driver.o \
+motor.o \
 PID.o \
-pwm.o \
+servo.o \
 solenoid.o \
 TWI_Master.o
 
@@ -89,13 +89,13 @@ C_DEPS +=  \
 adc.d \
 can.d \
 mcp.d \
+pwm.d \
 spi.d \
 uart.d \
-dac.d \
 node2.d \
-motor_driver.d \
+motor.d \
 PID.d \
-pwm.d \
+servo.d \
 solenoid.d \
 TWI_Master.d
 
@@ -103,13 +103,13 @@ C_DEPS_AS_ARGS +=  \
 adc.d \
 can.d \
 mcp.d \
+pwm.d \
 spi.d \
 uart.d \
-dac.d \
 node2.d \
-motor_driver.d \
+motor.d \
 PID.d \
-pwm.d \
+servo.d \
 solenoid.d \
 TWI_Master.d
 

@@ -12,6 +12,8 @@ lib.c
 
 mcp.c
 
+pwm.c
+
 spi.c
 
 uart.c

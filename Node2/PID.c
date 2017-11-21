@@ -1,7 +1,7 @@
 
 #include "pid.h"
 #include <avr/io.h>
-#include "../lib/interrupt_flags.h"
+#include "../lib/interrupts.h"
 
 
 /*! \brief Initialization of PID controller parameters.

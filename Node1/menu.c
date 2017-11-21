@@ -3,7 +3,7 @@
 #include <string.h>
 #include <avr/io.h>
 #include "../lib/joy.h"
-#include "../lib/interrupt_flags.h"
+#include "../lib/interrupts.h"
 #include "menu.h"
 #include "oled.h"
 
@@ -109,23 +109,15 @@ void menu_init(){
 
 //Functions for adding entries and nodes
 void add_list_entries(Menu* menu, char* entries[], int num_of_new_entries){
-	
-	//menu->entries = malloc(num_of_new_entries * sizeof(char*));	//Correct size of double pointer
-	
+
+	//Creates an empty menu to be added
 	for(int i = 0; i < num_of_new_entries; i++){
-		//menu->entries[i] = malloc(strlen(entries[i]) * sizeof(char)); //Allocate space for each string
-		//menu->entries[i] =  entries[i];								  //Adds each string
-		
-		//---NEW---
 		Menu* empty;
 		empty = malloc(sizeof(*empty));
 		empty->name = entries[i];
 		empty->num_of_entries = 0;
 		add_sub_menu(menu, empty);
-		//menu->num_of_entries+=1;
 	}
-	//menu->num_of_entries = num_of_new_entries;
-	//menu->cursor = 0; //To make sure the cursor is not something else
 }
 
 void add_sub_menu(Menu* super, Menu* sub){
@@ -136,25 +128,13 @@ void add_sub_menu(Menu* super, Menu* sub){
 	super->sub_menus = realloc(super->sub_menus, super->num_of_entries * sizeof(Menu*));
 	super->sub_menus[super->num_of_entries - 1] = malloc(sizeof(Menu));
 	super->sub_menus[super->num_of_entries - 1] = sub;
-	
-	//Name of entries in the super menu are updated
-	//super->entries = realloc(super->entries, super->num_of_entries * sizeof(char*));
-	//super->entries[super->num_of_entries - 1] = malloc(strlen(sub->name) * sizeof(char));
-	//super->entries[super->num_of_entries - 1] = sub->name;
 }
 
 //Drawing functions (change to update?)
 Menu* draw_menu(Menu* self){
 	//Print the menu
 	for(int i = 0; i < self->num_of_entries; i++){
-		//HER STOPPER DET!
 		oled_print_string(self->sub_menus[i]->name,0,i,5,0);
-		
-		if(self->name != "Main menu"){
-		//printf(self->sub_menus[i]->name);
-		//printf("\n");
-		}
-	
 	}
 	if(transition == 0){
 		oled_invert_rectangle(0,8*(self->cursor),64,8*((self->cursor) + 1));
@@ -162,6 +142,7 @@ Menu* draw_menu(Menu* self){
 	//Where to go next
 	Direction dir = joy_get_direction();
 	Position pos = joy_get_position();
+	//THIS DOES NOT WORK IF THE JOYSTICK IS NOT WORKING
 	if(transition == 0){
 		switch(dir){
 			case UP:
@@ -180,26 +161,11 @@ Menu* draw_menu(Menu* self){
 				}
 				break;
 			case RIGHT:
-				if (self->sub_menus[self->cursor]->num_of_entries != 0){
-					self = self->sub_menus[self->cursor];
-		
-					joy_held = 1;
-					transition = 1;
-								//printf("RIGHT");
-								//printf(self->name);
-								//printf("\n");
-								//printf("%d",self->num_of_entries);
-								//printf("\n");
-								//printf(self->sub_menus[0]->name);
-								//printf("\n");
-								//printf(self->sub_menus[1]->name);
-								//printf("\n");
-					return 0;
-				}
+				self = action_start_transition_right(self);
 				break;
 			case NEUTRAL:
 				if(pos.z  == 1 && self->sub_menus[self->cursor]->action != NULL){
-					self->sub_menus[self->cursor]->action(self);
+					self = self->sub_menus[self->cursor]->action(self);
 				}
 				break;
 		}
@@ -215,7 +181,7 @@ Menu* draw_menu(Menu* self){
 	}
 	return self;
 }
-void draw_list(Menu* self){
+Menu* draw_list(Menu* self){
 	for(int i = 0; i < self->num_of_entries; i++){
 		oled_print_string(self->sub_menus[i]->name,0,i,5,0);
 	}
@@ -227,16 +193,20 @@ void draw_list(Menu* self){
 }
 
 //Action functions
-void action_run_game(Menu* self){
+Menu* action_run_game(Menu* self){
 	state = in_game;
 }
-void action_start_transition_right(Menu* self){
-	joy_held = 1;
-	transition = 1;
+Menu* action_start_transition_right(Menu* self){
+		if (self->sub_menus[self->cursor]->num_of_entries != 0){
+			self = self->sub_menus[self->cursor];
+			joy_held = 1;
+			transition = 1;
+		}
+		return self;
 }
-void action_toggle_name(Menu* self){	//TEST FOR CHECK BOXES IN OPTIONS
+Menu* action_toggle_name(Menu* self){	//TEST FOR CHECK BOXES IN OPTIONS
 	self->sub_menus[self->cursor]->name= "Herman";
-	
+	return self;
 }
 //void action_animation(){}
 
@@ -250,16 +220,14 @@ void menu_transition(Menu *self, Direction dir){
 	if (transition_count == 8){
 		//wrapping
 		if(transition_dir == UP){
+			self->cursor--;
 			if(self->cursor == -1){
-				self->cursor = 4;
-			}
-			else{
-				self->cursor--;
+				self->cursor = self->num_of_entries - 1;
 			}
 		}
 		else if(transition_dir == DOWN){
 			//wrapping
-			if(self->cursor == self->num_of_entries){
+			if(self->cursor == self->num_of_entries - 1){
 				self->cursor = 0;
 			}
 			else{

@@ -18,7 +18,7 @@ int ymax = 255;
 void joy_init(){
 	clear_bit(DDRB,PB2);	//Set joystick button pin to input
 	set_bit(PORTB,PB2);		//Set the internal pull-up resistor needed for the button
-	//joy_calibrate();
+	joy_calibrate();
 }
 
 void joy_calibrate(){
@@ -78,7 +78,6 @@ Position joy_get_position(){
 		pos.y = y;
 		pos.z = z;
 		pos.r_slider = adc_read('r');
-		//printf("%d\r\n",pos.r_slider);
 		
 		if (x < 4 && x > -4)
 		{

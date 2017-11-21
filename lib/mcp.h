@@ -3,7 +3,6 @@
 
 #include "MCP2515.h"
 
-
 char mcp_read(char address);
 void mcp_write(char address, char data);
 void mcp_request_to_send(int TXB2, int TXB1, int TXB0);

@@ -3,9 +3,9 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "motor_driver.h"
+#include "motor.h"
 #include "../lib/joy.h"
-#include "pwm.h"
+#include "../lib/pwm.h"
 #include "PID.h"
 
 int motor_position = 0;
@@ -55,7 +55,7 @@ int motor_encoder_read(){
 	return encoder_val;
 }
 
-void motor_move_dc(int discrete_voltage){
+void motor_move(int discrete_voltage){
 	int voltage = 0;
 	
 	if (discrete_voltage > 255){
@@ -87,25 +87,15 @@ void motor_move_dc(int discrete_voltage){
 	//int voltage = (abs(pos.y) > 10) * abs(pos.y); //Set voltage to magnitude of pos.y, or 0
 }
 
-void motor_move_dc_with_pid(int position){
+void motor_move_with_pid(int position){
 	motor_position_past = motor_position;
 	motor_position = motor_encoder_read();
 	motor_speed = motor_position - motor_position_past; //normalize
 
 	int discrete_voltage = pid_Controller(position*20, motor_speed, &pid);
 
-	motor_move_dc(discrete_voltage);
+	motor_move(discrete_voltage);
 	//To do: Read timer register to normalize time
-}
-
-void motor_move_servo(float ms){
-	if(ms > 2.1){
-		ms = 2.1;
-	}
-	else if (ms < 0.9){
-		ms = 0.9;
-	}
-	pwm_set_duty_cycle(ms);
 }
 
 //= (uint8_t)pos.y; //& ~(1 << sizeof(pos.y)*8)); //Til minne om Hans sin absoluttverdiberegning

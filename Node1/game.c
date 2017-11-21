@@ -4,48 +4,48 @@
 #include "../lib/joy.h"
 #include "../lib/uart.h"
 #include "../lib/can.h"
-#include "../lib/interrupt_flags.h"
+#include "../lib/interrupts.h"
 #include "../lib/settings.h"
-
-int score = 0;
+#include "music.h"
+int deaths = 0;
 int initiated = 0;
-int game_time = 0;
+int game_time = -1;
 
 void game_init(){
-	/*
-	int calibrated = 0;
-	while (!calibrated){
-		Msg msg_received = can_receive();
-		if(msg_received.id == 3){
-			int calibrated = 1;
-		}
-		free(msg_received.data);	
-	}
-	*/
-	
-	int OCRA_num = (long)F_CPU/(256);						//Prescale with 256 to get seconds
-	OCR3AH = OCRA_num >> 8;
-	OCR3AL = OCRA_num;									//Sets the value for the compare match to 10240
-	TCCR3A = (1 << WGM31) | (1 << WGM30);				//Compare match mode
-	TCCR3B = (1 << WGM33) | (1 << WGM32) | (1 << CS32); //clock source to be used by the Timer/Counter clkI/O/8
-	ETIMSK = (1 << OCIE3A);								//Interrupt on compare match
+	oled_clear_screen();
 }
+int tones[] = { 1898, 1690, 1500, 1420, 1265, 1194, 1126, 1063, 1001, 947, 893, 843, 795, 749, 710, 668, 630, 594 };
 
 void game_run(){
+	
 	if (!initiated){
 		game_init();
+		//music_init(1);
+		//music_start_song();
 		initiated = 1;
 	}
-	   
-	if(game_second_passed == 1){
+	
+	
+	if(music_beat_flag == 1){
+		music_play_song(tones, 15);
+		music_beat_flag == 0;
+	}
+		//music_play_song(tones,15);
+	if(game_time_passed == 1){
 		game_time++;
 		char str[5];
+		char hs[4];
+
 		sprintf(str,"%5d",game_time);
-		//oled_clear_line(1);
-		oled_print_string(str,0,0,8,0);
-		oled_print_string("herms er best",0,1,8,0);
+		sprintf(hs,"%4d",1337);
+		oled_clear_line(0);
+		oled_print_string("HIGH SCORE:",0,0,5,0);
+		oled_print_string(hs,7*8,0,5,0);
+		oled_clear_line(1);
+		oled_print_string("SCORE:",0,1,5,0);
+		oled_print_string(str,4*8,1,5,0);
 		oled_refresh();
-		game_second_passed = 0;
+		game_time_passed = 0;
 		
 	}
 	//SEND POSITION
@@ -56,37 +56,17 @@ void game_run(){
 	msg.data = (char*) &position;
 	can_transmit(msg);
 	
-	printf("l = %d\r\n",msg.length);
-	//can_transmit(can_construct_msg(42, sizeof(position), (char*) &position));
-	
 	//GET SCORE
 	if (game_occluded){
-		score++;
 		char scr[5];
-		sprintf(scr,"%5d",score);
+		deaths++;
+		sprintf(scr,"%5d",deaths);
 		oled_print_string(scr,5,5,8,0);
 		oled_refresh();
 		game_occluded = 0;
+		//TODO: stop game
 	}
-	
-	/*
-	//GET SCORE
-	if (can_message_received){
-		Msg msg_received = can_receive();
-		if(msg_received.id == OCCLUDED){
-			score++;
-			char scr[5];
-			sprintf(scr,"%5d",score);
-			oled_print_string(scr,5,5,8,0);
-			oled_refresh();
-			printf("%d\r",score);
-		}
-		free(msg_received.data);
-	}
-	can_message_received = 0;
-	*/
+	//TODO: Create state-machine
+	//TODO: Calibrate hardware (?)
 }
 
-ISR(TIMER3_COMPA_vect){
-	game_second_passed = 1;
-}

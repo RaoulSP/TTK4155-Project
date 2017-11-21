@@ -1,7 +1,6 @@
-
 #include <avr/io.h>
 #include <util/delay.h>
-#include "../lib/interrupt_flags.h"
+#include "../lib/interrupts.h"
 
 void solenoid_init(){
 	DDRE |= (1 << PE4); 

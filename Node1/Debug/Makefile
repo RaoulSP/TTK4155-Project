@@ -41,12 +41,15 @@ C_SRCS +=  \
 ../../lib/can.c \
 ../../lib/joy.c \
 ../../lib/mcp.c \
+../../lib/pwm.c \
 ../../lib/spi.c \
 ../../lib/uart.c \
 ../game.c \
 ../menu.c \
+../music.c \
 ../node1.c \
 ../oled.c \
+../servo.c \
 ../sram.c \
 ../touch.c
 
@@ -62,12 +65,15 @@ adc.o \
 can.o \
 joy.o \
 mcp.o \
+pwm.o \
 spi.o \
 uart.o \
 game.o \
 menu.o \
+music.o \
 node1.o \
 oled.o \
+servo.o \
 sram.o \
 touch.o
 
@@ -76,12 +82,15 @@ adc.o \
 can.o \
 joy.o \
 mcp.o \
+pwm.o \
 spi.o \
 uart.o \
 game.o \
 menu.o \
+music.o \
 node1.o \
 oled.o \
+servo.o \
 sram.o \
 touch.o
 
@@ -90,12 +99,15 @@ adc.d \
 can.d \
 joy.d \
 mcp.d \
+pwm.d \
 spi.d \
 uart.d \
 game.d \
 menu.d \
+music.d \
 node1.d \
 oled.d \
+servo.d \
 sram.d \
 touch.d
 
@@ -104,12 +116,15 @@ adc.d \
 can.d \
 joy.d \
 mcp.d \
+pwm.d \
 spi.d \
 uart.d \
 game.d \
 menu.d \
+music.d \
 node1.d \
 oled.d \
+servo.d \
 sram.d \
 touch.d
 
@@ -127,6 +142,12 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
+
+
 
 
 

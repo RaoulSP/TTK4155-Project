@@ -42,6 +42,7 @@ C_SRCS +=  \
 ../joy.c \
 ../lib.c \
 ../mcp.c \
+../pwm.c \
 ../spi.c \
 ../uart.c
 
@@ -58,6 +59,7 @@ can.o \
 joy.o \
 lib.o \
 mcp.o \
+pwm.o \
 spi.o \
 uart.o
 
@@ -67,6 +69,7 @@ can.o \
 joy.o \
 lib.o \
 mcp.o \
+pwm.o \
 spi.o \
 uart.o
 
@@ -76,6 +79,7 @@ can.d \
 joy.d \
 lib.d \
 mcp.d \
+pwm.d \
 spi.d \
 uart.d
 
@@ -85,6 +89,7 @@ can.d \
 joy.d \
 lib.d \
 mcp.d \
+pwm.d \
 spi.d \
 uart.d
 
@@ -102,6 +107,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

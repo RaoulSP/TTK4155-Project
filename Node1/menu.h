@@ -17,7 +17,7 @@ typedef struct menu_t{
 	
 	//Functions
 	struct menu_t* (*draw)(struct menu_t* self);
-	void (*action)(struct menu_t* self);
+	struct menu_t* (*action)(struct menu_t* self);
 	
 }Menu;
 
@@ -28,15 +28,15 @@ void add_sub_menu(Menu* super, Menu* sub);
 
 //Drawing functions - to differentiate between different types of menus (change this to update menu?)
 Menu* draw_menu(Menu* self);
-void draw_list(Menu* self);
+Menu* draw_list(Menu* self);
 
 //Animations
 void menu_transition(Menu *self, Direction dir);
 
 //Actions
-void action_start_transition_right(Menu* self);
-void action_run_game(Menu* self);
-void action_toggle_name(Menu* self);
+Menu* action_start_transition_right(Menu* self);
+Menu* action_run_game(Menu* self);
+Menu* action_toggle_name(Menu* self);
 
 void menu_run_display();
 
