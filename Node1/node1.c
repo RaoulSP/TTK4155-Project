@@ -32,6 +32,8 @@ int main(void)
 	menu_init();
 	sei();
 	//sram_test();
+	
+	printf("%d\n", 255<<8 - 9%8);
 	while (1)
 	{
 		//joy_print();

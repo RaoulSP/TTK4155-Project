@@ -213,9 +213,49 @@ void oled_draw_line(int x1, int y1, int x2, int y2){
 }
 
 void oled_invert_rectangle(int x1, int y1, int x2, int y2){
-	for (int x = x1; x < x2; x++){
-		for (int y = y1; y < y2; y++){
-			oled_invert_pixel(x, y);
+	//NEW
+	//Swap
+	if(y1 > y2){
+		int temp = y1;
+		y1 = y2;
+		y2 = temp;
+	}
+	
+	if(x1 > x2){
+		int temp = x1;
+		x1 = y2;
+		x2 = temp;
+	}
+	int t = 255 << y1%8;		//Top line to be filled
+	int b = 255 >> 8 - y2%8;	//Bottom line to be filled
+	if(y1/8 != y2/8){ //Over several lines
+		//Filling top
+		oled_goto_line(y1/8);
+		for(int x = x1; x < x2; x++){
+			oled_goto_column(x);
+			oled_write_data(t ^ oled_read_data());
+		}
+		//Filling lines inbetween
+		for (int l = y1/8 + 1; l < y2/8; l++){
+			oled_goto_line(l);
+			for (int x = x1; x < x2; x++){
+				oled_goto_line(x);
+				oled_write_data(255 ^ oled_read_data());
+			}
+		}
+		//Filling bottom
+		oled_goto_line(y2/8);
+		for(int x = x1; x < x2; x++){
+			oled_goto_column(x);
+			oled_write_data(b ^ oled_read_data());
+		}
+	}
+	else{
+		int m = t & b;
+		oled_goto_line(y1/8);
+		for(int x = x1; x < x2; x++){
+			oled_goto_column(x);
+			oled_write_data(m ^ oled_read_data());
 		}
 	}
 }

@@ -39,6 +39,7 @@ Menu options = {
 	.name = "options",
 	//.type = MENU,
 	.draw = draw_menu,
+	.num_of_entries = 0,
 	.action = action_start_transition_right
 };
 
@@ -84,23 +85,23 @@ Menu* current_menu = &main_menu;
 void menu_init(){
 	add_sub_menu(&main_menu, &play_game);
 	
-	char* control_entr[3] = {"Player1", "Player2", "Player3"};
-	add_list_entries(&control, control_entr, 3);
+	char* control_entr[3] = {"player1", "player2", "player3"};
+	//add_list_entries(&control, control_entr, 3);
 	add_sub_menu(&options, &control);
 	
-	char* contro_entr[4] = {"Low", "Medium", "High","Ultra"};
-	add_list_entries(&contro, contro_entr, 4);
+	//char* contro_entr[4] = {"low", "medium", "high","ultra"};
+	//add_list_entries(&contro, contro_entr, 4);
 	add_sub_menu(&options, &contro);
 	
 	add_sub_menu(&main_menu, &options);
 	add_sub_menu(&main_menu, &toggle);
 	
-	char* diff_entr[3] = {"Easy", "Medium", "Hard"};
-	add_list_entries(&difficulty, diff_entr, 3);
-	add_sub_menu(&main_menu, &difficulty);
+	char* diff_entr[3] = {"easy"};
+	//add_list_entries(&main_menu, diff_entr, 1);
+	//add_sub_menu(&main_menu, &difficulty);
 	
-	char* high_entr[4] = {"1. Herman","2. Raoul","3. Alle andre","-inf^inf. Hans"};
-	add_list_entries(&highscore, high_entr,4);
+	char* high_entr[4] = {"1. herman","2. raoul","3. alle andre","-inf^inf. hans"};
+	//add_list_entries(&highscore, high_entr,4);
 	add_sub_menu(&main_menu, &highscore);
 	
 }
@@ -109,22 +110,22 @@ void menu_init(){
 //Functions for adding entries and nodes
 void add_list_entries(Menu* menu, char* entries[], int num_of_new_entries){
 	
-	menu->entries = malloc(num_of_new_entries * sizeof(char*));	//Correct size of double pointer
+	//menu->entries = malloc(num_of_new_entries * sizeof(char*));	//Correct size of double pointer
 	
 	for(int i = 0; i < num_of_new_entries; i++){
-		menu->entries[i] = malloc(strlen(entries[i]) * sizeof(char)); //Allocate space for each string
-		menu->entries[i] =  entries[i];								  //Adds each string
+		//menu->entries[i] = malloc(strlen(entries[i]) * sizeof(char)); //Allocate space for each string
+		//menu->entries[i] =  entries[i];								  //Adds each string
 		
 		//---NEW---
-		//Menu* empty;
-		//empty = malloc(sizeof(Menu));
-		////empty->name = malloc(strlen(entries[i]) * sizeof(char));
-		//empty->name = entries[i];
-		//add_sub_menu(menu, empty);
+		Menu* empty;
+		empty = malloc(sizeof(*empty));
+		empty->name = entries[i];
+		empty->num_of_entries = 0;
+		add_sub_menu(menu, empty);
 		//menu->num_of_entries+=1;
 	}
-	menu->num_of_entries = num_of_new_entries;
-	menu->cursor = 0; //To make sure the cursor is not something else
+	//menu->num_of_entries = num_of_new_entries;
+	//menu->cursor = 0; //To make sure the cursor is not something else
 }
 
 void add_sub_menu(Menu* super, Menu* sub){
@@ -137,19 +138,27 @@ void add_sub_menu(Menu* super, Menu* sub){
 	super->sub_menus[super->num_of_entries - 1] = sub;
 	
 	//Name of entries in the super menu are updated
-	super->entries = realloc(super->entries, super->num_of_entries * sizeof(char*));
-	super->entries[super->num_of_entries - 1] = malloc(strlen(sub->name) * sizeof(char));
-	super->entries[super->num_of_entries - 1] = sub->name;
+	//super->entries = realloc(super->entries, super->num_of_entries * sizeof(char*));
+	//super->entries[super->num_of_entries - 1] = malloc(strlen(sub->name) * sizeof(char));
+	//super->entries[super->num_of_entries - 1] = sub->name;
 }
 
 //Drawing functions (change to update?)
-void draw_menu(Menu* self){
+Menu* draw_menu(Menu* self){
 	//Print the menu
 	for(int i = 0; i < self->num_of_entries; i++){
-		oled_print_string(self->entries[i],0,i,5,0);
-	}
-	oled_invert_rectangle(0,8*(self->cursor),64,8*((self->cursor) + 1));
+		//HER STOPPER DET!
+		oled_print_string(self->sub_menus[i]->name,0,i,5,0);
+		
+		if(self->name != "Main menu"){
+		//printf(self->sub_menus[i]->name);
+		//printf("\n");
+		}
 	
+	}
+	if(transition == 0){
+		oled_invert_rectangle(0,8*(self->cursor),64,8*((self->cursor) + 1));
+	}
 	//Where to go next
 	Direction dir = joy_get_direction();
 	Position pos = joy_get_position();
@@ -173,8 +182,19 @@ void draw_menu(Menu* self){
 			case RIGHT:
 				if (self->sub_menus[self->cursor]->num_of_entries != 0){
 					self = self->sub_menus[self->cursor];
+		
 					joy_held = 1;
 					transition = 1;
+								//printf("RIGHT");
+								//printf(self->name);
+								//printf("\n");
+								//printf("%d",self->num_of_entries);
+								//printf("\n");
+								//printf(self->sub_menus[0]->name);
+								//printf("\n");
+								//printf(self->sub_menus[1]->name);
+								//printf("\n");
+					return 0;
 				}
 				break;
 			case NEUTRAL:
@@ -193,11 +213,11 @@ void draw_menu(Menu* self){
 			transition = 0;
 		}
 	}
+	return self;
 }
 void draw_list(Menu* self){
-
 	for(int i = 0; i < self->num_of_entries; i++){
-		oled_print_string(self->entries[i],0,i,5,0);
+		oled_print_string(self->sub_menus[i]->name,0,i,5,0);
 	}
 	//Where to go next
 	Direction dir = joy_get_direction();
@@ -215,15 +235,14 @@ void action_start_transition_right(Menu* self){
 	transition = 1;
 }
 void action_toggle_name(Menu* self){	//TEST FOR CHECK BOXES IN OPTIONS
-	self->entries[self->cursor]= "Herman";
+	self->sub_menus[self->cursor]->name= "Herman";
 	
 }
 //void action_animation(){}
 
 void menu_run_display(){
 	oled_clear_screen();
-	current_menu->draw(current_menu);
-	printf(current_menu->name);
+	current_menu = current_menu->draw(current_menu);
 	oled_refresh();
 }
 void menu_transition(Menu *self, Direction dir){
@@ -250,6 +269,7 @@ void menu_transition(Menu *self, Direction dir){
 		transition_count = 0;
 		transition_dir = NEUTRAL;
 		transition = 0;
+		oled_invert_rectangle(0,8*(self->cursor),64,8*((self->cursor) + 1));//The final box
 	}
 	//Update the transition
 	else if(transition == 1 && (transition_dir == UP || transition_dir == DOWN)){
@@ -257,24 +277,12 @@ void menu_transition(Menu *self, Direction dir){
 		if(transition_dir == UP){
 			sign = -1;
 		}
-		
 		int x1 = 0;
 		int x2 = 64;
 		int y1 = 8*(self->cursor) + sign*transition_count;
 		int y2 = 8*(self->cursor + 1) + sign*transition_count;
-		int y11= y1 + sign*transition_step;
-		int y22= y2 + sign*transition_step;
 		
-		if (transition_dir == UP){
-			oled_invert_rectangle(x1,y11,x2,y22);
-			oled_invert_rectangle(x1,y1,x2,y2);
-			
-		}
-		else{
-			oled_invert_rectangle(x1,y1,x2,y2);
-			oled_invert_rectangle(x1,y11,x2,y22);
-			
-		}
+		oled_invert_rectangle(x1,y1,x2,y2);
 		transition_count++;
 	}
 }

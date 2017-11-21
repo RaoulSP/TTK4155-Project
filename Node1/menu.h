@@ -16,7 +16,7 @@ typedef struct menu_t{
 	struct menu_t** sub_menus;
 	
 	//Functions
-	void (*draw)(struct menu_t* self);
+	struct menu_t* (*draw)(struct menu_t* self);
 	void (*action)(struct menu_t* self);
 	
 }Menu;
@@ -27,7 +27,7 @@ void add_list_entries(Menu* menu, char*entries[], int num_of_new_entries);
 void add_sub_menu(Menu* super, Menu* sub);
 
 //Drawing functions - to differentiate between different types of menus (change this to update menu?)
-void draw_menu(Menu* self);
+Menu* draw_menu(Menu* self);
 void draw_list(Menu* self);
 
 //Animations

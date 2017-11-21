@@ -118,7 +118,7 @@ Discarded input sections
                 0x00000000       0x28 adc.o
  .debug_ranges  0x00000000       0x18 adc.o
  .debug_line    0x00000000       0xc5 adc.o
- .debug_str     0x00000000      0x16a adc.o
+ .debug_str     0x00000000      0x167 adc.o
  .comment       0x00000000       0x31 adc.o
  .debug_frame   0x00000000       0x34 adc.o
  .text          0x00000000        0x0 can.o
@@ -163,7 +163,7 @@ Discarded input sections
                 0x00000000       0x48 joy.o
  .debug_ranges  0x00000000       0x38 joy.o
  .debug_line    0x00000000      0x17b joy.o
- .debug_str     0x00000000      0x2bb joy.o
+ .debug_str     0x00000000      0x2b8 joy.o
  .comment       0x00000000       0x31 joy.o
  .debug_frame   0x00000000      0x138 joy.o
  COMMON         0x00000000        0x4 joy.o
@@ -194,7 +194,7 @@ Discarded input sections
                 0x00000000       0x50 mcp.o
  .debug_ranges  0x00000000       0x40 mcp.o
  .debug_line    0x00000000      0x12a mcp.o
- .debug_str     0x00000000      0x1f5 mcp.o
+ .debug_str     0x00000000      0x1f2 mcp.o
  .comment       0x00000000       0x31 mcp.o
  .debug_frame   0x00000000       0xa8 mcp.o
  .text          0x00000000        0x0 spi.o
@@ -211,7 +211,7 @@ Discarded input sections
                 0x00000000       0x28 spi.o
  .debug_ranges  0x00000000       0x18 spi.o
  .debug_line    0x00000000       0xc1 spi.o
- .debug_str     0x00000000      0x172 spi.o
+ .debug_str     0x00000000      0x16f spi.o
  .comment       0x00000000       0x31 spi.o
  .debug_frame   0x00000000       0x34 spi.o
  .text          0x00000000        0x0 uart.o
@@ -230,7 +230,7 @@ Discarded input sections
                 0x00000000       0x30 uart.o
  .debug_ranges  0x00000000       0x20 uart.o
  .debug_line    0x00000000       0xe4 uart.o
- .debug_str     0x00000000      0x1a2 uart.o
+ .debug_str     0x00000000      0x19f uart.o
  .comment       0x00000000       0x31 uart.o
  .debug_frame   0x00000000       0x44 uart.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr5\libm.a(atan2.o)
@@ -936,12 +936,12 @@ END GROUP
  .debug_frame   0x00000000       0xf8 can.o
  .debug_frame   0x000000f8       0x24 lib.o
 
-.debug_str      0x00000000      0x1e2
+.debug_str      0x00000000      0x1df
  *(.debug_str)
- .debug_str     0x00000000      0x1d2 can.o
-                                0x20b (size before relaxing)
- .debug_str     0x000001d2       0x10 lib.o
-                                 0xd9 (size before relaxing)
+ .debug_str     0x00000000      0x1cf can.o
+                                0x208 (size before relaxing)
+ .debug_str     0x000001cf       0x10 lib.o
+                                 0xd6 (size before relaxing)
 
 .debug_loc      0x00000000      0x51c
  *(.debug_loc)
