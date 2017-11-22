@@ -151,13 +151,18 @@ X	-can_receive in main, use game_occluded
 
 	-adc og ext_adc?
 
-	-adc switch on channel?
+X	-adc switch on channel?
 
 	-uint8_t or int8_t
 		-etc
 
 	-common for interrupts and other things?
 
+	-ctrl + F "int"
+	
+	-Mark things as const. Const parameters in functions?
+	
+	-Mark things as unsigned
 	*/
 	
 	

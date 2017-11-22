@@ -215,6 +215,9 @@
     <Compile Include="sram.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="strings.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="touch.c">
       <SubType>compile</SubType>
     </Compile>

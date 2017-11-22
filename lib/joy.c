@@ -63,13 +63,13 @@ Position joy_get_position(){
 		if (x > xmean){
 			x = ((x - xmean) * 100) / (xmax - xmean);
 		}
-		else{
+		else {
 			x = ((x - xmean) * 100) / (xmean - xmin);
 		}
 		if (y > ymean){
 			y = ((y - ymean) * 100) / (ymax - ymean);
 		}
-		else{
+		else {
 			y = ((y - ymean)  * 100) / (ymean - ymin);
 		}
 		
@@ -79,12 +79,10 @@ Position joy_get_position(){
 		pos.z = z;
 		pos.r_slider = adc_read('r');
 		
-		if (x < 4 && x > -4)
-		{
+		if (x < 4 && x > -4){
 			pos.x = 0;
 		}
-		if (y < 4 && y > -4)
-		{
+		if (y < 4 && y > -4){
 			pos.y = 0;
 		}
 		return pos;

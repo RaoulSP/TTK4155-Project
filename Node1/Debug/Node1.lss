@@ -1007,7 +1007,7 @@ Position joy_get_position(){
      b0e:	60 93 c4 02 	sts	0x02C4, r22
      b12:	17 c0       	rjmp	.+46     	; 0xb42 <joy_get_position+0xc8>
 		}
-		else{
+		else {
 			x = ((x - xmean) * 100) / (xmean - xmin);
      b14:	bc 01       	movw	r22, r24
      b16:	64 1b       	sub	r22, r20
@@ -1052,7 +1052,7 @@ Position joy_get_position(){
      b74:	60 93 c6 02 	sts	0x02C6, r22
      b78:	15 c0       	rjmp	.+42     	; 0xba4 <joy_get_position+0x12a>
 		}
-		else{
+		else {
 			y = ((y - ymean)  * 100) / (ymean - ymin);
      b7a:	24 1b       	sub	r18, r20
      b7c:	35 0b       	sbc	r19, r21
@@ -1085,7 +1085,7 @@ Position joy_get_position(){
      bb6:	0e 94 98 03 	call	0x730	; 0x730 <adc_read>
      bba:	90 e0       	ldi	r25, 0x00	; 0
 		
-		if (x < 4 && x > -4)
+		if (x < 4 && x > -4){
      bbc:	60 91 c4 02 	lds	r22, 0x02C4
      bc0:	70 91 c5 02 	lds	r23, 0x02C5
      bc4:	6d 5f       	subi	r22, 0xFD	; 253
@@ -1093,18 +1093,16 @@ Position joy_get_position(){
      bc8:	67 30       	cpi	r22, 0x07	; 7
      bca:	71 05       	cpc	r23, r1
      bcc:	10 f4       	brcc	.+4      	; 0xbd2 <joy_get_position+0x158>
-		{
 			pos.x = 0;
      bce:	e1 2c       	mov	r14, r1
      bd0:	c1 2c       	mov	r12, r1
 		}
-		if (y < 4 && y > -4)
+		if (y < 4 && y > -4){
      bd2:	e0 91 c6 02 	lds	r30, 0x02C6
      bd6:	f0 91 c7 02 	lds	r31, 0x02C7
      bda:	33 96       	adiw	r30, 0x03	; 3
      bdc:	37 97       	sbiw	r30, 0x07	; 7
      bde:	10 f4       	brcc	.+4      	; 0xbe4 <joy_get_position+0x16a>
-		{
 			pos.y = 0;
      be0:	f1 2c       	mov	r15, r1
      be2:	d1 2c       	mov	r13, r1
