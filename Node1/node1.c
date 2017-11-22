@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include "../lib/uart.h"
 #include "../lib/can.h"
 #include "../lib/adc.h"
@@ -10,7 +11,6 @@
 #include "touch.h"
 #include "game.h"
 
-
 //Global variables
 volatile int game_occluded = 0;
 volatile int game_time_passed = 1;
@@ -20,7 +20,6 @@ State state = in_menu;
 
 int main(void)
 {
-
 	MCUCR |= (1<<SRE);	//Enable external memory
 	SFIOR |= (1<<XMM2); 
 	
@@ -32,10 +31,27 @@ int main(void)
 	touch_init();
 	menu_init();
 	sei();
-	//sram_test();
+	
 	while (1)
 	{	
-		//joy_print();
+		switch (state){
+			case initialize:
+				break;
+			case in_menu:
+				if(oled_refresh_timer == 1){
+					menu_run_display();
+					oled_refresh_timer = 0;
+				}
+				break;
+			case in_game:		
+				if(game_interrupt_flag == 1){
+					game_run();
+				}
+				break;
+		}
+		
+		
+		
 		if (can_message_received){
 			Msg msg_received =  can_receive();
 			switch (msg_received.id){
@@ -49,20 +65,6 @@ int main(void)
 			free(msg_received.data);
 			can_message_received = 0;
 		}
-		
-		switch (state){
-			case in_menu:
-				if(oled_refresh_timer == 1){
-					menu_run_display();
-					oled_refresh_timer = 0;
-				}
-				break;
-			case in_game:		
-				if(game_interrupt_flag == 1){
-					game_run();
-				}
-				break;
-		}
 	}
 	
 }	
@@ -71,11 +73,11 @@ int main(void)
 	
 	/*--TODO--
 	-Add a brightness function
-	-Add a interrupt for 60 Hz updates CHECK
+X	-Add a interrupt for 60 Hz updates
 
-	-can_transmit(msg); CHECK
-		-can_msg_t msg = can_receive();
-		-position3.x = msg.data[0];
+X	-can_transmit(msg); CHECK
+X		-can_msg_t msg = can_receive();
+X		-position3.x = msg.data[0];
 
 	Tips from student assistant:
 	-sleep(); avr/sleep.h? Don't run main loop more often than necessary
@@ -84,12 +86,12 @@ int main(void)
 	-Use fprintf and set up multiple streams
 		-fprintf(&uart_print,"",string);
 	
-	-Add capacitor on Node2 extension - solenoid affects stuff
-	-IMPORTANT: SOLENOID TIMER DOES NOT WORK ATM
+X	-Add capacitor on Node2 extension - solenoid affects stuff
+X	-IMPORTANT: SOLENOID TIMER DOES NOT WORK ATM
 	
 	Suggestion for various testing functions:
 	
-	int module_test(){
+/	int module_test(){
 		printf("Testing module:");
 		int input = ;
 		int output = ;
@@ -106,26 +108,56 @@ int main(void)
 		}
 	}
 	
-	Desired result:
-	Testing MCP		... OK
-	Testing SPI		... OK
-	Testing RAM		... OK
-	Testing ADC		... OK
-	Testing Oled	... (Print "OK" on OLED)
-	Testing CAN_LOOPBACK ...OK
-	etc.
+		Desired result:
+		Testing MCP		... OK
+		Testing SPI		... OK
+		Testing RAM		... OK
+		Testing ADC		... OK
+		Testing Oled	... (Print "OK" on OLED)
+		Testing CAN_LOOPBACK ...OK
+		etc.
 	
 	
-	#include "common.h"?
+	-#include "common.h"?
 	
-	Boot nr.: in eeprom?
+	-Boot nr.: in eeprom?
 	
-	coordinate struct? containing x  and y (and z? ... mwahaha)
+	-coordinate struct? containing x  and y (and z? ... mwahaha)
 	
 	
-	can_receive in main, use game_occluded
-	implement bitfield for struct
-	ctrl + f for "delay" and replace most of them
+X	-can_receive in main, use game_occluded
+	-implement bitfield for struct
+	-ctrl + f for "delay" and replace most of them
+	
+	//Nov. 22nd
+	
+	-music --> buzzer?
+
+	-state initialize?
+
+	-can_receive and switch?
+	-can_init--> associate ID with storage address
+
+	-coord struct med x og y for pixler. bitfield?
+	-bitfield for alle flagg
+
+	-strings.h
+
+	-preprosessor else if node 2?
+
+	-node2_init?
+
+	-remove us delays`
+
+	-adc og ext_adc?
+
+	-adc switch on channel?
+
+	-uint8_t or int8_t
+		-etc
+
+	-common for interrupts and other things?
+
 	*/
 	
 	
@@ -154,6 +186,7 @@ int main(void)
 	
 	sizeof(int) = 2 bytes
 	*/
+	
 	/*
 	State state;
 	

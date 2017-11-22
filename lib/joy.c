@@ -1,7 +1,7 @@
 #include "joy.h"
 #include "adc.h"
-#include "settings.h"
 #include "math.h"
+#include "settings.h"
 
 int x;
 int y;

@@ -21,11 +21,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  000005fc  00000000  00000000  00005be4  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000007b9  00000000  00000000  000061e0  2**0
+  9 .debug_str    000007f0  00000000  00000000  000061e0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000138d  00000000  00000000  00006999  2**0
+ 10 .debug_loc    0000138d  00000000  00000000  000069d0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 000001c0  00000000  00000000  00007d26  2**0
+ 11 .debug_ranges 000001c0  00000000  00000000  00007d5d  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -318,9 +318,9 @@ Disassembly of section .text:
      1fc:	08 95       	ret
 
 000001fe <can_init>:
-#include "can.h"
 #include "settings.h"
 #include "interrupts.h"
+
 volatile int can_message_received = 0;
 
 void can_init(int mode){
@@ -639,12 +639,6 @@ ISR(INT0_vect){
      3da:	18 95       	reti
 
 000003dc <mcp_read>:
-	clear_bit(PORTB, MCP_PIN);
-	spi_master_transmit(MCP_READ_STATUS);
-	char status = spi_master_transmit(0x00);
-	set_bit(PORTB ,MCP_PIN);
-	return status;
-}
      3dc:	cf 93       	push	r28
      3de:	c8 2f       	mov	r28, r24
      3e0:	2f 98       	cbi	0x05, 7	; 5
@@ -693,65 +687,40 @@ ISR(INT0_vect){
      42e:	08 95       	ret
 
 00000430 <mcp_bit_modify>:
-
-void mcp_bit_modify(char address, char mask, char data){
      430:	1f 93       	push	r17
      432:	cf 93       	push	r28
      434:	df 93       	push	r29
      436:	18 2f       	mov	r17, r24
      438:	d6 2f       	mov	r29, r22
      43a:	c4 2f       	mov	r28, r20
-	clear_bit(PORTB, MCP_PIN);
      43c:	2f 98       	cbi	0x05, 7	; 5
-	spi_master_transmit(MCP_BITMOD);	
      43e:	85 e0       	ldi	r24, 0x05	; 5
      440:	72 d0       	rcall	.+228    	; 0x526 <spi_master_transmit>
-	spi_master_transmit(address);
      442:	81 2f       	mov	r24, r17
      444:	70 d0       	rcall	.+224    	; 0x526 <spi_master_transmit>
-	spi_master_transmit(mask);
      446:	8d 2f       	mov	r24, r29
      448:	6e d0       	rcall	.+220    	; 0x526 <spi_master_transmit>
-	spi_master_transmit(data);
      44a:	8c 2f       	mov	r24, r28
      44c:	6c d0       	rcall	.+216    	; 0x526 <spi_master_transmit>
-	set_bit(PORTB, MCP_PIN);
      44e:	2f 9a       	sbi	0x05, 7	; 5
-}
      450:	df 91       	pop	r29
      452:	cf 91       	pop	r28
      454:	1f 91       	pop	r17
      456:	08 95       	ret
 
 00000458 <mcp_reset>:
-		
-void mcp_reset(){
-	clear_bit(PORTB, MCP_PIN);
      458:	2f 98       	cbi	0x05, 7	; 5
-	spi_master_transmit(MCP_RESET);
      45a:	80 ec       	ldi	r24, 0xC0	; 192
      45c:	64 d0       	rcall	.+200    	; 0x526 <spi_master_transmit>
-	set_bit(PORTB, MCP_PIN);
      45e:	2f 9a       	sbi	0x05, 7	; 5
      460:	08 95       	ret
 
 00000462 <mcp_init>:
-}
-	
-void mcp_init(){
-	spi_master_init();
      462:	59 d0       	rcall	.+178    	; 0x516 <spi_master_init>
-	mcp_reset();
      464:	f9 cf       	rjmp	.-14     	; 0x458 <mcp_reset>
      466:	08 95       	ret
 
 00000468 <pwm_set_duty_cycle>:
-	pwm_top = ((uint32_t)F_CPU/(uint16_t)(f * prescaler) - 1);
-	ICR1 = pwm_top; //This defines the pwm period length
-	pwm_set_duty_cycle(1.5); //Center the servo
-}
-
-void pwm_set_duty_cycle(float ms){
      468:	8f 92       	push	r8
      46a:	9f 92       	push	r9
      46c:	af 92       	push	r10
@@ -762,11 +731,6 @@ void pwm_set_duty_cycle(float ms){
      476:	ff 92       	push	r15
      478:	6b 01       	movw	r12, r22
      47a:	7c 01       	movw	r14, r24
-	#ifdef NODE_1
-		float duty_cycle = 0.5;
-		OCR1B = (pwm_top*duty_cycle);
-	#else
-	if(ms <= 20 && ms >= 0){
      47c:	20 e0       	ldi	r18, 0x00	; 0
      47e:	30 e0       	ldi	r19, 0x00	; 0
      480:	40 ea       	ldi	r20, 0xA0	; 160
@@ -782,8 +746,6 @@ void pwm_set_duty_cycle(float ms){
      494:	6f d6       	rcall	.+3294   	; 0x1174 <__gesf2>
      496:	88 23       	and	r24, r24
      498:	d4 f0       	brlt	.+52     	; 0x4ce <pwm_set_duty_cycle+0x66>
-		float duty_cycle = ms/20.0;
-		OCR1A = (pwm_top*duty_cycle);
      49a:	60 91 26 02 	lds	r22, 0x0226
      49e:	70 91 27 02 	lds	r23, 0x0227
      4a2:	80 e0       	ldi	r24, 0x00	; 0
@@ -791,12 +753,6 @@ void pwm_set_duty_cycle(float ms){
      4a6:	b4 d5       	rcall	.+2920   	; 0x1010 <__floatunsisf>
      4a8:	4b 01       	movw	r8, r22
      4aa:	5c 01       	movw	r10, r24
-	#ifdef NODE_1
-		float duty_cycle = 0.5;
-		OCR1B = (pwm_top*duty_cycle);
-	#else
-	if(ms <= 20 && ms >= 0){
-		float duty_cycle = ms/20.0;
      4ac:	20 e0       	ldi	r18, 0x00	; 0
      4ae:	30 e0       	ldi	r19, 0x00	; 0
      4b0:	40 ea       	ldi	r20, 0xA0	; 160
@@ -806,16 +762,12 @@ void pwm_set_duty_cycle(float ms){
      4b8:	12 d5       	rcall	.+2596   	; 0xede <__divsf3>
      4ba:	9b 01       	movw	r18, r22
      4bc:	ac 01       	movw	r20, r24
-		OCR1A = (pwm_top*duty_cycle);
      4be:	c5 01       	movw	r24, r10
      4c0:	b4 01       	movw	r22, r8
      4c2:	5c d6       	rcall	.+3256   	; 0x117c <__mulsf3>
      4c4:	79 d5       	rcall	.+2802   	; 0xfb8 <__fixunssfsi>
      4c6:	70 93 89 00 	sts	0x0089, r23
      4ca:	60 93 88 00 	sts	0x0088, r22
-	}
-	#endif
-}
      4ce:	ff 90       	pop	r15
      4d0:	ef 90       	pop	r14
      4d2:	df 90       	pop	r13
@@ -827,39 +779,23 @@ void pwm_set_duty_cycle(float ms){
      4de:	08 95       	ret
 
 000004e0 <pwm_init>:
-	#ifdef NODE_1
-		DDRE |= (1 << PE2); 
-		TCCR1A |= (1 << WGM11) | (1 << COM1B1); //Sets mode to fast pwm and prescaler clock 8 //Initial values all 0
-		f = 500; 
-	#else
-		DDRB |= (1 << DDB5); //Set direction for PWM pin to output //PB5 = pin 11 on the Arduino shield
      4e0:	25 9a       	sbi	0x04, 5	; 4
-		TCCR1A |= (1 << WGM11) | (1 << COM1A1); //Sets mode to fast pwm and prescaler clock 8 //Initial values all 0
      4e2:	e0 e8       	ldi	r30, 0x80	; 128
      4e4:	f0 e0       	ldi	r31, 0x00	; 0
      4e6:	80 81       	ld	r24, Z
      4e8:	82 68       	ori	r24, 0x82	; 130
      4ea:	80 83       	st	Z, r24
-		f = 50; 
-	#endif
-	
-	TCCR1B |= (1 << WGM13) | (1 << WGM12) |  (1 << CS11);
      4ec:	e1 e8       	ldi	r30, 0x81	; 129
      4ee:	f0 e0       	ldi	r31, 0x00	; 0
      4f0:	80 81       	ld	r24, Z
      4f2:	8a 61       	ori	r24, 0x1A	; 26
      4f4:	80 83       	st	Z, r24
-	
-	uint16_t prescaler = 8;
-	pwm_top = ((uint32_t)F_CPU/(uint16_t)(f * prescaler) - 1);
      4f6:	8f e3       	ldi	r24, 0x3F	; 63
      4f8:	9c e9       	ldi	r25, 0x9C	; 156
      4fa:	90 93 27 02 	sts	0x0227, r25
      4fe:	80 93 26 02 	sts	0x0226, r24
-	ICR1 = pwm_top; //This defines the pwm period length
      502:	90 93 87 00 	sts	0x0087, r25
      506:	80 93 86 00 	sts	0x0086, r24
-	pwm_set_duty_cycle(1.5); //Center the servo
      50a:	60 e0       	ldi	r22, 0x00	; 0
      50c:	70 e0       	ldi	r23, 0x00	; 0
      50e:	80 ec       	ldi	r24, 0xC0	; 192
@@ -868,77 +804,42 @@ void pwm_set_duty_cycle(float ms){
      514:	08 95       	ret
 
 00000516 <spi_master_init>:
-		DDRB &= ~(1 << DDB6);
-		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPI2X); //Enable SPI, Master, set clock rate fck/16
-		set_bit(PORTB,PB4); //Disable chip
-	#else
-		//Without setting PB0 as an output printf doesn|t work!?!?!?!?
-		DDRB |= (1<<DDB0)|(1 << DDB1)|(1 << DDB2)|(1 << DDB7); //Set MOSI, SS and SCK output, all others input
      516:	84 b1       	in	r24, 0x04	; 4
      518:	87 68       	ori	r24, 0x87	; 135
      51a:	84 b9       	out	0x04, r24	; 4
-		DDRB &= ~(1 << DDB3); //DO NOT TINK IS NECCSCAS RYTSR:
      51c:	23 98       	cbi	0x04, 3	; 4
-		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0); //Enable SPI, Master, set clock rate fck/16
      51e:	81 e5       	ldi	r24, 0x51	; 81
      520:	8c bd       	out	0x2c, r24	; 44
-		set_bit(PORTB,PB7); //Disable chip
      522:	2f 9a       	sbi	0x05, 7	; 5
      524:	08 95       	ret
 
 00000526 <spi_master_transmit>:
-	#endif
-}
-
-char spi_master_transmit(char cData)
-{
-	SPDR = cData; //Start transmission
      526:	8e bd       	out	0x2e, r24	; 46
-	while(!(SPSR & (1<<SPIF))); //Wait for transmission complete	
      528:	0d b4       	in	r0, 0x2d	; 45
      52a:	07 fe       	sbrs	r0, 7
      52c:	fd cf       	rjmp	.-6      	; 0x528 <spi_master_transmit+0x2>
-	return SPDR;
      52e:	8e b5       	in	r24, 0x2e	; 46
      530:	08 95       	ret
 
 00000532 <uart_putchar>:
-	#endif
-	fdevopen(uart_putchar, uart_getchar);
-}
-
-void uart_putchar(char c){
-	while (!( UCSR0A & (1<<UDRE0))); //Wait for empty transmit buffer
      532:	e0 ec       	ldi	r30, 0xC0	; 192
      534:	f0 e0       	ldi	r31, 0x00	; 0
      536:	90 81       	ld	r25, Z
      538:	95 ff       	sbrs	r25, 5
      53a:	fd cf       	rjmp	.-6      	; 0x536 <uart_putchar+0x4>
-	UDR0 = c; //Put data into buffer, sends the data
      53c:	80 93 c6 00 	sts	0x00C6, r24
      540:	08 95       	ret
 
 00000542 <uart_getchar>:
-}
-
-unsigned char uart_getchar(){
-	while (!( UCSR0A & (1<<RXC0)));
      542:	e0 ec       	ldi	r30, 0xC0	; 192
      544:	f0 e0       	ldi	r31, 0x00	; 0
      546:	80 81       	ld	r24, Z
      548:	88 23       	and	r24, r24
      54a:	ec f7       	brge	.-6      	; 0x546 <uart_getchar+0x4>
-	return UDR0;
      54c:	80 91 c6 00 	lds	r24, 0x00C6
      550:	08 95       	ret
 
 00000552 <uart_init>:
-#include <stdio.h>
-#include "settings.h"
-#include "uart.h"
-
-void uart_init(int baudRate){
-	int UBRR = ((long)F_CPU/((long)16*baudRate) - 1);
      552:	aa 27       	eor	r26, r26
      554:	97 fd       	sbrc	r25, 7
      556:	a0 95       	com	r26
@@ -968,22 +869,12 @@ void uart_init(int baudRate){
      586:	7f d6       	rcall	.+3326   	; 0x1286 <__divmodsi4>
      588:	21 50       	subi	r18, 0x01	; 1
      58a:	31 09       	sbc	r19, r1
-	UBRR0L = UBRR;
      58c:	20 93 c4 00 	sts	0x00C4, r18
-    UBRR0H = (UBRR>>8);
      590:	30 93 c5 00 	sts	0x00C5, r19
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0); //Enable receiver and transmitter 
      594:	88 e1       	ldi	r24, 0x18	; 24
      596:	80 93 c1 00 	sts	0x00C1, r24
-	
-	#ifdef NODE_1
-		UCSR0C = ((1<<URSEL0)|(1<<USBS0)|(3<<UCSZ00));
-	#else
-		UCSR0C = ((1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bits, 8 data bits //Asynchronous - No parity (?) //URSEL makes sure we won't access UBRRH during operation, but UCSRC. //URSEL should not be set in node 2
      59a:	8e e0       	ldi	r24, 0x0E	; 14
      59c:	80 93 c2 00 	sts	0x00C2, r24
-	#endif
-	fdevopen(uart_putchar, uart_getchar);
      5a0:	61 ea       	ldi	r22, 0xA1	; 161
      5a2:	72 e0       	ldi	r23, 0x02	; 2
      5a4:	89 e9       	ldi	r24, 0x99	; 153
@@ -992,24 +883,13 @@ void uart_init(int baudRate){
      5aa:	08 95       	ret
 
 000005ac <check_if_scored>:
-		}
-	}
-}
-
-int check_if_scored()
-{
      5ac:	cf 93       	push	r28
      5ae:	df 93       	push	r29
      5b0:	00 d0       	rcall	.+0      	; 0x5b2 <check_if_scored+0x6>
      5b2:	00 d0       	rcall	.+0      	; 0x5b4 <check_if_scored+0x8>
      5b4:	cd b7       	in	r28, 0x3d	; 61
      5b6:	de b7       	in	r29, 0x3e	; 62
-	int lower_trigger_value = 300;
-	int upper_trigger_value = 600;
-	int adc_val = adc_read();
      5b8:	15 de       	rcall	.-982    	; 0x1e4 <adc_read>
-	
-	if (adc_val < lower_trigger_value && scoring_allowed){ //Can't score again until the adc value goes up
      5ba:	8c 32       	cpi	r24, 0x2C	; 44
      5bc:	21 e0       	ldi	r18, 0x01	; 1
      5be:	92 07       	cpc	r25, r18
@@ -1018,7 +898,6 @@ int check_if_scored()
      5c6:	30 91 07 02 	lds	r19, 0x0207
      5ca:	23 2b       	or	r18, r19
      5cc:	b9 f0       	breq	.+46     	; 0x5fc <check_if_scored+0x50>
-		can_transmit(can_construct_msg(OCCLUDED, 0, 0));
      5ce:	40 e0       	ldi	r20, 0x00	; 0
      5d0:	50 e0       	ldi	r21, 0x00	; 0
      5d2:	60 e0       	ldi	r22, 0x00	; 0
@@ -1035,31 +914,23 @@ int check_if_scored()
      5e8:	6f 2f       	mov	r22, r31
      5ea:	7e 2f       	mov	r23, r30
      5ec:	19 de       	rcall	.-974    	; 0x220 <can_transmit>
-		scoring_allowed = 0;
      5ee:	10 92 07 02 	sts	0x0207, r1
      5f2:	10 92 06 02 	sts	0x0206, r1
-		return 1;
      5f6:	81 e0       	ldi	r24, 0x01	; 1
      5f8:	90 e0       	ldi	r25, 0x00	; 0
      5fa:	0e c0       	rjmp	.+28     	; 0x618 <check_if_scored+0x6c>
-	}
-	else if (adc_val >= upper_trigger_value){
      5fc:	88 35       	cpi	r24, 0x58	; 88
      5fe:	92 40       	sbci	r25, 0x02	; 2
      600:	4c f0       	brlt	.+18     	; 0x614 <check_if_scored+0x68>
-		scoring_allowed = 1;
      602:	81 e0       	ldi	r24, 0x01	; 1
      604:	90 e0       	ldi	r25, 0x00	; 0
      606:	90 93 07 02 	sts	0x0207, r25
      60a:	80 93 06 02 	sts	0x0206, r24
-	}
-	return 0;
      60e:	80 e0       	ldi	r24, 0x00	; 0
      610:	90 e0       	ldi	r25, 0x00	; 0
      612:	02 c0       	rjmp	.+4      	; 0x618 <check_if_scored+0x6c>
      614:	80 e0       	ldi	r24, 0x00	; 0
      616:	90 e0       	ldi	r25, 0x00	; 0
-}
      618:	26 96       	adiw	r28, 0x06	; 6
      61a:	0f b6       	in	r0, 0x3f	; 63
      61c:	f8 94       	cli
@@ -1071,95 +942,47 @@ int check_if_scored()
      628:	08 95       	ret
 
 0000062a <main>:
-volatile int pid_timer = 0;
-volatile int solenoid_timer = 0;
-int scoring_allowed = 1;
-
-int main(void)
-{	
      62a:	cf 93       	push	r28
      62c:	df 93       	push	r29
      62e:	00 d0       	rcall	.+0      	; 0x630 <main+0x6>
      630:	00 d0       	rcall	.+0      	; 0x632 <main+0x8>
      632:	cd b7       	in	r28, 0x3d	; 61
      634:	de b7       	in	r29, 0x3e	; 62
-	uart_init(9600);
      636:	80 e8       	ldi	r24, 0x80	; 128
      638:	95 e2       	ldi	r25, 0x25	; 37
      63a:	8b df       	rcall	.-234    	; 0x552 <uart_init>
-	adc_init();
      63c:	c5 dd       	rcall	.-1142   	; 0x1c8 <adc_init>
-	can_init(MODE_NORMAL);
      63e:	80 e0       	ldi	r24, 0x00	; 0
      640:	90 e0       	ldi	r25, 0x00	; 0
      642:	dd dd       	rcall	.-1094   	; 0x1fe <can_init>
-	pwm_init();
      644:	4d df       	rcall	.-358    	; 0x4e0 <pwm_init>
-	TWI_Master_Initialise();
      646:	33 d3       	rcall	.+1638   	; 0xcae <TWI_Master_Initialise>
-	motor_init();
      648:	c7 d0       	rcall	.+398    	; 0x7d8 <motor_init>
-	solenoid_init();
      64a:	ee d2       	rcall	.+1500   	; 0xc28 <solenoid_init>
-	
-	sei();
      64c:	78 94       	sei
-	
-	Position position_received = {0,0,0};
      64e:	00 e0       	ldi	r16, 0x00	; 0
      650:	10 e0       	ldi	r17, 0x00	; 0
      652:	a1 2c       	mov	r10, r1
      654:	b1 2c       	mov	r11, r1
      656:	61 2c       	mov	r6, r1
      658:	71 2c       	mov	r7, r1
-	int z_released = 1;
      65a:	88 24       	eor	r8, r8
      65c:	83 94       	inc	r8
      65e:	91 2c       	mov	r9, r1
-		free(msg_received.data);
-		
-		//UPDATE MOTORS		
-		int r_slider_mean = position_received.r_slider/2;
-		int r_around_zero = position_received.r_slider - r_slider_mean;
-		float r = r_around_zero*100/128;
      660:	0f 2e       	mov	r0, r31
      662:	f4 e6       	ldi	r31, 0x64	; 100
      664:	3f 2e       	mov	r3, r31
      666:	f0 2d       	mov	r31, r0
-		servo_set_angle((((float)r) * 1.2 / 200.0) + 1.5);
-		
-		printf("r = %d\r\n", position_received.r_slider);
      668:	0f 2e       	mov	r0, r31
      66a:	fb e1       	ldi	r31, 0x1B	; 27
      66c:	cf 2e       	mov	r12, r31
      66e:	f2 e0       	ldi	r31, 0x02	; 2
      670:	df 2e       	mov	r13, r31
      672:	f0 2d       	mov	r31, r0
-		if (position_received.z == 1 && z_released == 1 && solenoid_timer == 0){
-			solenoid_kick();
-			z_released = 0;
-		}
-		if(position_received.z == 0){
-			z_released = 1;
      674:	21 2c       	mov	r2, r1
-		
-		printf("r = %d\r\n", position_received.r_slider);
-		
-		if (position_received.z == 1 && z_released == 1 && solenoid_timer == 0){
-			solenoid_kick();
-			z_released = 0;
      676:	41 2c       	mov	r4, r1
      678:	51 2c       	mov	r5, r1
-	int z_released = 1;
-	Msg msg_received;
-		
-	while(1)
-	{
-		check_if_scored();
      67a:	98 df       	rcall	.-208    	; 0x5ac <check_if_scored>
-		
-		//CAN RECEIVE
-		msg_received = can_receive();
      67c:	1d de       	rcall	.-966    	; 0x2b8 <can_receive>
      67e:	29 83       	std	Y+1, r18	; 0x01
      680:	3a 83       	std	Y+2, r19	; 0x02
@@ -1169,7 +992,6 @@ int main(void)
      688:	7e 83       	std	Y+6, r23	; 0x06
      68a:	ed 80       	ldd	r14, Y+5	; 0x05
      68c:	fe 80       	ldd	r15, Y+6	; 0x06
-		switch (msg_received.id){
      68e:	89 81       	ldd	r24, Y+1	; 0x01
      690:	9a 81       	ldd	r25, Y+2	; 0x02
      692:	8d 30       	cpi	r24, 0x0D	; 13
@@ -1180,8 +1002,6 @@ int main(void)
      69c:	f9 f0       	breq	.+62     	; 0x6dc <main+0xb2>
      69e:	01 97       	sbiw	r24, 0x01	; 1
      6a0:	59 f5       	brne	.+86     	; 0x6f8 <main+0xce>
-			case 1: //For short strings
-				printf("%s",msg_received.data);
      6a2:	ff 92       	push	r15
      6a4:	ef 92       	push	r14
      6a6:	a9 e0       	ldi	r26, 0x09	; 9
@@ -1189,14 +1009,11 @@ int main(void)
      6aa:	bf 93       	push	r27
      6ac:	af 93       	push	r26
      6ae:	7e d7       	rcall	.+3836   	; 0x15ac <printf>
-				break;
      6b0:	0f 90       	pop	r0
      6b2:	0f 90       	pop	r0
      6b4:	0f 90       	pop	r0
      6b6:	0f 90       	pop	r0
      6b8:	26 c0       	rjmp	.+76     	; 0x706 <main+0xdc>
-			case 13: //For sending integers
-				printf("%d", *(int*)msg_received.data);
      6ba:	d7 01       	movw	r26, r14
      6bc:	11 96       	adiw	r26, 0x01	; 1
      6be:	8c 91       	ld	r24, X
@@ -1209,14 +1026,11 @@ int main(void)
      6cc:	bf 93       	push	r27
      6ce:	af 93       	push	r26
      6d0:	6d d7       	rcall	.+3802   	; 0x15ac <printf>
-				break;
      6d2:	0f 90       	pop	r0
      6d4:	0f 90       	pop	r0
      6d6:	0f 90       	pop	r0
      6d8:	0f 90       	pop	r0
      6da:	15 c0       	rjmp	.+42     	; 0x706 <main+0xdc>
-			case 42: //For sending positions
-				position_received = *(Position*)msg_received.data;
      6dc:	d7 01       	movw	r26, r14
      6de:	12 96       	adiw	r26, 0x02	; 2
      6e0:	6d 90       	ld	r6, X+
@@ -1230,10 +1044,7 @@ int main(void)
      6f0:	0d 91       	ld	r16, X+
      6f2:	1c 91       	ld	r17, X
      6f4:	17 97       	sbiw	r26, 0x07	; 7
-				break;
      6f6:	07 c0       	rjmp	.+14     	; 0x706 <main+0xdc>
-			default:
-				printf("ID unknown\r");
      6f8:	af e0       	ldi	r26, 0x0F	; 15
      6fa:	b2 e0       	ldi	r27, 0x02	; 2
      6fc:	bf 93       	push	r27
@@ -1241,24 +1052,17 @@ int main(void)
      700:	55 d7       	rcall	.+3754   	; 0x15ac <printf>
      702:	0f 90       	pop	r0
      704:	0f 90       	pop	r0
-		}
-		free(msg_received.data);
      706:	c7 01       	movw	r24, r14
      708:	78 d6       	rcall	.+3312   	; 0x13fa <free>
-		
-		//UPDATE MOTORS		
-		int r_slider_mean = position_received.r_slider/2;
      70a:	c8 01       	movw	r24, r16
      70c:	11 23       	and	r17, r17
      70e:	0c f4       	brge	.+2      	; 0x712 <main+0xe8>
      710:	01 96       	adiw	r24, 0x01	; 1
      712:	95 95       	asr	r25
      714:	87 95       	ror	r24
-		int r_around_zero = position_received.r_slider - r_slider_mean;
      716:	98 01       	movw	r18, r16
      718:	28 1b       	sub	r18, r24
      71a:	39 0b       	sbc	r19, r25
-		float r = r_around_zero*100/128;
      71c:	32 9e       	mul	r3, r18
      71e:	c0 01       	movw	r24, r0
      720:	33 9e       	mul	r3, r19
@@ -1278,7 +1082,6 @@ int main(void)
      73c:	80 95       	com	r24
      73e:	98 2f       	mov	r25, r24
      740:	69 d4       	rcall	.+2258   	; 0x1014 <__floatsisf>
-		servo_set_angle((((float)r) * 1.2 / 200.0) + 1.5);
      742:	2a e9       	ldi	r18, 0x9A	; 154
      744:	39 e9       	ldi	r19, 0x99	; 153
      746:	49 e9       	ldi	r20, 0x99	; 153
@@ -1295,15 +1098,11 @@ int main(void)
      75c:	5f e3       	ldi	r21, 0x3F	; 63
      75e:	57 d3       	rcall	.+1710   	; 0xe0e <__addsf3>
      760:	30 d2       	rcall	.+1120   	; 0xbc2 <servo_set_angle>
-		
-		printf("r = %d\r\n", position_received.r_slider);
      762:	1f 93       	push	r17
      764:	0f 93       	push	r16
      766:	df 92       	push	r13
      768:	cf 92       	push	r12
      76a:	20 d7       	rcall	.+3648   	; 0x15ac <printf>
-		
-		if (position_received.z == 1 && z_released == 1 && solenoid_timer == 0){
      76c:	0f 90       	pop	r0
      76e:	0f 90       	pop	r0
      770:	0f 90       	pop	r0
@@ -1320,43 +1119,27 @@ int main(void)
      788:	90 91 29 02 	lds	r25, 0x0229
      78c:	89 2b       	or	r24, r25
      78e:	49 f4       	brne	.+18     	; 0x7a2 <main+0x178>
-			solenoid_kick();
      790:	63 d2       	rcall	.+1222   	; 0xc58 <solenoid_kick>
-			z_released = 0;
      792:	42 01       	movw	r8, r4
      794:	06 c0       	rjmp	.+12     	; 0x7a2 <main+0x178>
-		}
-		if(position_received.z == 0){
      796:	a1 14       	cp	r10, r1
      798:	b1 04       	cpc	r11, r1
      79a:	19 f4       	brne	.+6      	; 0x7a2 <main+0x178>
-			z_released = 1;
      79c:	88 24       	eor	r8, r8
      79e:	83 94       	inc	r8
      7a0:	92 2c       	mov	r9, r2
-		}
-		
-		if (pid_timer == 1) {
      7a2:	80 91 2a 02 	lds	r24, 0x022A
      7a6:	90 91 2b 02 	lds	r25, 0x022B
      7aa:	01 97       	sbiw	r24, 0x01	; 1
      7ac:	09 f0       	breq	.+2      	; 0x7b0 <main+0x186>
      7ae:	65 cf       	rjmp	.-310    	; 0x67a <main+0x50>
-			motor_move_with_pid(position_received.y);
      7b0:	c3 01       	movw	r24, r6
      7b2:	97 d0       	rcall	.+302    	; 0x8e2 <motor_move_with_pid>
-			pid_timer = 0;
      7b4:	50 92 2b 02 	sts	0x022B, r5
      7b8:	40 92 2a 02 	sts	0x022A, r4
      7bc:	5e cf       	rjmp	.-324    	; 0x67a <main+0x50>
 
 000007be <motor_encoder_reset>:
-	double K_i = 0.00;	//0
-	pid_Init(K_p, K_i, K_d, &pid);
-}
-
-void motor_encoder_reset() {
-	PORTH &= ~(1 << PH6);
      7be:	e2 e0       	ldi	r30, 0x02	; 2
      7c0:	f1 e0       	ldi	r31, 0x01	; 1
      7c2:	80 81       	ld	r24, Z
@@ -1372,66 +1155,42 @@ void motor_encoder_reset() {
      7ca:	8a 95       	dec	r24
      7cc:	f1 f7       	brne	.-4      	; 0x7ca <motor_encoder_reset+0xc>
      7ce:	00 c0       	rjmp	.+0      	; 0x7d0 <motor_encoder_reset+0x12>
-	_delay_us(20);
-	PORTH |= (1 << PH6);
      7d0:	80 81       	ld	r24, Z
      7d2:	80 64       	ori	r24, 0x40	; 64
      7d4:	80 83       	st	Z, r24
      7d6:	08 95       	ret
 
 000007d8 <motor_init>:
-
-//initialize PID
-pidData_t pid;
-
-
-void motor_init(){
      7d8:	cf 92       	push	r12
      7da:	df 92       	push	r13
      7dc:	ef 92       	push	r14
      7de:	ff 92       	push	r15
      7e0:	0f 93       	push	r16
      7e2:	1f 93       	push	r17
-	//MOTOR 
-	DDRH |= (1 << PH1); //Set motor direction pin as output
      7e4:	e1 e0       	ldi	r30, 0x01	; 1
      7e6:	f1 e0       	ldi	r31, 0x01	; 1
      7e8:	80 81       	ld	r24, Z
      7ea:	82 60       	ori	r24, 0x02	; 2
      7ec:	80 83       	st	Z, r24
-	DDRH |= (1 << DDH4); //Set motor enable pin as output
      7ee:	80 81       	ld	r24, Z
      7f0:	80 61       	ori	r24, 0x10	; 16
      7f2:	80 83       	st	Z, r24
-	PORTH |= (1 << PH4); //Set motor enable pin high
      7f4:	a2 e0       	ldi	r26, 0x02	; 2
      7f6:	b1 e0       	ldi	r27, 0x01	; 1
      7f8:	8c 91       	ld	r24, X
      7fa:	80 61       	ori	r24, 0x10	; 16
      7fc:	8c 93       	st	X, r24
-	
-	//ENCODER
-	DDRH |= (1 << PH5); //OE as output
      7fe:	80 81       	ld	r24, Z
      800:	80 62       	ori	r24, 0x20	; 32
      802:	80 83       	st	Z, r24
-	DDRH |= (1 << PH3); //SEL as output
      804:	80 81       	ld	r24, Z
      806:	88 60       	ori	r24, 0x08	; 8
      808:	80 83       	st	Z, r24
-	DDRH |= (1 << PH6); //RST as output
      80a:	80 81       	ld	r24, Z
      80c:	80 64       	ori	r24, 0x40	; 64
      80e:	80 83       	st	Z, r24
-	DDRK = 0b00000000; //Encoder vals as input 
      810:	10 92 07 01 	sts	0x0107, r1
-	motor_encoder_reset();
      814:	d4 df       	rcall	.-88     	; 0x7be <motor_encoder_reset>
-	
-	double K_p = 0.075;	//0.075
-	double K_d = 0;		//0
-	double K_i = 0.00;	//0
-	pid_Init(K_p, K_i, K_d, &pid);
      816:	0f 2e       	mov	r0, r31
      818:	f9 e3       	ldi	r31, 0x39	; 57
      81a:	cf 2e       	mov	r12, r31
@@ -1448,7 +1207,6 @@ void motor_init(){
      830:	89 e9       	ldi	r24, 0x99	; 153
      832:	9d e3       	ldi	r25, 0x3D	; 61
      834:	7f d0       	rcall	.+254    	; 0x934 <pid_Init>
-}
      836:	1f 91       	pop	r17
      838:	0f 91       	pop	r16
      83a:	ff 90       	pop	r15
@@ -1458,18 +1216,11 @@ void motor_init(){
      842:	08 95       	ret
 
 00000844 <motor_encoder_read>:
-	_delay_us(20);
-	PORTH |= (1 << PH6);
-}
-
-int motor_encoder_read(){
-	PORTH &= ~(1 << PH5);
      844:	e2 e0       	ldi	r30, 0x02	; 2
      846:	f1 e0       	ldi	r31, 0x01	; 1
      848:	80 81       	ld	r24, Z
      84a:	8f 7d       	andi	r24, 0xDF	; 223
      84c:	80 83       	st	Z, r24
-	PORTH &= ~(1 << PH3); //Set sel low to get MSB
      84e:	80 81       	ld	r24, Z
      850:	87 7f       	andi	r24, 0xF7	; 247
      852:	80 83       	st	Z, r24
@@ -1477,13 +1228,10 @@ int motor_encoder_read(){
      856:	2a 95       	dec	r18
      858:	f1 f7       	brne	.-4      	; 0x856 <motor_encoder_read+0x12>
      85a:	00 c0       	rjmp	.+0      	; 0x85c <motor_encoder_read+0x18>
-	_delay_us(20); //mby?
-	int encoder_val = (PINK << 8); //MSB
      85c:	80 91 06 01 	lds	r24, 0x0106
      860:	90 e0       	ldi	r25, 0x00	; 0
      862:	98 2f       	mov	r25, r24
      864:	88 27       	eor	r24, r24
-	PORTH |= (1 << PH3); //Set sel high to get LSB
      866:	20 81       	ld	r18, Z
      868:	28 60       	ori	r18, 0x08	; 8
      86a:	20 83       	st	Z, r18
@@ -1491,23 +1239,14 @@ int motor_encoder_read(){
      86e:	2a 95       	dec	r18
      870:	f1 f7       	brne	.-4      	; 0x86e <motor_encoder_read+0x2a>
      872:	00 c0       	rjmp	.+0      	; 0x874 <motor_encoder_read+0x30>
-	_delay_us(20); //mby?
-	encoder_val |= PINK;  
      874:	20 91 06 01 	lds	r18, 0x0106
-	//MBY TOGGLE RESET?
-	
-	PORTH |= (1 << PH5);
      878:	30 81       	ld	r19, Z
      87a:	30 62       	ori	r19, 0x20	; 32
      87c:	30 83       	st	Z, r19
-	return encoder_val;
-}
      87e:	82 2b       	or	r24, r18
      880:	08 95       	ret
 
 00000882 <motor_move>:
-
-void motor_move(int discrete_voltage){
      882:	cf 93       	push	r28
      884:	df 93       	push	r29
      886:	00 d0       	rcall	.+0      	; 0x888 <motor_move+0x6>
@@ -1525,57 +1264,31 @@ void motor_move(int discrete_voltage){
      89e:	14 f0       	brlt	.+4      	; 0x8a4 <motor_move+0x22>
      8a0:	8f ef       	ldi	r24, 0xFF	; 255
      8a2:	90 e0       	ldi	r25, 0x00	; 0
-	}
-	else if (discrete_voltage < -255){
-		discrete_voltage = -255;
-	}
-	
-	if (discrete_voltage >= 0){
      8a4:	99 23       	and	r25, r25
      8a6:	34 f0       	brlt	.+12     	; 0x8b4 <motor_move+0x32>
-		PORTH |= (1 << PH1); //Set direction
      8a8:	e2 e0       	ldi	r30, 0x02	; 2
      8aa:	f1 e0       	ldi	r31, 0x01	; 1
      8ac:	20 81       	ld	r18, Z
      8ae:	22 60       	ori	r18, 0x02	; 2
      8b0:	20 83       	st	Z, r18
      8b2:	08 c0       	rjmp	.+16     	; 0x8c4 <motor_move+0x42>
-		voltage = discrete_voltage;
-	}
-	else if (discrete_voltage < 0){
-		PORTH &= ~(1 << PH1); //Set other direction
      8b4:	e2 e0       	ldi	r30, 0x02	; 2
      8b6:	f1 e0       	ldi	r31, 0x01	; 1
      8b8:	20 81       	ld	r18, Z
      8ba:	2d 7f       	andi	r18, 0xFD	; 253
      8bc:	20 83       	st	Z, r18
-		voltage = -discrete_voltage;
      8be:	91 95       	neg	r25
      8c0:	81 95       	neg	r24
      8c2:	91 09       	sbc	r25, r1
-	}
-	
-	int dac_address = 0b0101000;
-	char length = 3;
-	char msg[3];
-	msg[0] = ((dac_address << 1) | 0); //0 = write, 1 = read
      8c4:	90 e5       	ldi	r25, 0x50	; 80
      8c6:	99 83       	std	Y+1, r25	; 0x01
-	msg[1] = 0b00000000; //Command byte: R2, R1, R0, Rst, PD, A2, A1, A0
      8c8:	1a 82       	std	Y+2, r1	; 0x02
-	msg[2] = voltage; //Value of 0-255, maps to 0V-5V
      8ca:	8b 83       	std	Y+3, r24	; 0x03
-	TWI_Start_Transceiver_With_Data(msg, length); //To do: Move some of this code to DAC module?
      8cc:	63 e0       	ldi	r22, 0x03	; 3
      8ce:	70 e0       	ldi	r23, 0x00	; 0
      8d0:	ce 01       	movw	r24, r28
      8d2:	01 96       	adiw	r24, 0x01	; 1
      8d4:	f6 d1       	rcall	.+1004   	; 0xcc2 <TWI_Start_Transceiver_With_Data>
-	
-	//Just for fun, no ifs:
-	//PORTH |= ((pos.y > 0) << PH1); //Set direction
-	//int voltage = (abs(pos.y) > 10) * abs(pos.y); //Set voltage to magnitude of pos.y, or 0
-}
      8d6:	0f 90       	pop	r0
      8d8:	0f 90       	pop	r0
      8da:	0f 90       	pop	r0
@@ -1584,30 +1297,23 @@ void motor_move(int discrete_voltage){
      8e0:	08 95       	ret
 
 000008e2 <motor_move_with_pid>:
-
-void motor_move_with_pid(int position){
      8e2:	cf 93       	push	r28
      8e4:	df 93       	push	r29
      8e6:	ec 01       	movw	r28, r24
-	motor_position_past = motor_position;
      8e8:	80 91 30 02 	lds	r24, 0x0230
      8ec:	90 91 31 02 	lds	r25, 0x0231
      8f0:	90 93 2f 02 	sts	0x022F, r25
      8f4:	80 93 2e 02 	sts	0x022E, r24
-	motor_position = motor_encoder_read();
      8f8:	a5 df       	rcall	.-182    	; 0x844 <motor_encoder_read>
      8fa:	bc 01       	movw	r22, r24
      8fc:	90 93 31 02 	sts	0x0231, r25
      900:	80 93 30 02 	sts	0x0230, r24
-	motor_speed = motor_position - motor_position_past; //normalize
      904:	80 91 2e 02 	lds	r24, 0x022E
      908:	90 91 2f 02 	lds	r25, 0x022F
      90c:	68 1b       	sub	r22, r24
      90e:	79 0b       	sbc	r23, r25
      910:	70 93 2d 02 	sts	0x022D, r23
      914:	60 93 2c 02 	sts	0x022C, r22
-
-	int discrete_voltage = pid_Controller(position*20, motor_speed, &pid);
      918:	49 e3       	ldi	r20, 0x39	; 57
      91a:	52 e0       	ldi	r21, 0x02	; 2
      91c:	84 e1       	ldi	r24, 0x14	; 20
@@ -1618,11 +1324,7 @@ void motor_move_with_pid(int position){
      926:	90 0d       	add	r25, r0
      928:	11 24       	eor	r1, r1
      92a:	63 d0       	rcall	.+198    	; 0x9f2 <pid_Controller>
-
-	motor_move(discrete_voltage);
      92c:	aa df       	rcall	.-172    	; 0x882 <motor_move>
-	//To do: Read timer register to normalize time
-}
      92e:	df 91       	pop	r29
      930:	cf 91       	pop	r28
      932:	08 95       	ret
@@ -1965,23 +1667,14 @@ ISR(TIMER3_COMPA_vect){ //PID timer - called with interval 0.01s
      bc0:	18 95       	reti
 
 00000bc2 <servo_set_angle>:
- */ 
-
-#include "../lib/pwm.h"
-#include "servo.h"
-
-void servo_set_angle(float angle){
      bc2:	cf 92       	push	r12
      bc4:	df 92       	push	r13
      bc6:	ef 92       	push	r14
      bc8:	ff 92       	push	r15
      bca:	cf 93       	push	r28
      bcc:	df 93       	push	r29
-	int ms = angle; 
      bce:	ef d1       	rcall	.+990    	; 0xfae <__fixsfsi>
      bd0:	eb 01       	movw	r28, r22
-	
-	if(ms > 2.1){
      bd2:	88 27       	eor	r24, r24
      bd4:	77 fd       	sbrc	r23, 7
      bd6:	80 95       	com	r24
@@ -1996,9 +1689,6 @@ void servo_set_angle(float angle){
      be8:	c5 d2       	rcall	.+1418   	; 0x1174 <__gesf2>
      bea:	18 16       	cp	r1, r24
      bec:	54 f0       	brlt	.+20     	; 0xc02 <servo_set_angle+0x40>
-		ms = 2.1;
-	}
-	else if (ms < 0.9){
      bee:	26 e6       	ldi	r18, 0x66	; 102
      bf0:	36 e6       	ldi	r19, 0x66	; 102
      bf2:	46 e6       	ldi	r20, 0x66	; 102
@@ -2009,23 +1699,11 @@ void servo_set_angle(float angle){
      bfc:	88 23       	and	r24, r24
      bfe:	24 f0       	brlt	.+8      	; 0xc08 <servo_set_angle+0x46>
      c00:	05 c0       	rjmp	.+10     	; 0xc0c <servo_set_angle+0x4a>
-
-void servo_set_angle(float angle){
-	int ms = angle; 
-	
-	if(ms > 2.1){
-		ms = 2.1;
      c02:	c2 e0       	ldi	r28, 0x02	; 2
      c04:	d0 e0       	ldi	r29, 0x00	; 0
      c06:	02 c0       	rjmp	.+4      	; 0xc0c <servo_set_angle+0x4a>
-	}
-	else if (ms < 0.9){
-		ms = 0.9;
      c08:	c0 e0       	ldi	r28, 0x00	; 0
      c0a:	d0 e0       	ldi	r29, 0x00	; 0
-	}
-	
-	pwm_set_duty_cycle(ms);
      c0c:	be 01       	movw	r22, r28
      c0e:	88 27       	eor	r24, r24
      c10:	77 fd       	sbrc	r23, 7
@@ -2033,10 +1711,6 @@ void servo_set_angle(float angle){
      c14:	98 2f       	mov	r25, r24
      c16:	fe d1       	rcall	.+1020   	; 0x1014 <__floatsisf>
      c18:	27 dc       	rcall	.-1970   	; 0x468 <pwm_set_duty_cycle>
-	
-	//TODO: map angle to ms
-
-}
      c1a:	df 91       	pop	r29
      c1c:	cf 91       	pop	r28
      c1e:	ff 90       	pop	r15
@@ -2147,12 +1821,6 @@ ISR(TIMER4_COMPA_vect){
      cac:	18 95       	reti
 
 00000cae <TWI_Master_Initialise>:
-    {
-      msg[ i ] = TWI_buf[ i ];
-    }
-  }
-  return( TWI_statusReg.lastTransOK );                                   
-}
      cae:	8c e0       	ldi	r24, 0x0C	; 12
      cb0:	80 93 b8 00 	sts	0x00B8, r24
      cb4:	8f ef       	ldi	r24, 0xFF	; 255
@@ -2193,12 +1861,6 @@ ISR(TIMER4_COMPA_vect){
      d04:	08 95       	ret
 
 00000d06 <__vector_39>:
-This function is the Interrupt Service Routine (ISR), and called when the TWI interrupt is triggered;
-that is whenever a TWI event has occurred. This function should not be called directly from the main
-application.
-****************************************************************************/
-ISR(TWI_vect)
-{
      d06:	1f 92       	push	r1
      d08:	0f 92       	push	r0
      d0a:	0f b6       	in	r0, 0x3f	; 63
@@ -2214,9 +1876,6 @@ ISR(TWI_vect)
      d1e:	bf 93       	push	r27
      d20:	ef 93       	push	r30
      d22:	ff 93       	push	r31
-  static unsigned char TWI_bufPtr;
-  
-  switch (TWSR)
      d24:	80 91 b9 00 	lds	r24, 0x00B9
      d28:	90 e0       	ldi	r25, 0x00	; 0
      d2a:	fc 01       	movw	r30, r24
@@ -2228,20 +1887,11 @@ ISR(TWI_vect)
      d36:	ee 58       	subi	r30, 0x8E	; 142
      d38:	ff 4f       	sbci	r31, 0xFF	; 255
      d3a:	c1 c2       	rjmp	.+1410   	; 0x12be <__tablejump2__>
-  {
-    case TWI_START:             // START has been transmitted  
-    case TWI_REP_START:         // Repeated START has been transmitted
-      TWI_bufPtr = 0;                                     // Set buffer pointer to the TWI Address location
      d3c:	10 92 32 02 	sts	0x0232, r1
-    case TWI_MTX_ADR_ACK:       // SLA+W has been tramsmitted and ACK received
-    case TWI_MTX_DATA_ACK:      // Data byte has been tramsmitted and ACK received
-      if (TWI_bufPtr < TWI_msgSize)
      d40:	e0 91 32 02 	lds	r30, 0x0232
      d44:	80 91 34 02 	lds	r24, 0x0234
      d48:	e8 17       	cp	r30, r24
      d4a:	70 f4       	brcc	.+28     	; 0xd68 <__vector_39+0x62>
-      {
-        TWDR = TWI_buf[TWI_bufPtr++];
      d4c:	81 e0       	ldi	r24, 0x01	; 1
      d4e:	8e 0f       	add	r24, r30
      d50:	80 93 32 02 	sts	0x0232, r24
@@ -2250,29 +1900,15 @@ ISR(TWI_vect)
      d58:	fd 4f       	sbci	r31, 0xFD	; 253
      d5a:	80 81       	ld	r24, Z
      d5c:	80 93 bb 00 	sts	0x00BB, r24
-        TWCR = (1<<TWEN)|                                 // TWI Interface enabled
      d60:	85 e8       	ldi	r24, 0x85	; 133
      d62:	80 93 bc 00 	sts	0x00BC, r24
      d66:	43 c0       	rjmp	.+134    	; 0xdee <__vector_39+0xe8>
-               (1<<TWIE)|(1<<TWINT)|                      // Enable TWI Interupt and clear the flag to send byte
-               (0<<TWEA)|(0<<TWSTA)|(0<<TWSTO)|           //
-               (0<<TWWC);                                 //  
-      }else                    // Send STOP after last byte
-      {
-        TWI_statusReg.lastTransOK = TRUE;                 // Set status bits to completed successfully. 
      d68:	80 91 33 02 	lds	r24, 0x0233
      d6c:	81 60       	ori	r24, 0x01	; 1
      d6e:	80 93 33 02 	sts	0x0233, r24
-        TWCR = (1<<TWEN)|                                 // TWI Interface enabled
      d72:	84 e9       	ldi	r24, 0x94	; 148
      d74:	80 93 bc 00 	sts	0x00BC, r24
      d78:	3a c0       	rjmp	.+116    	; 0xdee <__vector_39+0xe8>
-               (0<<TWEA)|(0<<TWSTA)|(1<<TWSTO)|           // Initiate a STOP condition.
-               (0<<TWWC);                                 //
-      }
-      break;
-    case TWI_MRX_DATA_ACK:      // Data byte has been received and ACK tramsmitted
-      TWI_buf[TWI_bufPtr++] = TWDR;
      d7a:	e0 91 32 02 	lds	r30, 0x0232
      d7e:	81 e0       	ldi	r24, 0x01	; 1
      d80:	8e 0f       	add	r24, r30
@@ -2282,8 +1918,6 @@ ISR(TWI_vect)
      d8c:	eb 5c       	subi	r30, 0xCB	; 203
      d8e:	fd 4f       	sbci	r31, 0xFD	; 253
      d90:	80 83       	st	Z, r24
-    case TWI_MRX_ADR_ACK:       // SLA+R has been tramsmitted and ACK received
-      if (TWI_bufPtr < (TWI_msgSize-1) )                  // Detect the last byte to NACK it.
      d92:	20 91 32 02 	lds	r18, 0x0232
      d96:	30 e0       	ldi	r19, 0x00	; 0
      d98:	80 91 34 02 	lds	r24, 0x0234
@@ -2292,70 +1926,31 @@ ISR(TWI_vect)
      da0:	28 17       	cp	r18, r24
      da2:	39 07       	cpc	r19, r25
      da4:	24 f4       	brge	.+8      	; 0xdae <__vector_39+0xa8>
-      {
-        TWCR = (1<<TWEN)|                                 // TWI Interface enabled
      da6:	85 ec       	ldi	r24, 0xC5	; 197
      da8:	80 93 bc 00 	sts	0x00BC, r24
      dac:	20 c0       	rjmp	.+64     	; 0xdee <__vector_39+0xe8>
-               (1<<TWIE)|(1<<TWINT)|                      // Enable TWI Interupt and clear the flag to read next byte
-               (1<<TWEA)|(0<<TWSTA)|(0<<TWSTO)|           // Send ACK after reception
-               (0<<TWWC);                                 //  
-      }else                    // Send NACK after next reception
-      {
-        TWCR = (1<<TWEN)|                                 // TWI Interface enabled
      dae:	85 e8       	ldi	r24, 0x85	; 133
      db0:	80 93 bc 00 	sts	0x00BC, r24
      db4:	1c c0       	rjmp	.+56     	; 0xdee <__vector_39+0xe8>
-               (0<<TWEA)|(0<<TWSTA)|(0<<TWSTO)|           // Send NACK after reception
-               (0<<TWWC);                                 // 
-      }    
-      break; 
-    case TWI_MRX_DATA_NACK:     // Data byte has been received and NACK tramsmitted
-      TWI_buf[TWI_bufPtr] = TWDR;
      db6:	80 91 bb 00 	lds	r24, 0x00BB
      dba:	e0 91 32 02 	lds	r30, 0x0232
      dbe:	f0 e0       	ldi	r31, 0x00	; 0
      dc0:	eb 5c       	subi	r30, 0xCB	; 203
      dc2:	fd 4f       	sbci	r31, 0xFD	; 253
      dc4:	80 83       	st	Z, r24
-      TWI_statusReg.lastTransOK = TRUE;                 // Set status bits to completed successfully. 
      dc6:	80 91 33 02 	lds	r24, 0x0233
      dca:	81 60       	ori	r24, 0x01	; 1
      dcc:	80 93 33 02 	sts	0x0233, r24
-      TWCR = (1<<TWEN)|                                 // TWI Interface enabled
      dd0:	84 e9       	ldi	r24, 0x94	; 148
      dd2:	80 93 bc 00 	sts	0x00BC, r24
-             (0<<TWIE)|(1<<TWINT)|                      // Disable TWI Interrupt and clear the flag
-             (0<<TWEA)|(0<<TWSTA)|(1<<TWSTO)|           // Initiate a STOP condition.
-             (0<<TWWC);                                 //
-      break;      
      dd6:	0b c0       	rjmp	.+22     	; 0xdee <__vector_39+0xe8>
-    case TWI_ARB_LOST:          // Arbitration lost
-      TWCR = (1<<TWEN)|                                 // TWI Interface enabled
      dd8:	85 ea       	ldi	r24, 0xA5	; 165
      dda:	80 93 bc 00 	sts	0x00BC, r24
-             (1<<TWIE)|(1<<TWINT)|                      // Enable TWI Interupt and clear the flag
-             (0<<TWEA)|(1<<TWSTA)|(0<<TWSTO)|           // Initiate a (RE)START condition.
-             (0<<TWWC);                                 //
-      break;
      dde:	07 c0       	rjmp	.+14     	; 0xdee <__vector_39+0xe8>
-    case TWI_MRX_ADR_NACK:      // SLA+R has been tramsmitted and NACK received    
-    case TWI_MTX_DATA_NACK:     // Data byte has been tramsmitted and NACK received
-//    case TWI_NO_STATE              // No relevant state information available; TWINT = “0”
-    case TWI_BUS_ERROR:         // Bus error due to an illegal START or STOP condition
-    default:     
-      TWI_state = TWSR;                                 // Store TWSR and automatically sets clears noErrors bit.
      de0:	80 91 b9 00 	lds	r24, 0x00B9
      de4:	80 93 08 02 	sts	0x0208, r24
-                                                        // Reset TWI Interface
-      TWCR = (1<<TWEN)|                                 // Enable TWI-interface and release TWI pins
      de8:	84 e0       	ldi	r24, 0x04	; 4
      dea:	80 93 bc 00 	sts	0x00BC, r24
-             (0<<TWIE)|(0<<TWINT)|                      // Disable Interupt
-             (0<<TWEA)|(0<<TWSTA)|(0<<TWSTO)|           // No Signal requests
-             (0<<TWWC);                                 //
-  }
-}
      dee:	ff 91       	pop	r31
      df0:	ef 91       	pop	r30
      df2:	bf 91       	pop	r27

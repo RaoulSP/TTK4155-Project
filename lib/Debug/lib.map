@@ -110,15 +110,15 @@ Discarded input sections
  .text.adc_init
                 0x00000000        0x4 adc.o
  .text.adc_read
-                0x00000000       0x38 adc.o
+                0x00000000       0x3e adc.o
  .debug_info    0x00000000       0xcf adc.o
  .debug_abbrev  0x00000000       0x99 adc.o
  .debug_loc     0x00000000       0x6c adc.o
  .debug_aranges
                 0x00000000       0x28 adc.o
  .debug_ranges  0x00000000       0x18 adc.o
- .debug_line    0x00000000       0xc5 adc.o
- .debug_str     0x00000000      0x167 adc.o
+ .debug_line    0x00000000       0xc3 adc.o
+ .debug_str     0x00000000      0x16a adc.o
  .comment       0x00000000       0x31 adc.o
  .debug_frame   0x00000000       0x34 adc.o
  .text          0x00000000        0x0 can.o
@@ -163,7 +163,7 @@ Discarded input sections
                 0x00000000       0x48 joy.o
  .debug_ranges  0x00000000       0x38 joy.o
  .debug_line    0x00000000      0x17c joy.o
- .debug_str     0x00000000      0x2b8 joy.o
+ .debug_str     0x00000000      0x2bb joy.o
  .comment       0x00000000       0x31 joy.o
  .debug_frame   0x00000000      0x138 joy.o
  COMMON         0x00000000        0x4 joy.o
@@ -957,11 +957,11 @@ END GROUP
  .debug_frame   0x00000000       0xf8 can.o
  .debug_frame   0x000000f8       0x24 lib.o
 
-.debug_str      0x00000000      0x1df
+.debug_str      0x00000000      0x214
  *(.debug_str)
- .debug_str     0x00000000      0x1cf can.o
-                                0x208 (size before relaxing)
- .debug_str     0x000001cf       0x10 lib.o
+ .debug_str     0x00000000      0x1d2 can.o
+                                0x20b (size before relaxing)
+ .debug_str     0x000001d2       0x42 lib.o
                                  0xd6 (size before relaxing)
 
 .debug_loc      0x00000000      0x51c

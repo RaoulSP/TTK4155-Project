@@ -1060,31 +1060,31 @@ END GROUP
  .debug_frame   0x000004e4       0x60 solenoid.o
  .debug_frame   0x00000544       0xb8 TWI_Master.o
 
-.debug_str      0x00000000      0x7b9
+.debug_str      0x00000000      0x7f0
  *(.debug_str)
- .debug_str     0x00000000      0x137 adc.o
-                                0x173 (size before relaxing)
- .debug_str     0x00000137       0xce can.o
-                                0x210 (size before relaxing)
- .debug_str     0x00000205       0x6a mcp.o
+ .debug_str     0x00000000      0x13a adc.o
+                                0x176 (size before relaxing)
+ .debug_str     0x0000013a       0xce can.o
+                                0x213 (size before relaxing)
+ .debug_str     0x00000208       0x9e mcp.o
                                 0x202 (size before relaxing)
- .debug_str     0x0000026f       0x5d pwm.o
+ .debug_str     0x000002a6       0x5d pwm.o
                                 0x1b6 (size before relaxing)
- .debug_str     0x000002cc       0x16 spi.o
+ .debug_str     0x00000303       0x16 spi.o
                                 0x17f (size before relaxing)
- .debug_str     0x000002e2       0x6a uart.o
+ .debug_str     0x00000319       0x6a uart.o
                                 0x1af (size before relaxing)
- .debug_str     0x0000034c      0x187 node2.o
+ .debug_str     0x00000383      0x187 node2.o
                                 0x341 (size before relaxing)
- .debug_str     0x000004d3      0x170 motor.o
+ .debug_str     0x0000050a      0x170 motor.o
                                 0x312 (size before relaxing)
- .debug_str     0x00000643       0x85 PID.o
-                                0x261 (size before relaxing)
- .debug_str     0x000006c8        0xd servo.o
+ .debug_str     0x0000067a       0x85 PID.o
+                                0x264 (size before relaxing)
+ .debug_str     0x000006ff        0xd servo.o
                                 0x10d (size before relaxing)
- .debug_str     0x000006d5       0x1c solenoid.o
-                                0x187 (size before relaxing)
- .debug_str     0x000006f1       0xc8 TWI_Master.o
+ .debug_str     0x0000070c       0x1c solenoid.o
+                                0x18a (size before relaxing)
+ .debug_str     0x00000728       0xc8 TWI_Master.o
                                 0x254 (size before relaxing)
 
 .debug_loc      0x00000000     0x138d

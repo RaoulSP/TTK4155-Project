@@ -1,8 +1,4 @@
 #include "adc.h"
-/*ISR(INT2_vect)
-{
-	adcConversionRunning = 0;
-}*/
 
 #ifdef NODE_1
 	void adc_init(){
@@ -10,21 +6,21 @@
 	}
 	uint8_t adc_read(char channel){
 		volatile char *ext_adc = (char *) 0x1400; 
-		if (channel == 'x'){
+		switch (channel){
+		case 'x':
 			*ext_adc = 0b0100;
-		}
-	
-		else if (channel == 'y'){
+			break;
+		case 'y':
 			*ext_adc = 0b0101;
-		}
-	
-		else if (channel == 'l'){
+			break;
+		case 'l':
 			*ext_adc = 0b0110;
-		}
-	
-		else if (channel == 'r'){
+			break;
+		case 'r':
 			*ext_adc = 0b0111;
+			break;
 		}
+		
 		while(test_bit(PINE, PE0)); //Wait for interrupt flag to signify completed conversion
 		return (uint8_t) *ext_adc;
 }

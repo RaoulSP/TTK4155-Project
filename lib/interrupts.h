@@ -1,10 +1,13 @@
 #ifndef INTERRUPT_H_
 #define INTERRUPT_H_
+
 #include <avr/interrupt.h>
+
 #include "settings.h"
 
 #ifdef NODE_1
 typedef enum state_t{
+	initialize,
 	in_menu,
 	in_game
 } State;

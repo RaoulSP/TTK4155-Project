@@ -5,6 +5,7 @@
 #include "can.h"
 #include "settings.h"
 #include "interrupts.h"
+
 volatile int can_message_received = 0;
 
 void can_init(int mode){
