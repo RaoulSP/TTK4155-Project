@@ -10,7 +10,8 @@ void uart_init(int baudRate){
 	
 	#ifdef NODE_1
 		UCSR0C = ((1<<URSEL0)|(1<<USBS0)|(3<<UCSZ00));
-	#else
+	#endif
+	#ifdef NODE_2
 		UCSR0C = ((1<<USBS0)|(3<<UCSZ00)); //Set frame format: 2 stop bits, 8 data bits //Asynchronous - No parity (?) //URSEL makes sure we won't access UBRRH during operation, but UCSRC. //URSEL should not be set in node 2
 	#endif
 	fdevopen(uart_putchar, uart_getchar);

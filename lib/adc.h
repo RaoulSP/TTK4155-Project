@@ -8,7 +8,8 @@
 #ifdef NODE_1
 	void adc_init();
 	uint8_t adc_read(char channel);
-#else
+#endif
+#ifdef NODE_2
 	void adc_init();
 	int16_t adc_read();
 #endif

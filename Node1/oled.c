@@ -254,10 +254,11 @@ void oled_invert_rectangle(int x1, int y1, int x2, int y2){
 ISR(TIMER2_COMP_vect)
 {
 	if(state == in_menu){
-		oled_refresh_timer = 1;	
+		flags.oled_refresh_timeout = 1;	
 	}
 	else if(state == in_game){
-		game_time_passed = 1;
+		flags.game_time_passed = 1;
+		flags.game_interrupt == 1;
 	}
 	
 }

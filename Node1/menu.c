@@ -16,64 +16,61 @@ Direction transition_dir = NEUTRAL;
 int transition_count = 0;
 int transition_step = 1;
 int joy_held = 0;
+
 //----------INITIALIZATION--------------
 //The name of the menus and their functions
 Menu main_menu = {
-	.name = "Main menu",
+	.name = "MAIN MENU",
 	.num_of_entries = 0,
 	.cursor = 0,
 	.super_menu = NULL,
 	.sub_menus = NULL,
-	//.type = MENU,
-	.draw = draw_menu
+	.draw = draw_menu,
+	.offset = 1
 };
 
 Menu difficulty = {
 	.name = "Difficulty",
-	//.type = MENU,
 	.draw = draw_menu,
-	.action = action_start_transition_right
+	.action = action_start_transition_right,
+	.offset = 1
 };
 
 Menu options = {
-	.name = "options",
-	//.type = MENU,
+	.name = "Options",
 	.draw = draw_menu,
 	.num_of_entries = 0,
-	.action = action_start_transition_right
+	.action = action_start_transition_right,
+	.offset = 1
 };
 
 Menu highscore = {
 	.name = "High score",
-	//.type = LIST,
 	.draw = draw_list,
 	.action = action_start_transition_right
 };
 
 Menu control = {
 	.name = "Control",
-	//.type = MENU,
 	.draw = draw_menu,
-	.action = action_start_transition_right
+	.action = action_start_transition_right,
+	.offset = 1
 };
 
 Menu contro = {
 	.name = "Graphics",
-	//.type = MENU,
 	.draw = draw_menu,
 	.action = action_start_transition_right
 };
 
 Menu toggle = {
 	.name = "Hans",
-	//.type = MENU,
 	.draw = draw_menu,
 	.action = action_toggle_name
 };
 
 Menu play_game= {
 	.name = "Play game",
-	//.type = MENU,
 	.draw = draw_menu,
 	.action = action_run_game
 };
@@ -133,11 +130,13 @@ void add_sub_menu(Menu* super, Menu* sub){
 //Drawing functions (change to update?)
 Menu* draw_menu(Menu* self){
 	//Print the menu
+	
+	oled_print_string(self->name,10,0,8,0);
 	for(int i = 0; i < self->num_of_entries; i++){
-		oled_print_string(self->sub_menus[i]->name,0,i,5,0);
+		oled_print_string(self->sub_menus[i]->name,0,i + self->offset,5,0);
 	}
 	if(transition == 0){
-		oled_invert_rectangle(0,8*(self->cursor),64,8*((self->cursor) + 1));
+		oled_invert_rectangle(0,8*(self->cursor + self->offset),64,8*((self->cursor + self->offset) + 1));
 	}
 	//Where to go next
 	Direction dir = joy_get_direction();
@@ -146,28 +145,33 @@ Menu* draw_menu(Menu* self){
 	if(transition == 0){
 		switch(dir){
 			case UP:
-				transition = 1;
-				transition_dir = UP;
-				break;
+			transition = 1;
+			transition_dir = UP;
+			break;
 			case DOWN:
-				transition = 1;
-				transition_dir = DOWN;
-				break;
+			transition = 1;
+			transition_dir = DOWN;
+			break;
 			case LEFT:
-				if (self->super_menu != NULL){
-					self = self->super_menu;
-					joy_held = 1;
-					transition = 1;
-				}
-				break;
+			if (self->super_menu != NULL){
+				self = self->super_menu;
+				joy_held = 1;
+				transition = 1;
+			}
+			break;
 			case RIGHT:
-				self = action_start_transition_right(self);
-				break;
+			self = action_start_transition_right(self);
+			break;
 			case NEUTRAL:
-				if(pos.z  == 1 && self->sub_menus[self->cursor]->action != NULL){
-					self = self->sub_menus[self->cursor]->action(self);
-				}
-				break;
+			if(pos.z  == 1 && self->sub_menus[self->cursor]->action != NULL && joy_held == 0){
+				self = self->sub_menus[self->cursor]->action(self);
+				joy_held = 1;
+				
+			}
+			else if(pos.z == 0){
+				joy_held = 0;
+			}
+			break;
 		}
 	}
 	else{
@@ -196,13 +200,14 @@ Menu* draw_list(Menu* self){
 Menu* action_run_game(Menu* self){
 	state = in_game;
 }
+
 Menu* action_start_transition_right(Menu* self){
-		if (self->sub_menus[self->cursor]->num_of_entries != 0){
-			self = self->sub_menus[self->cursor];
-			joy_held = 1;
-			transition = 1;
-		}
-		return self;
+	if (self->sub_menus[self->cursor]->num_of_entries != 0){
+		self = self->sub_menus[self->cursor];
+		joy_held = 1;
+		transition = 1;
+	}
+	return self;
 }
 Menu* action_toggle_name(Menu* self){	//TEST FOR CHECK BOXES IN OPTIONS
 	self->sub_menus[self->cursor]->name= "Herman";
@@ -215,7 +220,7 @@ void menu_run_display(){
 	current_menu = current_menu->draw(current_menu);
 	oled_refresh();
 }
-void menu_transition(Menu *self, Direction dir){
+void menu_transition(Menu *self, int dir){
 	//If done with transition
 	if (transition_count == 8){
 		//wrapping
@@ -237,7 +242,7 @@ void menu_transition(Menu *self, Direction dir){
 		transition_count = 0;
 		transition_dir = NEUTRAL;
 		transition = 0;
-		oled_invert_rectangle(0,8*(self->cursor),64,8*((self->cursor) + 1));//The final box
+		oled_invert_rectangle(self->offset,8*(self->cursor + self->offset),64,8*((self->cursor + self->offset) + 1));//The final box
 	}
 	//Update the transition
 	else if(transition == 1 && (transition_dir == UP || transition_dir == DOWN)){
@@ -247,10 +252,20 @@ void menu_transition(Menu *self, Direction dir){
 		}
 		int x1 = 0;
 		int x2 = 64;
-		int y1 = 8*(self->cursor) + sign*transition_count;
-		int y2 = 8*(self->cursor + 1) + sign*transition_count;
+		int y1 = 8*(self->cursor + self->offset) + sign*transition_count;
+		int y2 = 8*(self->cursor + 1 + self->offset) + sign*transition_count;
 		
-		oled_invert_rectangle(x1,y1,x2,y2);
+		if(y1 < 8*self->offset){
+			oled_invert_rectangle(x1, 8*self->offset,x2,y2);
+			oled_invert_rectangle(x1,(self->num_of_entries)*8+y1,x2,(self->num_of_entries + self->offset)*8);
+		}
+		else if(y2 > (self->num_of_entries + self->offset)*8){
+			oled_invert_rectangle(x1,y1,x2,(self->num_of_entries + self->offset)*8);
+			oled_invert_rectangle(x1,8*self->offset,x2,y2 - (self->num_of_entries)*8);
+		}
+		else{
+			oled_invert_rectangle(x1,y1,x2,y2);
+		}
 		transition_count++;
 	}
 }

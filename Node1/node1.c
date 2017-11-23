@@ -1,72 +1,86 @@
+#include "../lib/settings.h"
+#include <avr/io.h>
 #include <stdlib.h>
+#include <avr/sleep.h>
+#include <util/delay.h>
 
+#include "../lib/interrupts.h"
 #include "../lib/uart.h"
 #include "../lib/can.h"
 #include "../lib/adc.h"
 #include "../lib/joy.h"
-#include "../lib/interrupts.h"
 #include "oled.h"
 #include "sram.h"
 #include "menu.h"
 #include "touch.h"
 #include "game.h"
+#include "music.h"
 
 //Global variables
-volatile int game_occluded = 0;
-volatile int game_time_passed = 1;
-volatile int oled_refresh_timer = 0;
-volatile int game_interrupt_flag = 1;
+volatile Flags flags = {0,0,0,0,0,0};
 State state = in_menu;
 
 int main(void)
 {
 	MCUCR |= (1<<SRE);	//Enable external memory
 	SFIOR |= (1<<XMM2); 
-	
 	uart_init(9600);
+	printf("\r\nRESET\r\n");
 	can_init(MODE_NORMAL);
 	adc_init();
 	oled_init();
 	joy_init();
 	touch_init();
+	music_init();
 	menu_init();
 	sei();
 	
+	Position position_received = {0,0,0,0};
+	Msg msg_received;
+	
 	while (1)
 	{	
+		if(flags.music_beat == 1){
+			music_play_song();
+			flags.music_beat == 0;
+		}
+		
 		switch (state){
-			case initialize:
-				break;
 			case in_menu:
-				if(oled_refresh_timer == 1){
+				if(flags.oled_refresh_timeout == 1){
 					menu_run_display();
-					oled_refresh_timer = 0;
+					flags.oled_refresh_timeout = 0;
 				}
 				break;
 			case in_game:		
-				if(game_interrupt_flag == 1){
+				if(flags.game_interrupt == 1){
 					game_run();
+					flags.game_interrupt == 0; //set to 0 when we start using interrupts
 				}
 				break;
 		}
 		
-		
-		
-		if (can_message_received){
-			Msg msg_received =  can_receive();
+		if (can_message_received == 1){
+			msg_received = can_receive();
 			switch (msg_received.id){
 				case OCCLUDED:
-					game_occluded = 1;
+					flags.game_occluded = 1;
 					break;
-				
+				case POSITION:
+					position_received = *(Position*)msg_received.data;
+					printf("%4d\r", position_received.y);
+					break;
 				default:
 					printf("ID unknown\r");
 			}
 			free(msg_received.data);
 			can_message_received = 0;
 		}
+		
+	sleep_enable(); //reduces power draw by 5-6 mA?
+	sleep_cpu();
+	sleep_disable(); //SMCR &= ~(1<<SE);
 	}
-	
 }	
 
 	
@@ -80,7 +94,7 @@ X		-can_msg_t msg = can_receive();
 X		-position3.x = msg.data[0];
 
 	Tips from student assistant:
-	-sleep(); avr/sleep.h? Don't run main loop more often than necessary
+X	-sleep(); avr/sleep.h? Don't run main loop more often than necessary
 		-Read about various sleep states. Sleep state for ADC reading? Reduces noise
 	-EEPROM Usage?
 	-Use fprintf and set up multiple streams
@@ -89,9 +103,58 @@ X		-position3.x = msg.data[0];
 X	-Add capacitor on Node2 extension - solenoid affects stuff
 X	-IMPORTANT: SOLENOID TIMER DOES NOT WORK ATM
 	
+	-#include "common.h"?
+	
+	-Boot nr.: in eeprom?
+	
+	-coordinate struct? containing x  and y (and z? ...)
+	
+X	-can_receive in main, use flags.game_occluded
+	-implement bitfield for struct
+X	-ctrl + f for "delay" and replace most of them
+	
+	//Nov. 22nd
+	
+	-music --> buzzer?
+
+	-state initialize?
+
+	-can_receive and switch?
+	-can_init--> associate ID with storage address
+
+	-coord struct med x og y for pixler. bitfield?
+	-bitfield for alle flagg
+
+	-strings.h
+
+X	-preprosessor else if node 2?
+
+	-node2_init?
+
+X	-remove us delays`
+
+	-adc og ext_adc?
+
+X	-adc switch on channel?
+
+	-uint8_t or int8_t
+		-etc
+
+	-common for interrupts and other things?
+
+	-ctrl + F "int"
+	
+	-Mark things as const. Const parameters in functions?
+	
+	-Mark things as unsigned
+	
+X	-Run_game on timer instead of interrupts?
+	*/
+	
+	/*
 	Suggestion for various testing functions:
 	
-/	int module_test(){
+	/	int module_test(){
 		printf("Testing module:");
 		int input = ;
 		int output = ;
@@ -108,64 +171,15 @@ X	-IMPORTANT: SOLENOID TIMER DOES NOT WORK ATM
 		}
 	}
 	
-		Desired result:
-		Testing MCP		... OK
-		Testing SPI		... OK
-		Testing RAM		... OK
-		Testing ADC		... OK
-		Testing Oled	... (Print "OK" on OLED)
-		Testing CAN_LOOPBACK ...OK
-		etc.
-	
-	
-	-#include "common.h"?
-	
-	-Boot nr.: in eeprom?
-	
-	-coordinate struct? containing x  and y (and z? ... mwahaha)
-	
-	
-X	-can_receive in main, use game_occluded
-	-implement bitfield for struct
-	-ctrl + f for "delay" and replace most of them
-	
-	//Nov. 22nd
-	
-	-music --> buzzer?
-
-	-state initialize?
-
-	-can_receive and switch?
-	-can_init--> associate ID with storage address
-
-	-coord struct med x og y for pixler. bitfield?
-	-bitfield for alle flagg
-
-	-strings.h
-
-	-preprosessor else if node 2?
-
-	-node2_init?
-
-	-remove us delays`
-
-	-adc og ext_adc?
-
-X	-adc switch on channel?
-
-	-uint8_t or int8_t
-		-etc
-
-	-common for interrupts and other things?
-
-	-ctrl + F "int"
-	
-	-Mark things as const. Const parameters in functions?
-	
-	-Mark things as unsigned
+	Desired result:
+	Testing MCP		... OK
+	Testing SPI		... OK
+	Testing RAM		... OK
+	Testing ADC		... OK
+	Testing Oled	... (Print "OK" on OLED)
+	Testing CAN_LOOPBACK ...OK
+	etc.
 	*/
-	
-	
 	
 	
 	/*--NOTES--
@@ -198,13 +212,13 @@ X	-adc switch on channel?
 	while (1){
 		switch (state){
 			case in_menu:
-			if(oled_refresh_timer == 1){
+			if(flags.oled_refresh_timeout == 1){
 				menu_run_display();
-				oled_refresh_timer = 0;
+				flags.oled_refresh_timeout = 0;
 			}
 			break;
 			case in_game:
-			if(game_interrupt_flag == 1){
+			if(flags.game_interrupt == 1){
 				game_run();
 			}
 			break;

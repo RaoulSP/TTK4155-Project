@@ -9,7 +9,8 @@ void pwm_init(){
 		DDRE |= (1 << PE2); 
 		TCCR1A |= (1 << WGM11) | (1 << COM1B1); //Sets mode to fast pwm and prescaler clock 8 //Initial values all 0
 		f = 500; 
-	#else
+	#endif
+	#ifdef NODE_2
 		DDRB |= (1 << DDB5); //Set direction for PWM pin to output //PB5 = pin 11 on the Arduino shield
 		TCCR1A |= (1 << WGM11) | (1 << COM1A1); //Sets mode to fast pwm and prescaler clock 8 //Initial values all 0
 		f = 50; 
@@ -27,7 +28,8 @@ void pwm_set_duty_cycle(float ms){
 	#ifdef NODE_1
 		float duty_cycle = 0.5;
 		OCR1B = (pwm_top*duty_cycle);
-	#else
+	#endif
+	#ifdef NODE_2
 	if(ms <= 20 && ms >= 0){
 		float duty_cycle = ms/20.0;
 		OCR1A = (pwm_top*duty_cycle);

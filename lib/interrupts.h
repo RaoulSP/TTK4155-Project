@@ -7,24 +7,39 @@
 
 #ifdef NODE_1
 typedef enum state_t{
-	initialize,
 	in_menu,
 	in_game
 } State;
 
- extern volatile int game_occluded;
- extern volatile int game_time_passed;
- extern volatile int game_interrupt_flag;
- extern volatile int oled_refresh_timer;
- extern volatile int music_beat_flag;
- extern State state;
- 
-#else
+extern State state;
 
-extern volatile int solenoid_timer;
-extern volatile int pid_timer;
-
-#endif
 extern volatile int can_message_received;
 
+typedef struct flag_t{
+	int game_occluded : 1;
+	int game_time_passed : 1;
+	int game_interrupt : 1;
+	int oled_refresh_timeout : 1;
+	int music_beat : 1;
+	int can_message_received : 1;
+}Flags;
+#endif
+
+#ifdef NODE_2
+typedef struct flag_t{
+	int solenoid_timeout : 1;
+	int pid_timeout : 1;
+	int can_message_received : 1;
+}Flags;
+#endif
+
+extern volatile Flags flags;
+/*
+	 extern volatile int flags.flags.flags.game_occluded : 1;
+	 extern volatile int flags.flags.flags.game_time_passed : 1;
+	 extern volatile int game_interrupt_flag : 1;
+	 extern volatile int oled_refresh_timer : 1;
+	 extern volatile int flags.music_beat : 1;
+	 
+*/
 #endif /* INTERRUPT_H_ */

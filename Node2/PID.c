@@ -98,5 +98,5 @@ void pid_Reset_Integrator(pidData_t *pid_st)
 
 
 ISR(TIMER3_COMPA_vect){ //PID timer - called with interval 0.01s
-	pid_timer = 1;
+	flags.pid_timeout = 1;
 }

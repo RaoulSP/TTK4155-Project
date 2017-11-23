@@ -5,10 +5,11 @@
 typedef struct menu_t{
 	char* name;
 	int cursor;
+	int offset;
 
 	//Entries are almost the same as sub_menus, but an entry might just be a name.
-	//This means that it is necessary to check if there are sub menus if one wants to 
-	//do an action or a transition, not whether there are entries or not 
+	//This means that it is necessary to check if there are sub menus if one wants to
+	//do an action or a transition, not whether there are entries or not
 	char** entries;
 	int num_of_entries;
 	
@@ -21,6 +22,7 @@ typedef struct menu_t{
 	
 }Menu;
 
+
 //Setup functions
 void menu_init();
 void add_list_entries(Menu* menu, char*entries[], int num_of_new_entries);
@@ -31,7 +33,7 @@ Menu* draw_menu(Menu* self);
 Menu* draw_list(Menu* self);
 
 //Animations
-void menu_transition(Menu *self, Direction dir);
+void menu_transition(Menu *self, int dir);
 
 //Actions
 Menu* action_start_transition_right(Menu* self);

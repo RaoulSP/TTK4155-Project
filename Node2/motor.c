@@ -43,11 +43,11 @@ void motor_encoder_reset() {
 
 int motor_encoder_read(){
 	PORTH &= ~(1 << PH5);
-	PORTH &= ~(1 << PH3); //Set sel low to get MSB
-	_delay_us(20); //mby?
+	PORTH &= ~(1 << PH3); //Set sel pin low to get MSB
+	_delay_us(20);
 	int encoder_val = (PINK << 8); //MSB
-	PORTH |= (1 << PH3); //Set sel high to get LSB
-	_delay_us(20); //mby?
+	PORTH |= (1 << PH3); //Set sel pin high to get LSB
+	_delay_us(20);
 	encoder_val |= PINK;  
 	//MBY TOGGLE RESET?
 	
@@ -80,11 +80,7 @@ void motor_move(int discrete_voltage){
 	msg[0] = ((dac_address << 1) | 0); //0 = write, 1 = read
 	msg[1] = 0b00000000; //Command byte: R2, R1, R0, Rst, PD, A2, A1, A0
 	msg[2] = voltage; //Value of 0-255, maps to 0V-5V
-	TWI_Start_Transceiver_With_Data(msg, length); //To do: Move some of this code to DAC module?
-	
-	//Just for fun, no ifs:
-	//PORTH |= ((pos.y > 0) << PH1); //Set direction
-	//int voltage = (abs(pos.y) > 10) * abs(pos.y); //Set voltage to magnitude of pos.y, or 0
+	TWI_Start_Transceiver_With_Data(msg, length);
 }
 
 void motor_move_with_pid(int position){
@@ -97,5 +93,3 @@ void motor_move_with_pid(int position){
 	motor_move(discrete_voltage);
 	//To do: Read timer register to normalize time
 }
-
-//= (uint8_t)pos.y; //& ~(1 << sizeof(pos.y)*8)); //Til minne om Hans sin absoluttverdiberegning

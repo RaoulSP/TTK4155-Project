@@ -14,7 +14,8 @@
 #ifdef NODE_1 
 	#define F_CPU 4915200
 	#define MCP_PIN 4
-#else
+#endif
+#ifdef NODE_2
 	#define F_CPU 16000000
 	#define MCP_PIN 7
 #endif

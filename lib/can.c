@@ -14,14 +14,22 @@ void can_init(int mode){
 	mcp_bit_modify(0x2B,0b00000011, 0b00000011); //enable receive msg interrupt
 	mcp_bit_modify(MCP_RXB0CTRL, 0b01100000, 0b01100000); //Disable filters
 	mcp_bit_modify(MCP_CANCTRL, 0xFF, mode); //Sets operation mode 
+	mcp_bit_modify(0x0C, 0b00001111, 0b00001111); //Set receive buffer interrupts 0 and 1
+	
 	//TODO: Filter initialization
 	//NOTES: CANINTE.TXInE
 	//priority bits? TXP
 	
 	#ifdef NODE_1
 	//External interrupt
-	MCUCR |= (1 << ISC01);
-	GICR |= (1 << INT0);
+	MCUCR |= (1 << ISC01); //Enable interrupt on falling edge
+	GICR |= (1 << INT0);   //Enable external interrupt 0
+	#endif
+	#ifdef NODE_2
+	//printf("ISR init");
+	EICRB |= (1 << ISC51);
+	EIMSK |= (1 << INT5);
+	
 	#endif
 }
 
@@ -63,10 +71,20 @@ Msg can_construct_msg(int id, int length, char* data){
 	return msg;
 } 
 
+#ifdef NODE_1
 ISR(INT0_vect){
+	//printf("int?");
 	can_message_received = 1;
 	//printf("ISR: %d\r\n", can_message_received);
 }
+#endif
+#ifdef NODE_2
+ISR(INT5_vect){
+	//printf("ISR");
+	can_message_received = 1;
+	//printf("ISR: %d\r\n", can_message_received);
+}
+#endif
 
 
 //void can_test(){ 

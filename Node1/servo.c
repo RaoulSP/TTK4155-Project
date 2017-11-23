@@ -2,7 +2,7 @@
 #include "servo.h"
 
 void servo_set_angle(float angle){
-	int ms = angle; 
+	float ms = angle; 
 	
 	if(ms > 2.1){
 		ms = 2.1;

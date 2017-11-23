@@ -22,11 +22,11 @@ void solenoid_kick(){
 	
 	//Start timer
 	TCCR4B |= (1 <<  CS42);
-	solenoid_timer = 1;
+	flags.solenoid_timeout = 1;
 }
 
 ISR(TIMER4_COMPA_vect){
-	solenoid_timer = 0;
+	flags.solenoid_timeout = 0;
 	//Turn off solenoid
 	PORTE |= (1 << PE4);
 	//Stop timer

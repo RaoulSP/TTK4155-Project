@@ -18,7 +18,7 @@ int ymax = 255;
 void joy_init(){
 	clear_bit(DDRB,PB2);	//Set joystick button pin to input
 	set_bit(PORTB,PB2);		//Set the internal pull-up resistor needed for the button
-	joy_calibrate();
+	//joy_calibrate();
 }
 
 void joy_calibrate(){
@@ -74,7 +74,8 @@ Position joy_get_position(){
 		}
 		
 		Position pos;
-		pos.x = x;
+		//pos.x = x;
+		pos.x = 0;
 		pos.y = y;
 		pos.z = z;
 		pos.r_slider = adc_read('r');
@@ -121,5 +122,5 @@ Direction joy_get_direction(){
 void joy_print(){
 	Position pos = joy_get_position();
 	Position_polar pos_pol = joy_get_position_polar();
-	printf("x = %4d, y = %4d, X= %4d, Y = %4d, Z = %1d, amplitude = %4d, angle = %4d, direction = %2d\r", adc_read('x'), adc_read('y'), pos.x, pos.y, pos.z, pos_pol.amplitude, pos_pol.angle, joy_get_direction());
+	//printf("x = %4d, y = %4d, X= %4d, Y = %4d, Z = %1d, amplitude = %4d, angle = %4d, direction = %2d\r", adc_read('x'), adc_read('y'), pos.x, pos.y, pos.z, pos_pol.amplitude, pos_pol.angle, joy_get_direction());
 }
